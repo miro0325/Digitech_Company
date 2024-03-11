@@ -41,6 +41,8 @@ public class Purchase : Command
                 txt = txt.Replace($"<{match.Value}>", cmd);
             for(int i = 0; i < args.Length; i++)
             {
+                if (match.Value == null || string.IsNullOrEmpty(args[i])) continue;
+                
                 if(match.Value == $"args[{i}]")
                 {
                     txt = txt.Replace($"<{match.Value}>", int.Parse(args[i]).ToString());
