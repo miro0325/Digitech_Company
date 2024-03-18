@@ -10,7 +10,8 @@ Material:
   m_Name: Bus
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _USESPECULAR_ON
   m_LightmapFlags: 6
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -109,12 +110,14 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _UseBumpMap: 0
+    - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ShadowColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &5699423467797965650

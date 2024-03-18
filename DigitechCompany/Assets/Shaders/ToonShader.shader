@@ -4,7 +4,9 @@ Shader "Unlit/ToonShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         [HDR]_Color("Main Tex Color", Color) = (1,1,1,1)
+        [HDR]_EmissionColor("Emission Color",Color) = (1,1,1,1)
         [MaterialToggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
+        [MaterialToggle]_UseSpecular("Enable Specular", Range(0,1)) = 0 
         _BumpMap("NormalMap", 2D) = "bump" {}
         _EmissionMap("Emission Map",2D) = "white" {}
         _LUT_Tex("LUT", 2D) = "white" {}
@@ -29,8 +31,6 @@ Shader "Unlit/ToonShader"
             #pragma fragment frag noshadow
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             
             struct appdata
             {
@@ -72,7 +72,6 @@ Shader "Unlit/ToonShader"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             struct Attributes
             {
@@ -110,8 +109,11 @@ Shader "Unlit/ToonShader"
             SAMPLER(sampler_EmissionMap);
 
             float4 _Color;
+            float4 _EmissionColor;
+            float4 _ShadowColor;
 
             bool _UseBumpMap;
+            bool _UseSpecular;
             //Texture2D _MainTex;
             //SamplerState sampler_MainTex;
 
@@ -146,7 +148,7 @@ Shader "Unlit/ToonShader"
                 half4 EmissionMap = SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap));
 
                 float3 Normal;
-                if(_UseBumpMap == 1) 
+                if(_UseBumpMap) 
                 {
                     Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
                 }
@@ -162,7 +164,11 @@ Shader "Unlit/ToonShader"
                 
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
-                col *= Toon;
+                 col *= Toon;
+                //if(halfLambert < 0.5) 
+                //{
+                //    col *= _ShadowColor;
+                //}
                 //col.rgb *= _Color;
 
                 float3 BandedDiffuse = SAMPLE_TEXTURE2D(_LUT_Tex, sampler_LUT_Tex, float2(Toon,0.5f)).rgb;
@@ -170,16 +176,22 @@ Shader "Unlit/ToonShader"
                 float3 HalfVector = normalize(lightDir + IN.viewDir);
                 float HDotN = saturate(dot(HalfVector, Normal));
                 float PowedHDotN = pow(HDotN, 500.0f);
- 
+                
                 float SpecularSmooth = smoothstep(0.005, 0.01f, PowedHDotN);
                 SpecularColor = SpecularSmooth * 1.0f;
 
                 half4 finalColor;
-                finalColor.rgb = ((col * (_Color * EmissionMap.rgb)) + SpecularColor) * BandedDiffuse * light.color * light.distanceAttenuation;
+                if(_UseSpecular) 
+                {
+                    finalColor.rgb = ((col * (_Color + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * BandedDiffuse * light.color * light.distanceAttenuation;
+                }
+                else 
+                {
+                    finalColor.rgb = (col * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * light.color * light.distanceAttenuation;
+                }
                 finalColor.a = 1;
                 return finalColor;
             }
-
             ENDHLSL
         }
         

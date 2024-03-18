@@ -3,23 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
-
-
-public class BezierCurve
-{
-    public static Vector3 Lerp(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float value)
-    {
-        Vector3 a = Vector3.Lerp(p1, p2, value);
-        Vector3 b = Vector3.Lerp(p2, p3, value);
-        Vector3 c = Vector3.Lerp(p3, p4, value);
-
-        Vector3 d = Vector3.Lerp(a, b, value);
-        Vector3 e = Vector3.Lerp(b, c, value);
-
-        Vector3 f = Vector3.Lerp(d, e, value);
-        return f;
-    }
-}
+using System;
 
 [System.Serializable]
 public class MovePoint
@@ -29,7 +13,7 @@ public class MovePoint
     public Ease ease;
 }
 
-public class Delivary : MonoBehaviour
+public class Delivary : Singleton<Delivary>
 {
     [SerializeField] float delivaryDuration;
     private float curTime = 0;
@@ -55,16 +39,21 @@ public class Delivary : MonoBehaviour
 
     [Header("Delivary Setting"), Space(5)]
     [SerializeField] Transform containerPos;
-    [SerializeField] List<GameObject> delivaryItems = new();
+    [SerializeField] List<ItemBase> delivaryItems = new();
     [SerializeField] GameObject containerObj;
 
+    [SerializeField] float callDelay;
+
     private bool isArrive = false;
+    private bool isDelivering = false;
+    private bool isOrder = false;
 
     private Container container;
 
     private Vector3 originPos;
     private Vector3 originRot;
-   
+
+    private Queue<Action> delivaryOrders = new();
 
     private void Start()
     {
@@ -74,9 +63,11 @@ public class Delivary : MonoBehaviour
     private void Update()
     {
         UpdateDelivaryTimer();
-        if(Input.GetKeyDown(KeyCode.LeftAlt))
+        if (!isOrder && delivaryOrders.Count > 0)
         {
-            ArriveMovement();
+            isOrder = true;
+            var order = delivaryOrders.Dequeue();
+            order();
         }
     }
 
@@ -112,6 +103,7 @@ public class Delivary : MonoBehaviour
     private void ArriveMovement()
     {
         InitDelivary();
+        isDelivering = true;
         Sequence sequence = DOTween.Sequence();
         transform.position = spawnTrans.position;
         var rot = transform.eulerAngles;
@@ -153,7 +145,9 @@ public class Delivary : MonoBehaviour
                 curTime += Time.deltaTime;
                 yield return null;
             }
+            Invoke(nameof(ResetDelivary), 3f);
         }
+        
     }
          
     private void Transformation()
@@ -210,7 +204,8 @@ public class Delivary : MonoBehaviour
 
     private void SeperateContainer()
     {
-        container.Seperate();
+        container.Seperate(delivaryItems);
+        delivaryItems.Clear();
         container = null;
     }
 
@@ -222,4 +217,24 @@ public class Delivary : MonoBehaviour
             boostFX.Play();
     }
     
+    public void AddDelivaryItem(ItemBase item)
+    {
+        if (item == null) return;
+        delivaryItems.Add(item);
+        OrderDelivary();
+    }
+
+    private void OrderDelivary()
+    {
+        if(!isOrder || (!isDelivering && delivaryOrders.Count < 1))
+            delivaryOrders.Enqueue(() => Invoke(nameof(ArriveMovement), callDelay));
+    }
+
+    private void ResetDelivary()
+    {
+        isOrder = false;
+        isDelivering = false;
+    }
+
+   
 }

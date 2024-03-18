@@ -16,15 +16,15 @@ MonoBehaviour:
   aliases:
   - h
   isMultipleCommand: 0
-  explain: '>MOONYS
+  explain: '>MOONS
 
-    Call MoonY here
+    Call Moon List here
 
 
     >STORE
 
-    enter the shop and show
-    item list
+    enter the shop and
+    show item list
 
 
     >BESTIARY

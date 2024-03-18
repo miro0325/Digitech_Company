@@ -13,12 +13,22 @@ public class Purchase : Command
     {
         get
         {
-            return itemList;
+            //Debug.Log(itemList[0].Name);
+            var list = itemList;
+            if(itemDict.Count == 0)
+            {
+                foreach(var item in list)
+                {
+                    itemDict.Add(item.Name.ToLower(), item);
+                }
+            }
+            return list.Select(x => x.Name.ToLower()).ToArray();
         }
 
     }
 
-    [SerializeField] string[] itemList; 
+    [SerializeField] ItemBase[] itemList; 
+    private Dictionary<string, ItemBase> itemDict = new();
 
     public override string Activate(string cmd, string[] args)
     {
@@ -27,6 +37,12 @@ public class Purchase : Command
             args = new string[1];
             args[0] = "1";
         }
+        Debug.Log(int.Parse(args[0]));
+        for(int i = 0; i < args.Length; i++)
+        {
+
+        }
+        Delivary.Instance.AddDelivaryItem(GetItem(cmd));
         return GetExplainText(cmd,args);
     }
 
@@ -51,6 +67,15 @@ public class Purchase : Command
             }
         }
         return txt;
+    }
+
+    private ItemBase GetItem(string key)
+    {
+        if(itemDict.TryGetValue(key, out var item))
+        {
+            return item;
+        }
+        return null;
     }
 
 }

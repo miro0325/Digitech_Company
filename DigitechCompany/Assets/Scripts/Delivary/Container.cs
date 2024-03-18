@@ -6,6 +6,8 @@ public class Container : MonoBehaviour
 {
     [SerializeField] private Transform[] doors;
     [SerializeField] private float pushSpeed;
+
+    private List<ItemBase> items = new();
     
     void Start()
     {
@@ -17,12 +19,23 @@ public class Container : MonoBehaviour
         
     }
 
-    public void Seperate()
+    public void Seperate(List<ItemBase> itmeList)
     {
+        items = itmeList;
+        SpawnItems();
         transform.parent = null;
         var r = gameObject.AddComponent<Rigidbody>();
         r.mass = r.mass * 4;
         DoorControl();
+        
+    }
+
+    private void SpawnItems()
+    {
+        foreach(var item in items)
+        {   
+            Instantiate(item,transform.position,Quaternion.identity);
+        }
     }
 
     private void DoorControl()
