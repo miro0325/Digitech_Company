@@ -17,13 +17,7 @@ namespace Game.Lobby
             UIStack.Instance.Open<GameModeSelectUI>();
             
             single.onClick.AddListener(() => { });
-            online.onClick.AddListener(() => 
-            {
-                LobbyManager.Instance.ConnectToOnlineServer().onComplete = () =>
-                {
-                    // UIStack.Instance.Open<>
-                };
-            });
+            online.onClick.AddListener(() => LobbyManager.Instance.ConnectToOnlineServer().onComplete = () => UIStack.Instance.Open<RoomDisplayUI>());
         }
 
         public override void Display()

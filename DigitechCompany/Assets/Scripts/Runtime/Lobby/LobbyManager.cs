@@ -20,8 +20,10 @@ namespace Game.Lobby
 
         private ConnectingState connectingState;
         private ConnectionCompletionDelegateHolder connectionCompletionDelegateHolder;
+        private List<RoomInfo> rooms = new();
 
         public ConnectingState ConnectingState => connectingState;
+        public List<RoomInfo> Rooms => rooms;
 
         public ConnectionCompletionDelegateHolder ConnectToOnlineServer()
         {
@@ -41,6 +43,11 @@ namespace Game.Lobby
         {
             connectingState = ConnectingState.Done;
             connectionCompletionDelegateHolder.onComplete?.Invoke();
+        }
+
+        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        {
+            rooms = roomList;
         }
     }
 }
