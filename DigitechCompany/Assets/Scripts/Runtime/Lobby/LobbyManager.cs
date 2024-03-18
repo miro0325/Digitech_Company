@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
@@ -5,33 +6,41 @@ using UnityEngine;
 
 namespace Game.Lobby
 {
+    public enum ConnectingState { None, TryMaster, TryLobby, Done }
+
     public class LobbyManager : MonoBehaviourPunCallbacks
     {
+        public class ConnectionCompletionDelegateHolder
+        {
+            public Action onComplete;
+        }
+        
         private static LobbyManager instance;
         public static LobbyManager Instance => instance ??= FindObjectOfType<LobbyManager>();
 
-        private bool isConnectedMaster;
-        private bool isConnectedLobby;
-        private List<RoomInfo> rooms = new();
+        private ConnectingState connectingState;
+        private ConnectionCompletionDelegateHolder connectionCompletionDelegateHolder;
 
-        public bool IsConnectedMaster => isConnectedMaster;
-        public bool IsConnectedLobby => isConnectedLobby;
-        public List<RoomInfo> Rooms => rooms;
+        public ConnectingState ConnectingState => connectingState;
 
-        private void Awake()
+        public ConnectionCompletionDelegateHolder ConnectToOnlineServer()
         {
+            connectingState = ConnectingState.TryMaster;
             PhotonNetwork.ConnectUsingSettings();
+            connectionCompletionDelegateHolder = new();
+            return connectionCompletionDelegateHolder;
         }
 
         public override void OnConnectedToMaster()
         {
-            isConnectedMaster = true;
+            connectingState = ConnectingState.TryLobby;
             PhotonNetwork.JoinLobby();
         }
 
         public override void OnJoinedLobby()
         {
-            isConnectedLobby = true;
+            connectingState = ConnectingState.Done;
+            connectionCompletionDelegateHolder.onComplete?.Invoke();
         }
     }
 }
