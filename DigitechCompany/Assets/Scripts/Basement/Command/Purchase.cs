@@ -37,12 +37,20 @@ public class Purchase : Command
             args = new string[1];
             args[0] = "1";
         }
-        Debug.Log(int.Parse(args[0]));
-        for(int i = 0; i < args.Length; i++)
+        //Debug.Log(int.TryParse(args[0]));
+        int count = 0;
+        if(int.TryParse(args[0], out count))
         {
-
+            for (int i = 0; i < count; i++)
+            {
+                Delivary.Instance.AddDelivaryItem(GetItem(cmd));
+            }
+        } else
+        {
+            Delivary.Instance.AddDelivaryItem(GetItem(cmd));
+            args[0] = "1";
         }
-        Delivary.Instance.AddDelivaryItem(GetItem(cmd));
+        
         return GetExplainText(cmd,args);
     }
 

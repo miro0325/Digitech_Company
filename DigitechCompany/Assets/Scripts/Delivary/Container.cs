@@ -6,6 +6,7 @@ public class Container : MonoBehaviour
 {
     [SerializeField] private Transform[] doors;
     [SerializeField] private float pushSpeed;
+    [SerializeField] private Transform spawnRadius;
 
     private List<ItemBase> items = new();
     
@@ -33,7 +34,8 @@ public class Container : MonoBehaviour
     private void SpawnItems()
     {
         foreach(var item in items)
-        {   
+        {
+            var spawnPos = spawnRadius.position;
             Instantiate(item,transform.position,Quaternion.identity);
         }
     }

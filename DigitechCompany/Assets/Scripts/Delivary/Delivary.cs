@@ -219,7 +219,8 @@ public class Delivary : Singleton<Delivary>
     
     public void AddDelivaryItem(ItemBase item)
     {
-        if (item == null) return;
+        
+        if (item == null || isDelivering) return;
         delivaryItems.Add(item);
         OrderDelivary();
     }
@@ -234,6 +235,7 @@ public class Delivary : Singleton<Delivary>
     {
         isOrder = false;
         isDelivering = false;
+        
     }
 
    
