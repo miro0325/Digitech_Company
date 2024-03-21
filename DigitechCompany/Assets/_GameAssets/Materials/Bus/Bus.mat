@@ -10,7 +10,11 @@ Material:
   m_Name: Bus
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _GLOSSYREFLECTIONS_OFF
+  - _NORMALMAP
+  - _USEMAINLIGHT_ON
+  - _USESPECULAR_ON
   m_LightmapFlags: 6
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -25,7 +29,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: c9420386d1db9184eb1870e1f07ab741, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -85,7 +89,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Cel: 8
+    - _Cel: 4.29
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -97,7 +101,9 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _LightStrength: 1
     - _Metallic: 1
+    - _Mode: 0
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.03
     - _Parallax: 0.005
@@ -108,13 +114,20 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
+    - _UVSec: 0
     - _UseBumpMap: 0
+    - _UseMainLight: 1
+    - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LightColor: {r: 1, g: 1, b: 1, a: 1}
+    - _LightDir: {r: 0.01, g: 0, b: 0, a: 0}
+    - _LightPos: {r: -0.61, g: 0, b: 0.45, a: 0}
+    - _ShadowColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &5699423467797965650

@@ -2,14 +2,23 @@ Shader "Unlit/ToonShader"
 {
     Properties
     {
+        [Header(Textures),Space(3)]
         _MainTex ("Texture", 2D) = "white" {}
-        [HDR]_Color("Main Tex Color", Color) = (1,1,1,1)
-        [MaterialToggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
+        _Color("Main Tex Color", Color) = (1,1,1,1)
+        [HDR]_EmissionColor("Emission Color",Color) = (1,1,1,1)
+        [Toggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
+        [Toggle]_UseSpecular("Enable Specular", Range(0,1)) = 0 
+        [Toggle]_UseMainLight("Enable MainLight", float) = 0
         _BumpMap("NormalMap", 2D) = "bump" {}
         _EmissionMap("Emission Map",2D) = "white" {}
         _LUT_Tex("LUT", 2D) = "white" {}
         _Outline_Bold ("Outline Bold", float) = 0
         _Cel ("Cel", Range(1,10)) = 1
+
+        _LightPos ("Light Pos",Vector) = (0,0,0,0)
+        _LightDir ("Light Dir",Vector) = (0,0,0,0)
+        _LightColor ("Light Color",Color) = (1,1,1,1) 
+        _LightStrength ("Light Strength",float) = 1
     }
     SubShader
     {
@@ -29,8 +38,6 @@ Shader "Unlit/ToonShader"
             #pragma fragment frag noshadow
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             
             struct appdata
             {
@@ -72,7 +79,6 @@ Shader "Unlit/ToonShader"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             struct Attributes
             {
@@ -87,12 +93,13 @@ Shader "Unlit/ToonShader"
             struct Varyings
             {
                 float4 position : SV_POSITION;
+                float3 worldPos : NORMAL0;
                 float2 uv : TEXCOORD0;
                 float2 uv_LUT_Tex : TEXCOORD1;
                 float2 uv_BumpMap : TEXCOORD2;
                 float2 uv_Emission : TEXCOORD3;
                 float3 viewDir : TEXCOORD4;
-                float3 normal : NORMAL;
+                float3 normal : NORMAL1;
             };
 
 
@@ -110,8 +117,17 @@ Shader "Unlit/ToonShader"
             SAMPLER(sampler_EmissionMap);
 
             float4 _Color;
+            float4 _EmissionColor;
+            float4 _ShadowColor;
+
+            float3 _LightPos;
+            float3 _LightDir;
+            float4 _LightColor;
+            float _LightStrength;
 
             bool _UseBumpMap;
+            bool _UseSpecular;
+            bool _UseMainLight;
             //Texture2D _MainTex;
             //SamplerState sampler_MainTex;
 
@@ -124,11 +140,14 @@ Shader "Unlit/ToonShader"
                 float4 _EmissionMap_ST;
             CBUFFER_END
 
+
+
             Varyings vert (Attributes IN)
             {
                 Varyings OUT;
                 float3 temp = TransformObjectToWorld(IN.position.xyz);
-                OUT.position = TransformObjectToHClip(IN.position.xyz);;
+                OUT.position = TransformObjectToHClip(IN.position.xyz);
+                OUT.worldPos = temp;
                 OUT.uv = IN.uv_MainTex;
                 OUT.normal = TransformObjectToWorld(IN.normal);
                 OUT.uv_BumpMap = IN.uv_BumpMap;
@@ -146,41 +165,77 @@ Shader "Unlit/ToonShader"
                 half4 EmissionMap = SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap));
 
                 float3 Normal;
-                if(_UseBumpMap == 1) 
+
+                //half3 WorldPos = IN.worldPos;
+                //half3 WorldNormal = IN.normal;
+                //half3 Normals;
+                //half3 WorldView = _WorldSpaceCameraPos.xyz;
+                //half3 diffuseColor;
+                //AdditionalLights_half(WorldPos,WorldNormal,WorldView,diffuseColor, Normals);
+
+                if(_UseBumpMap) 
                 {
                     Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
                 }
                 else 
                 {
-                    Normal = normalize(IN.normal); 
+                    Normal = normalize(IN.normal ); 
+                }
+                float3 lightDir;
+                half3 lightColor;
+                float attenuation;
+
+                if(_UseMainLight) 
+                {
+                    Light light = GetMainLight();
+                    lightDir = normalize(light.direction);  
+                    lightColor = light.color;
+                    attenuation = light.distanceAttenuation;
+                } else 
+                {
+                    lightDir = normalize(_LightPos.xyz - IN.worldPos);
+                    lightDir *= _LightDir;
+                    lightColor = _LightColor;
+                    float3 vertexToLightSource = TransformObjectToWorld(_LightPos.xyz) - TransformObjectToWorld(IN.worldPos);
+                    float distance = length(vertexToLightSource);
+                    //attenuation = (100 / distance) * _LightStrength;
+                    attenuation =1;
                 }
 
-                Light light = GetMainLight();
-                float3 lightDir = normalize(light.direction);  
-
-                half Ndotl = saturate(dot(lightDir, Normal));
+                half Ndotl = saturate(dot(Normal, lightDir));
                 
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
                 col *= Toon;
-                //col.rgb *= _Color;
 
+                
                 float3 BandedDiffuse = SAMPLE_TEXTURE2D(_LUT_Tex, sampler_LUT_Tex, float2(Toon,0.5f)).rgb;
                 float3 SpecularColor;
                 float3 HalfVector = normalize(lightDir + IN.viewDir);
                 float HDotN = saturate(dot(HalfVector, Normal));
                 float PowedHDotN = pow(HDotN, 500.0f);
- 
+                
                 float SpecularSmooth = smoothstep(0.005, 0.01f, PowedHDotN);
                 SpecularColor = SpecularSmooth * 1.0f;
+                
 
                 half4 finalColor;
-                finalColor.rgb = ((col * (_Color * EmissionMap.rgb)) + SpecularColor) * BandedDiffuse * light.color * light.distanceAttenuation;
+                if(_UseSpecular) 
+                {
+                    finalColor.rgb = ((col * (_Color + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
+                }
+                else 
+                {
+                    finalColor.rgb = (col * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
+                }
+                
+                //finalColor.rgb = diffuseColor;
                 finalColor.a = 1;
+                
                 return finalColor;
             }
-
             ENDHLSL
+            
         }
         
     }
