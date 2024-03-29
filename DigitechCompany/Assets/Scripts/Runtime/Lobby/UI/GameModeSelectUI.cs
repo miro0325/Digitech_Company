@@ -6,26 +6,27 @@ using UnityEngine.UI;
 
 namespace Game.Lobby
 {
-    public class GameModeSelectUI : UIStackWindow
+    public class GameModeSelectUI : MonoBehaviour
     {
+        private LobbyManager lobbyManager => ServiceProvider.Get<LobbyManager>();
+
         [SerializeField] private Image bg;
         [SerializeField] private Button single;
         [SerializeField] private Button online;
 
         private void Start()
         {
-            UIStack.Instance.Open<GameModeSelectUI>();
-            
+            bg.gameObject.SetActive(true);
             single.onClick.AddListener(() => { });
-            online.onClick.AddListener(() => LobbyManager.Instance.ConnectToOnlineServer().onComplete = () => UIStack.Instance.Open<RoomDisplayUI>());
+            online.onClick.AddListener(() => lobbyManager.ConnectToOnlineServer());
         }
 
-        public override void Display()
+        public void Display()
         {
             bg.gameObject.SetActive(true);
         }
 
-        public override void Hide()
+        public void Hide()
         {
             bg.gameObject.SetActive(false);
         }

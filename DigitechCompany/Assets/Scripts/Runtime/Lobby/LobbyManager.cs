@@ -6,31 +6,25 @@ using UnityEngine;
 
 namespace Game.Lobby
 {
-    public enum ConnectingState { None, TryMaster, TryLobby, Done }
+    public enum ConnectingState { None, TryMaster, TryLobby, InLobby }
 
     public class LobbyManager : MonoBehaviourPunCallbacks
     {
-        public class ConnectionCompletionDelegateHolder
-        {
-            public Action onComplete;
-        }
-        
-        private static LobbyManager instance;
-        public static LobbyManager Instance => instance ??= FindObjectOfType<LobbyManager>();
-
         private ConnectingState connectingState;
-        private ConnectionCompletionDelegateHolder connectionCompletionDelegateHolder;
         private List<RoomInfo> rooms = new();
 
         public ConnectingState ConnectingState => connectingState;
         public List<RoomInfo> Rooms => rooms;
 
-        public ConnectionCompletionDelegateHolder ConnectToOnlineServer()
+        private void Awake()
+        {
+            ServiceProvider.Register(this);
+        }
+
+        public void ConnectToOnlineServer()
         {
             connectingState = ConnectingState.TryMaster;
             PhotonNetwork.ConnectUsingSettings();
-            connectionCompletionDelegateHolder = new();
-            return connectionCompletionDelegateHolder;
         }
 
         public override void OnConnectedToMaster()
@@ -41,8 +35,19 @@ namespace Game.Lobby
 
         public override void OnJoinedLobby()
         {
-            connectingState = ConnectingState.Done;
-            connectionCompletionDelegateHolder.onComplete?.Invoke();
+            connectingState = ConnectingState.InLobby;
+        }
+
+        public override void OnDisconnected(DisconnectCause cause)
+        {
+            base.OnDisconnected(cause);
+            connectingState = ConnectingState.None;
+        }
+
+        public override void OnJoinRoomFailed(short returnCode, string message)
+        {
+            base.OnJoinRoomFailed(returnCode, message);
+            connectingState = ConnectingState.InLobby;
         }
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)

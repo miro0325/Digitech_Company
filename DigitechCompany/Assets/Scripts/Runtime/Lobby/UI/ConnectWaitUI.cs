@@ -7,12 +7,14 @@ namespace Game.Lobby
 {
     public class ConnectWaitUI : MonoBehaviour
     {
+        private LobbyManager lobbyManager => ServiceProvider.Get<LobbyManager>();
+
         [SerializeField] private Image bg;
         [SerializeField] private TextMeshProUGUI text;
 
         private void Start()
         {
-            LobbyManager.Instance
+            lobbyManager
                 .ObserveEveryValueChanged(l => l.ConnectingState)
                 .Subscribe(x =>
                 {

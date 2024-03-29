@@ -6,29 +6,39 @@ using UnityEngine.UI;
 
 namespace Game.Lobby
 {
-    public class RoomDisplayUI : UIStackWindow
+    public class RoomUI : MonoBehaviour
     {
+        private LobbyManager lobbyManager => ServiceProvider.Get<LobbyManager>();
+
         [SerializeField] private Image bg;
         [SerializeField] private RoomInfoSlotUI slotPrefab;
         [SerializeField] private RectTransform slotParent;
         [SerializeField] private Button testButton;
+        [SerializeField] private RoomCreateUI roomCreateUI;
 
         private List<RoomInfoSlotUI> slots = new();
 
         private void Start()
         {
-            testButton.onClick.AddListener(() =>
-            {
-                PhotonNetwork.CreateRoom("Test");
-            });
+            testButton.onClick.AddListener(() => roomCreateUI.Display());
 
-            LobbyManager.Instance
+            lobbyManager
+                .ObserveEveryValueChanged(l => l.ConnectingState)
+                .Where(c => c == ConnectingState.InLobby)
+                .Subscribe(_ => bg.gameObject.SetActive(true));
+
+            lobbyManager
+                .ObserveEveryValueChanged(l => l.ConnectingState)
+                .Where(c => c == ConnectingState.None)
+                .Subscribe(_ => bg.gameObject.SetActive(false));
+
+            lobbyManager
                 .ObserveEveryValueChanged(l => l.Rooms.Count)
                 .Subscribe(x =>
                 {
                     while (slots.Count != x)
                     {
-                        if(slots.Count > x)
+                        if (slots.Count > x)
                         {
                             Destroy(slots[^1].gameObject);
                             slots.RemoveAt(slots.Count - 1);
@@ -39,17 +49,17 @@ namespace Game.Lobby
                         }
                     }
 
-                    for(int i = 0; i < x; i++)
-                        slots[i].Set(LobbyManager.Instance.Rooms[i]);
+                    for (int i = 0; i < x; i++)
+                        slots[i].Set(lobbyManager.Rooms[i]);
                 });
         }
 
-        public override void Display()
+        public void Display()
         {
             bg.gameObject.SetActive(true);
         }
 
-        public override void Hide()
+        public void Hide()
         {
             bg.gameObject.SetActive(false);
         }
