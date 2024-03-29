@@ -179,7 +179,7 @@ Shader "Unlit/ToonShader"
                 }
                 else 
                 {
-                    Normal = normalize(IN.normal ); 
+                    Normal = normalize(IN.normal); 
                 }
                 float3 lightDir;
                 half3 lightColor;

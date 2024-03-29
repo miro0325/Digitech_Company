@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using System.Linq;
 using System;
+using Photon.Pun;
 
 [System.Serializable]
 public class MovePoint
@@ -54,6 +55,7 @@ public class Delivary : Singleton<Delivary>
     private Vector3 originRot;
 
     private Queue<Action> delivaryOrders = new();
+    private Queue<List<ItemBase>> delivaryOrderedItems = new();
 
     private void Start()
     {
@@ -204,8 +206,8 @@ public class Delivary : Singleton<Delivary>
 
     private void SeperateContainer()
     {
-        container.Seperate(delivaryItems);
-        delivaryItems.Clear();
+        if (delivaryOrderedItems.Count == 0) Debug.LogError("Item Order Error");
+        container.Seperate(delivaryOrderedItems.Dequeue());
         container = null;
     }
 
@@ -217,18 +219,29 @@ public class Delivary : Singleton<Delivary>
             boostFX.Play();
     }
     
-    public void AddDelivaryItem(ItemBase item)
+    public void AddDelivaryItems(List<ItemBase> items)
     {
         
-        if (item == null || isDelivering) return;
-        delivaryItems.Add(item);
+        if (items.Count == 0 || items == null || isDelivering) return;
+        foreach(ItemBase item in items)
+        {
+            delivaryItems.Add(item);
+            Debug.Log(item.Name);
+        }
         OrderDelivary();
     }
 
     private void OrderDelivary()
     {
         if(!isOrder || (!isDelivering && delivaryOrders.Count < 1))
+        {
             delivaryOrders.Enqueue(() => Invoke(nameof(ArriveMovement), callDelay));
+            var list = delivaryItems.ToList();
+            delivaryOrderedItems.Enqueue(list);
+            Debug.Log(delivaryItems.Count);
+            delivaryItems.Clear();
+        }
+        
     }
 
     private void ResetDelivary()

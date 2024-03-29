@@ -23,6 +23,7 @@ public class Container : MonoBehaviour
     public void Seperate(List<ItemBase> itmeList)
     {
         items = itmeList;
+        Debug.Log(itmeList.Count);
         SpawnItems();
         transform.parent = null;
         var r = gameObject.AddComponent<Rigidbody>();
@@ -36,7 +37,11 @@ public class Container : MonoBehaviour
         foreach(var item in items)
         {
             var spawnPos = spawnRadius.position;
-            Instantiate(item,transform.position,Quaternion.identity);
+            Debug.Log(item);
+            var spawnItem = Instantiate(item,spawnPos,Quaternion.identity);
+            //if(spawnItem.TryGetComponent(out Collider col)) {
+            //    col.enabled = false;
+            //}
         }
     }
 

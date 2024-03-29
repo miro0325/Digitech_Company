@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[ExecuteAlways]
+//[ExecuteAlways]
 public class ToonHandler : MonoBehaviour
 {
     [SerializeField] Light customLight;
@@ -46,7 +46,6 @@ public class ToonHandler : MonoBehaviour
             mat.SetVector("_LightPos",customLight.transform.position);
             mat.SetColor("_LightColor", customLight.color);
             mat.SetFloat("_LightStrength",customLight.intensity);
-            Debug.Log(customLight.transform.forward);
             mat.SetVector("_LightDir", customLight.transform.forward);
        }
     }
@@ -54,7 +53,8 @@ public class ToonHandler : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(customLight.transform.position, customLight.transform.forward);
+        
+        Debug.DrawRay(customLight.transform.position, customLight.transform.forward);
     }
 
 }
