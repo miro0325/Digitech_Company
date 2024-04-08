@@ -28,8 +28,8 @@ namespace Game.InGame
             var mouseX = Input.GetAxis("Mouse X");
             transform.Rotate(0, mouseX * Time.deltaTime * dataContainer.settingData.mouseSensivity.x, 0);
             
-            var h = Input.GetAxisRaw("Horizontal");
-            var v = Input.GetAxisRaw("Vertical");
+            var h = Input.GetAxis("Horizontal");
+            var v = Input.GetAxis("Vertical");
             var dir = transform.TransformDirection(new Vector3(h, 0, v)) * moveSpeed;
             rigidbody.velocity = new Vector3(dir.x, rigidbody.velocity.y, dir.z);
         }
