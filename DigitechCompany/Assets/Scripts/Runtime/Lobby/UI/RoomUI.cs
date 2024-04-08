@@ -13,14 +13,14 @@ namespace Game.Lobby
         [SerializeField] private Image bg;
         [SerializeField] private RoomInfoSlotUI slotPrefab;
         [SerializeField] private RectTransform slotParent;
-        [SerializeField] private Button testButton;
+        [SerializeField] private Button roomCreateButton;
         [SerializeField] private RoomCreateUI roomCreateUI;
 
         private List<RoomInfoSlotUI> slots = new();
 
         private void Start()
         {
-            testButton.onClick.AddListener(() => roomCreateUI.Display());
+            roomCreateButton.onClick.AddListener(() => roomCreateUI.Display());
 
             lobbyManager
                 .ObserveEveryValueChanged(l => l.ConnectingState)

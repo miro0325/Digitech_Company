@@ -18,11 +18,27 @@ namespace Game.Lobby
                 .ObserveEveryValueChanged(l => l.ConnectingState)
                 .Subscribe(x =>
                 {
-                    bg.gameObject.SetActive(x == ConnectingState.TryMaster || x == ConnectingState.TryLobby);
-                    if(x == ConnectingState.TryMaster)
-                        text.text = $"connecting server...";
-                    if(x == ConnectingState.TryLobby)
-                        text.text = $"connecting lobby...";
+                    Debug.Log(x);
+                    switch (x)
+                    {
+                        case ConnectingState.None:
+                        case ConnectingState.InLobby:
+                        case ConnectingState.InRoom:
+                            bg.gameObject.SetActive(false);
+                            break;
+                        case ConnectingState.TryMaster:
+                            bg.gameObject.SetActive(true);
+                            text.text = $"connecting server...";
+                            break;
+                        case ConnectingState.TryRoom:
+                            bg.gameObject.SetActive(true);
+                            text.text = $"connecting room...";
+                            break;
+                        case ConnectingState.TryLobby:
+                            bg.gameObject.SetActive(true);
+                            text.text = $"connecting lobby...";
+                            break;
+                    }
                 });
         }
     }

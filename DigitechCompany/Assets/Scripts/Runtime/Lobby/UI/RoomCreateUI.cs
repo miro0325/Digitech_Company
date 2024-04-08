@@ -9,6 +9,8 @@ namespace Game.Lobby
 {
     public class RoomCreateUI : MonoBehaviour
     {
+        private LobbyManager lobbyManager => ServiceProvider.Get<LobbyManager>();
+
         [SerializeField] private Image bg;
         [SerializeField] private TMP_InputField roomName;
         [SerializeField] private TMP_InputField maxPlayer;
@@ -23,12 +25,16 @@ namespace Game.Lobby
                 var hash = new Hashtable { { "password", password.text } };
                 var roomOption = new RoomOptions() { MaxPlayers = int.Parse(maxPlayer.text), CustomRoomProperties = hash };
                 PhotonNetwork.CreateRoom(roomName.text, roomOptions: roomOption);
+                lobbyManager.ConnectToRoom();
+                Debug.Log("create");
             });
+
+            cancle.onClick.AddListener(() => bg.gameObject.SetActive(false));
         }
 
         public void Display()
         {
-            
+            bg.gameObject.SetActive(true);
         }
     }
 }

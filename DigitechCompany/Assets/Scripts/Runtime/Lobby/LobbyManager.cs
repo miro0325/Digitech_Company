@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Lobby
 {
-    public enum ConnectingState { None, TryMaster, TryLobby, InLobby }
+    public enum ConnectingState { None, TryMaster, TryLobby, InLobby, TryRoom, InRoom }
 
     public class LobbyManager : MonoBehaviourPunCallbacks
     {
@@ -25,6 +25,12 @@ namespace Game.Lobby
         {
             connectingState = ConnectingState.TryMaster;
             PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.AutomaticallySyncScene = true;
+        }
+
+        public void ConnectToRoom()
+        {
+            connectingState = ConnectingState.TryRoom;
         }
 
         public override void OnConnectedToMaster()
@@ -42,6 +48,12 @@ namespace Game.Lobby
         {
             base.OnDisconnected(cause);
             connectingState = ConnectingState.None;
+        }
+
+        public override void OnJoinedRoom()
+        {
+            connectingState = ConnectingState.InRoom;
+            PhotonNetwork.LoadLevel("test-gamescene");
         }
 
         public override void OnJoinRoomFailed(short returnCode, string message)
