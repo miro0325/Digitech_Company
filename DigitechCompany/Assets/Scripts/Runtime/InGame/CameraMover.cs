@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using Game.Service;
 
 namespace Game.InGame
 {
     public class CameraMover : MonoBehaviour
     {
-        private Player player => ServiceProvider.Get<Player>();
-        private DataContainer dataContainer => ServiceProvider.Get<DataContainer>();
+        private Player player => Services.Get<Player>();
+        private DataContainer dataContainer => Services.Get<DataContainer>();
 
         [SerializeField] private Vector3 offset;
         [SerializeField] private float rotXClamp;

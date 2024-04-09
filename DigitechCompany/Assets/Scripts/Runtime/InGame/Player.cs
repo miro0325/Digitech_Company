@@ -1,11 +1,12 @@
 using Photon.Pun;
 using UnityEngine;
+using Game.Service;
 
 namespace Game.InGame
 {
     public class Player : MonoBehaviourPun
     {
-        private DataContainer dataContainer => ServiceProvider.Get<DataContainer>();
+        private DataContainer dataContainer => Services.Get<DataContainer>();
 
         [SerializeField] private float moveSpeed;
 
@@ -18,7 +19,7 @@ namespace Game.InGame
             if(!photonView.IsMine) return;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            ServiceProvider.Register(this);
+            Services.Register(this);
         }
 
         private void Update()
