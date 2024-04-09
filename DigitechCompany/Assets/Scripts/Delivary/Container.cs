@@ -39,9 +39,7 @@ public class Container : MonoBehaviour
             var spawnPos = spawnRadius.position;
             Debug.Log(item);
             var spawnItem = Instantiate(item,spawnPos,Quaternion.identity);
-            //if(spawnItem.TryGetComponent(out Collider col)) {
-            //    col.enabled = false;
-            //}
+            
         }
     }
 

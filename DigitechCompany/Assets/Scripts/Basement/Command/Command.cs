@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
 
-//[CreateAssetMenu(menuName = "Command",order =1)]
+
 public abstract class Command : ScriptableObject
 {
     protected Regex regax = new Regex(@"(?<=\<)(.*?)(?=\>)");

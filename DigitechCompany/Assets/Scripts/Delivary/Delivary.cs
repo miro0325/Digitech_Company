@@ -226,7 +226,6 @@ public class Delivary : Singleton<Delivary>
         foreach(ItemBase item in items)
         {
             delivaryItems.Add(item);
-            Debug.Log(item.Name);
         }
         OrderDelivary();
     }
@@ -238,7 +237,6 @@ public class Delivary : Singleton<Delivary>
             delivaryOrders.Enqueue(() => Invoke(nameof(ArriveMovement), callDelay));
             var list = delivaryItems.ToList();
             delivaryOrderedItems.Enqueue(list);
-            Debug.Log(delivaryItems.Count);
             delivaryItems.Clear();
         }
         

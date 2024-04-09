@@ -13,7 +13,6 @@ Material:
   m_InvalidKeywords:
   - _GLOSSYREFLECTIONS_OFF
   - _NORMALMAP
-  - _USEMAINLIGHT_ON
   - _USESPECULAR_ON
   m_LightmapFlags: 6
   m_EnableInstancingVariants: 0
@@ -116,7 +115,7 @@ Material:
     - _Surface: 0
     - _UVSec: 0
     - _UseBumpMap: 0
-    - _UseMainLight: 1
+    - _UseMainLight: 0
     - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
