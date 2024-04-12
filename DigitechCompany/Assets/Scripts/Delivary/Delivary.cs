@@ -149,7 +149,6 @@ public class Delivary : Singleton<Delivary>
             }
             Invoke(nameof(ResetDelivary), 3f);
         }
-        
     }
          
     private void Transformation()
@@ -239,15 +238,11 @@ public class Delivary : Singleton<Delivary>
             delivaryOrderedItems.Enqueue(list);
             delivaryItems.Clear();
         }
-        
     }
 
     private void ResetDelivary()
     {
         isOrder = false;
         isDelivering = false;
-        
     }
-
-   
 }

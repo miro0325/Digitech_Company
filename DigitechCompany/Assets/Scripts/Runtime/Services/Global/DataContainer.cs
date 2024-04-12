@@ -12,8 +12,8 @@ namespace Game.Service
         private ProjectInitializer projectInitializer => Services.Get<ProjectInitializer>();
 
         //load
-        public List<ItemData> itemData = new();
-
+        public List<SellItemData> sellItemData = new();
+        public List<BuyItemData> buyItemData = new();
         //user
         public SettingData settingData;
 
@@ -30,8 +30,13 @@ namespace Game.Service
                     tsv =>
                     {
                         var split = tsv.Split('\n');
-                        for(int i = 1; i < split.Length; i++)
-                            itemData.Add(ItemData.Parse(split[i]));
+                        for (int i = 1; i < split.Length; i++)
+                        {
+                            var data = SellItemData.Parse(split[i]);
+                            if(data != null)
+                                sellItemData.Add(data);
+
+                        }
                     }
                 );
             }));
