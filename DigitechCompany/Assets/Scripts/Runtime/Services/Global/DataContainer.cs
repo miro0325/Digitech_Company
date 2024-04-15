@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace Game.Service
 {
@@ -12,8 +13,7 @@ namespace Game.Service
         private ProjectInitializer projectInitializer => Services.Get<ProjectInitializer>();
 
         //load
-        public List<SellItemData> sellItemData = new();
-        public List<BuyItemData> buyItemData = new();
+        public List<ItemData> itemData = new();
         //user
         public SettingData settingData;
 
@@ -32,11 +32,12 @@ namespace Game.Service
                         var split = tsv.Split('\n');
                         for (int i = 1; i < split.Length; i++)
                         {
-                            var data = SellItemData.Parse(split[i]);
+                            var data = ItemData.Parse(split[i]);
                             if(data != null)
-                                sellItemData.Add(data);
+                                itemData.Add(data);
 
                         }
+                        SceneManager.LoadSceneAsync("Room");
                     }
                 );
             }));

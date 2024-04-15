@@ -3,21 +3,21 @@ Shader "Unlit/ToonShader"
     Properties
     {
         [Header(Textures),Space(3)]
-        _Outline_Color("Outline Color",Color) = (1,1,1,1)
+        _Outline_Color("Outline Color",Color) = (0,0,0,1)
         _Color("Main Tex Color", Color) = (1,1,1,1)
         [HDR]_EmissionColor("Emission Color",Color) = (1,1,1,1)
 
         [Toggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
         [Toggle]_UseSpecular("Enable Specular", Range(0,1)) = 0 
-        [Toggle]_UseMainLight("Enable MainLight", float) = 0
+        [Toggle]_UseMainLight("Enable MainLight", float) = 1
 
         _MainTex ("Texture", 2D) = "white" {}
         _BumpMap("NormalMap", 2D) = "bump" {}
         _EmissionMap("Emission Map",2D) = "white" {}
         _RampTex("Ramp Texture", 2D) = "white" {}
 
-        _Outline_Bold ("Outline Bold", float) = 0
-        _Cel ("Cel", Range(1,10)) = 1
+        _Outline_Bold ("Outline Bold", float) = 0.1
+        _Cel ("Cel", Range(1,10)) = 3
 
         _LightPos ("Light Pos",Vector) = (0,0,0,0)
         _LightDir ("Light Dir",Vector) = (0,0,0,0)
