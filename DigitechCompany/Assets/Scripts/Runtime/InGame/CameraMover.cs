@@ -8,8 +8,8 @@ namespace Game.InGame
 {
     public class CameraMover : MonoBehaviour
     {
-        private Player player => Services.Get<Player>();
-        private DataContainer dataContainer => Services.Get<DataContainer>();
+        private Player player;
+        private DataContainer dataContainer;
 
         [SerializeField] private Vector3 offset;
         [SerializeField] private float rotXClamp;
@@ -18,7 +18,10 @@ namespace Game.InGame
 
         private void Start()
         {
-            transform.SetParent(player.transform);
+            player = Services.Get<Player>();
+            dataContainer = Services.Get<DataContainer>();
+
+            // transform.SetParent(player.transform);
             transform.localPosition = Vector3.zero + offset;
             transform.localEulerAngles = Vector3.zero;
         }
@@ -28,7 +31,12 @@ namespace Game.InGame
             var mouseY = Input.GetAxis("Mouse Y");
             rotX -= mouseY * Time.deltaTime * dataContainer.settingData.mouseSensivity.y;
             rotX = Mathf.Clamp(rotX, -rotXClamp, rotXClamp);
-            transform.localEulerAngles = new Vector3(rotX, 0, 0);
+            transform.localEulerAngles = new Vector3(rotX, player.transform.eulerAngles.y, 0);
+        }
+
+        private void LateUpdate()
+        {
+            transform.position = player.transform.position + Vector3.up * 1.5f;
         }
     }
 }

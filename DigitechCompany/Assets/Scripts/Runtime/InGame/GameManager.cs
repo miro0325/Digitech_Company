@@ -9,7 +9,7 @@ namespace Game.InGame
     {
         private void Awake()
         {
-            PhotonNetwork.Instantiate("Prefabs/Player", Vector3.up * 3, Quaternion.identity);
+            PhotonNetwork.Instantiate("Prefabs/Player", Vector3.up * 8, Quaternion.identity);
         }
     }
 }
