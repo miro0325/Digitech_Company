@@ -18,6 +18,7 @@ Shader "Unlit/ToonShader"
 
         _Outline_Bold ("Outline Bold", float) = 0.1
         _Cel ("Cel", Range(1,10)) = 3
+        _RimPower ("Rim Power",Range(0,1)) = 1
 
         _LightPos ("Light Pos",Vector) = (0,0,0,0)
         _LightDir ("Light Dir",Vector) = (0,0,0,0)
@@ -131,6 +132,9 @@ Shader "Unlit/ToonShader"
             float3 _LightDir;
             float4 _LightColor;
             float _LightStrength;
+                
+            float _RimPower;
+
 
             bool _UseBumpMap;
             bool _UseSpecular;
@@ -168,8 +172,7 @@ Shader "Unlit/ToonShader"
             half4 frag (Varyings IN) : SV_Target
             {
                 half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, TRANSFORM_TEX(IN.uv, _MainTex));
-                half4 RampTex = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, TRANSFORM_TEX(IN.uv_RampTex, _RampTex));
-                half4 EmissionMap = SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap));
+                half4 EmissionMap = SAMPLE_TEXTURE2D_LOD(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap),0);
 
                 float3 Normal;
 
@@ -209,11 +212,16 @@ Shader "Unlit/ToonShader"
                     attenuation =1;
                 }
 
-                half Ndotl = saturate(dot(Normal, lightDir));
+                half rim = 1 - max(saturate(dot(Normal,normalize(IN.viewDir))),0);
+                
+
+                half Ndotl = saturate(max(0,dot(Normal, lightDir)));
                 
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
-                col *= Toon;
+                half2 rh = Toon; 
+                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0)).rgb;
+                //col *= Toon;
 
                 
                 float3 BandedDiffuse = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5f)).rgb;
@@ -227,13 +235,17 @@ Shader "Unlit/ToonShader"
                 
 
                 half4 finalColor;
+                half4 rim2 = float4(pow(rim,_RimPower).rrr,1) * pow(rim,_RimPower).r;
                 if(_UseSpecular) 
                 {
-                    finalColor.rgb = ((col * (_Color + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
+                    //finalColor.rgb = ((col * Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb * pow(rim,_RimPower)))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb *= rim2;
                 }
                 else 
                 {
-                    finalColor.rgb = (col * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb *= rim2;
                 }
                 
                 //finalColor.rgb = diffuseColor;
