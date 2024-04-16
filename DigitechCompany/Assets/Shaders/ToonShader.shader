@@ -3,17 +3,22 @@ Shader "Unlit/ToonShader"
     Properties
     {
         [Header(Textures),Space(3)]
-        _MainTex ("Texture", 2D) = "white" {}
+        _Outline_Color("Outline Color",Color) = (0,0,0,1)
         _Color("Main Tex Color", Color) = (1,1,1,1)
         [HDR]_EmissionColor("Emission Color",Color) = (1,1,1,1)
+
         [Toggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
         [Toggle]_UseSpecular("Enable Specular", Range(0,1)) = 0 
-        [Toggle]_UseMainLight("Enable MainLight", float) = 0
+        [Toggle]_UseMainLight("Enable MainLight", float) = 1
+
+        _MainTex ("Texture", 2D) = "white" {}
         _BumpMap("NormalMap", 2D) = "bump" {}
         _EmissionMap("Emission Map",2D) = "white" {}
-        _LUT_Tex("LUT", 2D) = "white" {}
-        _Outline_Bold ("Outline Bold", float) = 0
-        _Cel ("Cel", Range(1,10)) = 1
+        _RampTex("Ramp Texture", 2D) = "white" {}
+
+        _Outline_Bold ("Outline Bold", float) = 0.1
+        _Cel ("Cel", Range(1,10)) = 3
+        _RimPower ("Rim Power",Range(0,1)) = 1
 
         _LightPos ("Light Pos",Vector) = (0,0,0,0)
         _LightDir ("Light Dir",Vector) = (0,0,0,0)
@@ -22,11 +27,10 @@ Shader "Unlit/ToonShader"
     }
     SubShader
     {
-        Tags { 
+        Tags 
+        { 
             "RenderType"="Opaque"
             "RenderPipeline" = "UniversalPipeline"
-
-            //"LightMode" = "UniversalForward"
         }
         LOD 100
         Cull front
@@ -48,23 +52,27 @@ Shader "Unlit/ToonShader"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
+                float4 color : COLOR;
             };
 
             
             float _Outline_Bold;
+            float4 _Outline_Color;
 
             v2f vert (appdata v)
             {
                 v2f o;
-                float3 n = normalize(v.normal);
-                float3 Outline_Pos = v.vertex + n * (_Outline_Bold * 0.1f);
-                o.vertex = TransformObjectToHClip(Outline_Pos);
+                o.vertex = TransformObjectToHClip(v.vertex);
+                float3 normal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV,v.normal));
+                float2 offset = mul((float2x2)UNITY_MATRIX_P, normal.xy);
+                o.vertex.xy += offset * o.vertex.z * _Outline_Bold;
+                o.color = _Outline_Color;
                 return o;
             }
 
             half4 frag (v2f i) : SV_Target
             {
-                return 0.0f;
+                return i.color;
             }
             ENDHLSL
         }
@@ -84,7 +92,7 @@ Shader "Unlit/ToonShader"
             {
                 float4 position : POSITION;
                 float2 uv_MainTex : TEXCOORD0;
-                float2 uv_LUT_Tex : TEXCOORD0;
+                float2 uv_RampTex : TEXCOORD0;
                 float2 uv_BumpMap : TEXCOORD0;
                 float2 uv_Emission : TEXCOORD0;
                 float3 normal : NORMAL;
@@ -95,7 +103,7 @@ Shader "Unlit/ToonShader"
                 float4 position : SV_POSITION;
                 float3 worldPos : NORMAL0;
                 float2 uv : TEXCOORD0;
-                float2 uv_LUT_Tex : TEXCOORD1;
+                float2 uv_RampTex : TEXCOORD1;
                 float2 uv_BumpMap : TEXCOORD2;
                 float2 uv_Emission : TEXCOORD3;
                 float3 viewDir : TEXCOORD4;
@@ -110,8 +118,8 @@ Shader "Unlit/ToonShader"
             TEXTURE2D(_BumpMap);
             SAMPLER(sampler_BumpMap);
 
-            TEXTURE2D(_LUT_Tex);
-            SAMPLER(sampler_LUT_Tex);
+            TEXTURE2D(_RampTex);
+            SAMPLER(sampler_RampTex);
 
             TEXTURE2D(_EmissionMap);
             SAMPLER(sampler_EmissionMap);
@@ -124,6 +132,9 @@ Shader "Unlit/ToonShader"
             float3 _LightDir;
             float4 _LightColor;
             float _LightStrength;
+                
+            float _RimPower;
+
 
             bool _UseBumpMap;
             bool _UseSpecular;
@@ -136,7 +147,7 @@ Shader "Unlit/ToonShader"
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
                 float4 _BumpMap_ST;
-                float4 _LUT_Tex_ST;
+                float4 _RampTex_ST;
                 float4 _EmissionMap_ST;
             CBUFFER_END
 
@@ -151,7 +162,7 @@ Shader "Unlit/ToonShader"
                 OUT.uv = IN.uv_MainTex;
                 OUT.normal = TransformObjectToWorld(IN.normal);
                 OUT.uv_BumpMap = IN.uv_BumpMap;
-                OUT.uv_LUT_Tex = IN.uv_LUT_Tex;
+                OUT.uv_RampTex = IN.uv_RampTex;
                 OUT.uv_Emission = IN.uv_Emission;
                 OUT.viewDir = normalize(_WorldSpaceCameraPos.xyz - temp);
                     
@@ -161,8 +172,7 @@ Shader "Unlit/ToonShader"
             half4 frag (Varyings IN) : SV_Target
             {
                 half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, TRANSFORM_TEX(IN.uv, _MainTex));
-                half4 BandLUT = SAMPLE_TEXTURE2D(_LUT_Tex, sampler_LUT_Tex, TRANSFORM_TEX(IN.uv_LUT_Tex, _LUT_Tex));
-                half4 EmissionMap = SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap));
+                half4 EmissionMap = SAMPLE_TEXTURE2D_LOD(_EmissionMap, sampler_EmissionMap, TRANSFORM_TEX(IN.uv_Emission, _EmissionMap),0);
 
                 float3 Normal;
 
@@ -179,7 +189,7 @@ Shader "Unlit/ToonShader"
                 }
                 else 
                 {
-                    Normal = normalize(IN.normal ); 
+                    Normal = normalize(IN.normal); 
                 }
                 float3 lightDir;
                 half3 lightColor;
@@ -202,14 +212,19 @@ Shader "Unlit/ToonShader"
                     attenuation =1;
                 }
 
-                half Ndotl = saturate(dot(Normal, lightDir));
+                half rim = 1 - max(saturate(dot(Normal,normalize(IN.viewDir))),0);
+                
+
+                half Ndotl = saturate(max(0,dot(Normal, lightDir)));
                 
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
-                col *= Toon;
+                half2 rh = Toon; 
+                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0)).rgb;
+                //col *= Toon;
 
                 
-                float3 BandedDiffuse = SAMPLE_TEXTURE2D(_LUT_Tex, sampler_LUT_Tex, float2(Toon,0.5f)).rgb;
+                float3 BandedDiffuse = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5f)).rgb;
                 float3 SpecularColor;
                 float3 HalfVector = normalize(lightDir + IN.viewDir);
                 float HDotN = saturate(dot(HalfVector, Normal));
@@ -220,13 +235,17 @@ Shader "Unlit/ToonShader"
                 
 
                 half4 finalColor;
+                half4 rim2 = float4(pow(rim,_RimPower).rrr,1) * pow(rim,_RimPower).r;
                 if(_UseSpecular) 
                 {
-                    finalColor.rgb = ((col * (_Color + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
+                    //finalColor.rgb = ((col * Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb * pow(rim,_RimPower)))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb *= rim2;
                 }
                 else 
                 {
-                    finalColor.rgb = (col * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * BandedDiffuse * (lightColor * attenuation);
+                    finalColor.rgb *= rim2;
                 }
                 
                 //finalColor.rgb = diffuseColor;
