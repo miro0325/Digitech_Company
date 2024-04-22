@@ -220,7 +220,7 @@ Shader "Unlit/ToonShader"
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
                 half2 rh = Toon; 
-                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0)).rgb;
+                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5)).rgb;
                 //col *= Toon;
 
                 
@@ -238,14 +238,14 @@ Shader "Unlit/ToonShader"
                 half4 rim2 = float4(pow(rim,_RimPower).rrr,1) * pow(rim,_RimPower).r;
                 if(_UseSpecular) 
                 {
-                    //finalColor.rgb = ((col * Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb * pow(rim,_RimPower)))) + SpecularColor) * BandedDiffuse * (lightColor * attenuation);
-                    finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb))) * BandedDiffuse * (lightColor * attenuation);
-                    finalColor.rgb *= rim2;
+                    finalColor.rgb = ((col *  Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * (lightColor * attenuation);
+                    //finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb)))  * (lightColor * attenuation);
+                    //finalColor.rgb *= rim2;
                 }
                 else 
                 {
-                    finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * BandedDiffuse * (lightColor * attenuation);
-                    finalColor.rgb *= rim2;
+                    finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * (lightColor * attenuation);
+                    //finalColor.rgb *= rim2;
                 }
                 
                 //finalColor.rgb = diffuseColor;

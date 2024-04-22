@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8272853208350906631}
   - component: {fileID: 6137248921642347981}
   - component: {fileID: 6137248921642347982}
+  - component: {fileID: 1469061500086247106}
   m_Layer: 0
   m_Name: 00Shovel
   m_TagString: Untagged
@@ -96,12 +97,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35f4b2f48b5611c4cb5d98c7ca228633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 1
-  itemName: 
-  weight: 0
-  sellPrices: 0000000000000000
-  buyPrice: 0
-  isOnlySell: 0
-  isInteractable: 0
-  isBothHand: 0
-  type: 0
+--- !u!95 &1469061500086247106
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5632629914785778712}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ffc74b86fb56daf42a7db40a26b6871a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

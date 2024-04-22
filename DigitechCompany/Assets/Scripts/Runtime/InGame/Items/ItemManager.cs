@@ -22,7 +22,6 @@ public class ItemManager : MonoBehaviour
     {
         foreach (var itemData in dataContainer.itemData)
         {
-            
             Debug.Log(loader.Items.ContainsKey(itemData.id));
             if (!loader.Items.ContainsKey(itemData.id) || loader.Items[itemData.id] == null) continue;
             var item = Instantiate(loader.Items[itemData.id],transform);

@@ -15,12 +15,8 @@ public class ResourceLoader : MonoBehaviour
     {
         Services.Register(this, true);
         ResourceLoad();
-        
     }
-
-
-
-
+    
     private void ResourceLoad()
     {
         var itemPrefabs = Resources.LoadAll<ItemBase>(ITEM_PATH);
@@ -28,11 +24,5 @@ public class ResourceLoader : MonoBehaviour
         {
             items.Add(i+1, itemPrefabs[i]);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
