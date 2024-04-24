@@ -1,29 +1,48 @@
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Game.Service;
 
 namespace Game.InGame
 {
     public class Player : MonoBehaviourPun
     {
+        //const
         private readonly static int Animator_MoveXHash = Animator.StringToHash("MoveX");
         private readonly static int Animator_MoveYHash = Animator.StringToHash("MoveY");
         private readonly static int Animator_IsRunHash = Animator.StringToHash("IsRun");
+        private readonly static int Animator_IsGroundHash = Animator.StringToHash("IsGround");
 
+        //service
         private DataContainer dataContainer;
 
+        //inspector field
+        [Header("Value")]
         [SerializeField] private float moveSpeed;
+        [SerializeField] private float gravity;
+        [SerializeField] private float jumpScale;
+        [SerializeField] private float camRotateXClamp;
+        [SerializeField] private Vector3 groundCastOffset;
+        [SerializeField] private float groundCastRadius;
+        [SerializeField] private LayerMask groundCastMask;
+        [Header("Reference")]
+        [SerializeField] private Camera cam;
+        [Header("Animator")]
+        [SerializeField] private Animator playerModel;
+        [SerializeField] private Animator armModel;
 
-        private new Rigidbody rigidbody;
-        private Animator animator;
+        //field
+        private float camRotateX;
+        private float velocityY;
+        private CharacterController cc;
 
         private void Awake()
         {
-            rigidbody = GetComponent<Rigidbody>();
-            animator = GetComponent<Animator>();
+            cc = GetComponent<CharacterController>();
 
-            if(!photonView.IsMine) return;
-            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            if (!photonView.IsMine) return;
+            playerModel.GetComponentInChildren<SkinnedMeshRenderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            cam.gameObject.SetActive(true);
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -37,18 +56,42 @@ namespace Game.InGame
 
         private void Update()
         {
-            if(!photonView.IsMine) return;
+            var input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            var isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
 
-            var mouseX = Input.GetAxis("Mouse X");
-            transform.Rotate(0, mouseX * Time.deltaTime * dataContainer.settingData.mouseSensivity.x, 0);
-            
-            var h = Input.GetAxisRaw("Horizontal");
-            var v = Input.GetAxisRaw("Vertical");
-            var dir = transform.TransformDirection(new Vector3(h, 0, v)) * moveSpeed;
-            if(h != 0 || v != 0) rigidbody.velocity = new Vector3(dir.x, rigidbody.velocity.y, dir.z);
-            animator.SetBool(Animator_IsRunHash, h != 0 || v != 0);
-            animator.SetFloat(Animator_MoveXHash, h);
-            animator.SetFloat(Animator_MoveYHash, v);
+            playerModel.SetFloat(Animator_MoveXHash, input.x);
+            playerModel.SetFloat(Animator_MoveYHash, input.y);
+            playerModel.SetBool(Animator_IsRunHash, input != Vector2.zero);
+            playerModel.SetBool(Animator_IsGroundHash, isGround);
+
+            if (!photonView.IsMine) return;
+            var mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            var inputMag = Mathf.Clamp01(input.magnitude);
+            var relativeDir = transform.TransformDirection(new Vector3(input.x, 0, input.y)).normalized;
+            var velocity = moveSpeed * inputMag * relativeDir;
+
+            if(cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
+            else velocityY -= gravity * Time.deltaTime;
+
+            if(isGround && Input.GetKeyDown(KeyCode.Space)) velocityY = jumpScale;
+            velocity.y = velocityY;
+            cc.Move(velocity * Time.deltaTime);
+
+            camRotateX -= mouseInput.y * dataContainer.settingData.mouseSensivity.y;
+            camRotateX = Mathf.Clamp(camRotateX, -camRotateXClamp, camRotateXClamp);
+            cam.transform.localEulerAngles = new Vector3(camRotateX, 0, 0);
+            transform.Rotate(0, mouseInput.x * dataContainer.settingData.mouseSensivity.x, 0);
+
+            armModel.SetFloat(Animator_MoveXHash, input.x);
+            armModel.SetFloat(Animator_MoveYHash, input.y);
+            armModel.SetBool(Animator_IsRunHash, input != Vector2.zero);
+            armModel.SetBool(Animator_IsGroundHash, isGround);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position + groundCastOffset, groundCastRadius);
         }
     }
 }
