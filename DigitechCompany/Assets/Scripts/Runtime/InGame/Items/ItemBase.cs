@@ -7,8 +7,8 @@ using Game.Data;
 public abstract class ItemBase : MonoBehaviour,IInteractable
 {
     public ItemData Data => data;
-
     public bool IsInHand => isInHand;
+    public Transform[] ikHandPoints;
 
     private ItemData data;
 

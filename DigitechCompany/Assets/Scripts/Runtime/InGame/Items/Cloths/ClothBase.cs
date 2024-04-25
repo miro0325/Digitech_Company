@@ -27,6 +27,11 @@ public class ClothBase : ItemBase
 
     }
 
+    public virtual void Effect()
+    {
+
+    }
+
     private void Awake()
     {
         
