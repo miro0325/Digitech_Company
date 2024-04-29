@@ -7,9 +7,9 @@ Shader "Unlit/ToonShader"
         _Color("Main Tex Color", Color) = (1,1,1,1)
         [HDR]_EmissionColor("Emission Color",Color) = (1,1,1,1)
 
-        [Toggle]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
-        [Toggle]_UseSpecular("Enable Specular", Range(0,1)) = 0 
-        [Toggle]_UseMainLight("Enable MainLight", float) = 1
+        [Toggle(USE_BUMPMAP)]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
+        [Toggle(USE_SPECULAR)]_UseSpecular("Enable Specular", Range(0,1)) = 0 
+        [Toggle(ONLY_MAINLIGHT)]_UseMainLight("Enable MainLight", float) = 1
 
         _MainTex ("Texture", 2D) = "white" {}
         _BumpMap("NormalMap", 2D) = "bump" {}
@@ -18,12 +18,16 @@ Shader "Unlit/ToonShader"
 
         _Outline_Bold ("Outline Bold", float) = 0.1
         _Cel ("Cel", Range(1,10)) = 3
-        _RimPower ("Rim Power",Range(0,1)) = 1
+        _RimThreshold("Rim Threshold",float) = 1
+        _Smoothness("Smoothness",float) = 1
 
-        _LightPos ("Light Pos",Vector) = (0,0,0,0)
-        _LightDir ("Light Dir",Vector) = (0,0,0,0)
-        _LightColor ("Light Color",Color) = (1,1,1,1) 
-        _LightStrength ("Light Strength",float) = 1
+        _EdgeDiffuse ("Edge Diffuse", float) = 1
+        _EdgeSpecular ("Edge Specular", float) = 1
+        _EdgeSpecularOffset ("Edge Specular Offset", float) = 1
+        _EdgeDistanceAttenuation ("Edge Distance Attenuation", float) = 1
+        _EdgeShadowAttenuation ("Edge Shadow Attenuation", float) = 1
+        _EdgeRim ("Edge Rim", float) = 1
+        _EdgeRimOffset ("Edge Rim Offset", float) = 1
     }
     SubShader
     {
@@ -86,6 +90,10 @@ Shader "Unlit/ToonShader"
             #pragma vertex vert
             #pragma fragment frag
 
+            #pragma shader_feature USE_BUMPMAP
+            #pragma shader_feature USE_SPECULAR
+            #pragma shader_feature ONLY_MAINLIGHT 
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             struct Attributes
@@ -102,15 +110,22 @@ Shader "Unlit/ToonShader"
             {
                 float4 position : SV_POSITION;
                 float3 worldPos : NORMAL0;
+                float3 localPos : NORMAL2;
                 float2 uv : TEXCOORD0;
                 float2 uv_RampTex : TEXCOORD1;
                 float2 uv_BumpMap : TEXCOORD2;
                 float2 uv_Emission : TEXCOORD3;
                 float3 viewDir : TEXCOORD4;
-                float3 normal : NORMAL1;
+                float3 worldNormal : NORMAL1;
             };
 
-
+            struct LightVariables {
+                float3 Normal : NORMAL;
+                float3 ViewDir : TEXCOORD0;
+                float Smoothness;
+                float Shininess;
+                float RimThreshold;
+            };
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
@@ -128,14 +143,17 @@ Shader "Unlit/ToonShader"
             float4 _EmissionColor;
             float4 _ShadowColor;
 
-            float3 _LightPos;
-            float3 _LightDir;
-            float4 _LightColor;
-            float _LightStrength;
+            float _EdgeDiffuse;
+            float _EdgeSpecular;
+            float _EdgeSpecularOffset;
+            float _EdgeDistanceAttenuation;
+            float _EdgeShadowAttenuation;
+            float _EdgeRim;
+            float _EdgeRimOffset;
+
+            float _RimThreshold;
+            float _Smoothness;
                 
-            float _RimPower;
-
-
             bool _UseBumpMap;
             bool _UseSpecular;
             bool _UseMainLight;
@@ -151,16 +169,64 @@ Shader "Unlit/ToonShader"
                 float4 _EmissionMap_ST;
             CBUFFER_END
 
+            half3 CalculateCelShading(Light l, LightVariables s) {
+                float shadowAttenuationSmoothSpeed = smoothstep(0,_EdgeShadowAttenuation,l.shadowAttenuation);
+                float distanceAttenuationSmoothSpeed = smoothstep(0,_EdgeDistanceAttenuation,l.distanceAttenuation);
+                float attenuation = shadowAttenuationSmoothSpeed * distanceAttenuationSmoothSpeed;
+                
+                float diffuse = saturate(dot(s.Normal,l.direction));
+                diffuse = ceil(diffuse * 0.5 + 0.5);
+                diffuse *= attenuation;
+                float3 h = SafeNormalize(l.direction + s.ViewDir);
+                float specular = saturate(dot(s.Normal,h));
+                specular = pow(specular,s.Shininess);
+                specular = specular > 0.2 ? 1 : 0; 
+                specular *= diffuse * s.Smoothness;
 
+                float rim = 1 - dot(s.ViewDir,s.Normal);
+                rim = rim > 0.75 ? 1 : 0;
+
+                diffuse = smoothstep(0, _EdgeDiffuse,diffuse);
+                //specular = s.Smoothness * smoothstep(1 - s.Smoothness) * _EdgeSpecular + _EdgeSpecularOffset,_EdgeSpecular + _EdgeSpecularOffset,specular);
+
+                return l.color * (diffuse + max(specular,rim));
+            }
+
+            void Lighting_CelShading(float Smoothness,float RimThreshold, float3 Position, float3 Normal, float3 View, out float3 Color) {
+                LightVariables s;
+
+                s.Normal = Normal;
+                s.ViewDir = SafeNormalize(View);
+                s.Smoothness = Smoothness;
+                s.Shininess = exp2(10 * Smoothness + 1);
+                s.RimThreshold = RimThreshold;
+
+                float4 clipPos = TransformObjectToHClip(Position);
+                float4 shadowCoord = ComputeScreenPos(clipPos);
+
+                //float4 shadowCoord = TransformWorldToShadowCoord(Position);
+
+                Light light = GetMainLight();
+                Color = CalculateCelShading(light,s);
+                #ifdef ONLY_MAINLIGHT
+                #else
+                int pixelLightCount = GetAdditionalLightsCount();
+                for(int i = 0; i < pixelLightCount; i++) {
+                    light = GetAdditionalLight(i,Position);
+                    Color += CalculateCelShading(light,s);
+                }
+                #endif
+            }
 
             Varyings vert (Attributes IN)
             {
                 Varyings OUT;
                 float3 temp = TransformObjectToWorld(IN.position.xyz);
+                OUT.localPos = IN.position;
                 OUT.position = TransformObjectToHClip(IN.position.xyz);
                 OUT.worldPos = temp;
                 OUT.uv = IN.uv_MainTex;
-                OUT.normal = TransformObjectToWorld(IN.normal);
+                OUT.worldNormal = TransformObjectToWorld(IN.normal);
                 OUT.uv_BumpMap = IN.uv_BumpMap;
                 OUT.uv_RampTex = IN.uv_RampTex;
                 OUT.uv_Emission = IN.uv_Emission;
@@ -176,41 +242,21 @@ Shader "Unlit/ToonShader"
 
                 float3 Normal;
 
-                //half3 WorldPos = IN.worldPos;
-                //half3 WorldNormal = IN.normal;
-                //half3 Normals;
-                //half3 WorldView = _WorldSpaceCameraPos.xyz;
-                //half3 diffuseColor;
-                //AdditionalLights_half(WorldPos,WorldNormal,WorldView,diffuseColor, Normals);
 
-                if(_UseBumpMap) 
-                {
+                #ifdef USE_BUMPMAP
                     Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
-                }
-                else 
-                {
-                    Normal = normalize(IN.normal); 
-                }
+                #else
+                    Normal = normalize(IN.worldNormal); 
+                #endif
                 float3 lightDir;
                 half3 lightColor;
                 float attenuation;
 
-                if(_UseMainLight) 
-                {
                     Light light = GetMainLight();
                     lightDir = normalize(light.direction);  
                     lightColor = light.color;
                     attenuation = light.distanceAttenuation;
-                } else 
-                {
-                    lightDir = normalize(_LightPos.xyz - IN.worldPos);
-                    lightDir *= _LightDir;
-                    lightColor = _LightColor;
-                    float3 vertexToLightSource = TransformObjectToWorld(_LightPos.xyz) - TransformObjectToWorld(IN.worldPos);
-                    float distance = length(vertexToLightSource);
-                    //attenuation = (100 / distance) * _LightStrength;
-                    attenuation =1;
-                }
+                    
 
                 half rim = 1 - max(saturate(dot(Normal,normalize(IN.viewDir))),0);
                 
@@ -235,19 +281,17 @@ Shader "Unlit/ToonShader"
                 
 
                 half4 finalColor;
-                half4 rim2 = float4(pow(rim,_RimPower).rrr,1) * pow(rim,_RimPower).r;
-                if(_UseSpecular) 
-                {
-                    finalColor.rgb = ((col *  Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * (lightColor * attenuation);
+                Lighting_CelShading(_Smoothness, _RimThreshold,IN.worldPos,Normal,IN.viewDir,finalColor.rgb);
+                #ifdef USE_SPECULAR
+                    finalColor.rgb *= (col * Ramp * (_Color  + (_EmissionColor * EmissionMap.rgb)));
+                    //finalColor.rgb = ((col *  Ramp *(_Color  + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * (lightColor * attenuation);
                     //finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb)))  * (lightColor * attenuation);
                     //finalColor.rgb *= rim2;
-                }
-                else 
-                {
-                    finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * (lightColor * attenuation);
+                #else
+                    finalColor.rgb *= (col * Ramp * (_Color  + (_EmissionColor * EmissionMap.rgb)));
+                    //finalColor.rgb = (col * Ramp * ((_Color + (_EmissionColor * EmissionMap.rgb)))) * (lightColor * attenuation);
                     //finalColor.rgb *= rim2;
-                }
-                
+                #endif
                 //finalColor.rgb = diffuseColor;
                 finalColor.a = 1;
                 
