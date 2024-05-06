@@ -1,15 +1,13 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-namespace Game.InGame
+public class GameManager : MonoBehaviourPunCallbacks
 {
-    public class GameManager : MonoBehaviourPunCallbacks
+    private void Awake()
     {
-        private void Awake()
-        {
-            PhotonNetwork.Instantiate("Prefabs/Player", Vector3.up * 8, Quaternion.identity);
-        }
+        NetworkObject.Instantiate("Prefabs/Player", Vector3.up * 9, Quaternion.identity);
+        NetworkObject.Instantiate("TestShovel", new Vector3(1, 8));
     }
 }

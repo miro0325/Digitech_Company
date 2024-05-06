@@ -19,13 +19,16 @@ public partial class Stats
     private ReactiveCollection<float> stats;
 
     //event
+    /// <summary>
+    /// key, old, new
+    /// </summary>
     public event Action<Key, float, float> OnStatChanged;
 
     //method
     public Stats()
     {
         stats = new();
-        for(int i = 0; i < (int)Key.End; i++)
+        for (int i = 0; i < (int)Key.End; i++)
             stats.Add(0);
 
         stats
@@ -64,7 +67,7 @@ public partial class Stats
     public void ChangeFrom(Stats target)
     {
         var stats = target.GetStats();
-        for(int i = 0; i < stats.Count; i++)
+        for (int i = 0; i < stats.Count; i++)
             ModifyStat((Key)i, x => stats[i]);
     }
 
