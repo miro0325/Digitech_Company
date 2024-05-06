@@ -1,58 +1,70 @@
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using Game.Data;
 
-
-public abstract class ItemBase : MonoBehaviour,IInteractable
+public class ItemBase : NetworkObject, IInteractable
 {
-    public int Id => id;
-    public string Name => itemName;
-    public float Weight => weight;
-    public int SellPrice => sellPrice;
-    public int BuyPrice => buyPrice;
-    public bool IsOnlySell => isOnlySell;
-    public bool IsInteractable => isInteractable;
-    public bool IsBothHand => isBothHand;
-    public ItemType Type => type;
+    //service
+    private GameManager gameManager;
+    private NetworkObjectManager networkObjectManager;
 
-    [SerializeField] protected int id;
-    [SerializeField] protected string itemName;
-    [SerializeField] protected float weight;
-    [SerializeField] protected int[] sellPrices = new int[2];
-    [SerializeField] protected int buyPrice = 0;
-    [SerializeField] protected bool isOnlySell = false;
-    [SerializeField] protected bool isInteractable;
-    [SerializeField] protected bool isBothHand = false;
-    [SerializeField] protected ItemType type;
+    //inspector field
+    [SerializeField] protected Transform leftHandPoint;
+    [SerializeField] protected Transform rightHandPoint;
 
-    private int sellPrice;
+    //field
+    protected UnitBase ownUnit;
+    protected Animator animator;
+    protected Rigidbody rb;
+    protected PhotonTransformView transformView;
 
-    public abstract void OnInteract();
+    //property
+    public bool InHand => ownUnit != null;
+    public virtual string InteractionExplain => "줍기";
+    public Transform LeftHandPoint => leftHandPoint;
+    public Transform RightHandPoint => rightHandPoint;
 
-    public abstract void OnGet();
-
-    public abstract void OnDrop();
-
-    public void Init(ItemData data)
+    public override void OnCreate()
     {
-        id = data.id;
-        itemName = data.name;
-        weight = data.weight;
-        isInteractable = data.isInteractable;
-        isBothHand = data.isBothHand;
-        type = data.type;
-        if(data.isOnlySell)
-        {
-            sellPrices[0] = data.prices[0];
-            sellPrices[1] = data.prices[1];
-            buyPrice = 0;
-        } else
-        {
-            buyPrice = Random.Range(data.prices[0],data.prices[1]);
-            sellPrice = 0;
-        }
-        
+        base.OnCreate();
+        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
+        transformView = GetComponent<PhotonTransformView>();
     }
 
+    private void Start()
+    {
+        gameManager = Services.Get<GameManager>();
+        networkObjectManager = Services.Get<NetworkObjectManager>();
+    }
+
+    public virtual void OnInteract(UnitBase unit)
+    {
+        //to camera position
+        ownUnit = unit;
+        transformView.enabled = false;
+        animator.enabled = true;
+        rb.isKinematic = true;
+        rb.detectCollisions = false;
+        
+        //camera view weight set
+        animator.SetLayerWeight(1, 1);
+
+        //send rpc
+        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, unit.guid);
+    }
+
+    [PunRPC]
+    protected virtual void OnInteractRpc(string guid)
+    {
+        //to chest position
+        transformView.enabled = false;
+        ownUnit = NetworkObject.GetNetworkObject(guid) as UnitBase;
+
+        //chest view weight set
+        animator.SetLayerWeight(1, 0);
+    }
+
+    public virtual void OnUse() { }
+
+    public virtual void OnThrow() { }
 }

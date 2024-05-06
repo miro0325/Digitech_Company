@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Service;
-
 
 public class ItemManager : MonoBehaviour
 {
@@ -27,7 +25,7 @@ public class ItemManager : MonoBehaviour
             if (!loader.Items.ContainsKey(itemData.id) || loader.Items[itemData.id] == null) continue;
             var item = Instantiate(loader.Items[itemData.id],transform);
             item.transform.localPosition = Vector3.zero;
-            item.Init(itemData);
+            // item.Init(itemData);
             originItems.Add(itemData.id,item);
         }
     }
