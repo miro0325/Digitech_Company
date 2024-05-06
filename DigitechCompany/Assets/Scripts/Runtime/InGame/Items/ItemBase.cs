@@ -1,59 +1,70 @@
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using Game.Data;
 
-
-public abstract class ItemBase : MonoBehaviour,IInteractable
+public class ItemBase : NetworkObject, IInteractable
 {
-    public ItemData Data => data;
-    public bool IsInHand => isInHand;
-    public Transform[] ikHandPoints;
+    //service
+    private GameManager gameManager;
+    private NetworkObjectManager networkObjectManager;
 
-    private ItemData data;
+    //inspector field
+    [SerializeField] protected Transform leftHandPoint;
+    [SerializeField] protected Transform rightHandPoint;
 
-    protected bool isInHand = false;
-    protected Rigidbody rb;
+    //field
+    protected UnitBase ownUnit;
     protected Animator animator;
+    protected Rigidbody rb;
+    protected PhotonTransformView transformView;
 
-    public abstract void OnInteract(TempPlayer temp);
+    //property
+    public bool InHand => ownUnit != null;
+    public virtual string InteractionExplain => "줍기";
+    public Transform LeftHandPoint => leftHandPoint;
+    public Transform RightHandPoint => rightHandPoint;
 
-    public virtual void OnGet(TempPlayer temp)
+    public override void OnCreate()
     {
+        base.OnCreate();
+        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
+        transformView = GetComponent<PhotonTransformView>();
+    }
+
+    private void Start()
+    {
+        gameManager = Services.Get<GameManager>();
+        networkObjectManager = Services.Get<NetworkObjectManager>();
+    }
+
+    public virtual void OnInteract(UnitBase unit)
+    {
+        //to camera position
+        ownUnit = unit;
+        transformView.enabled = false;
+        animator.enabled = true;
         rb.isKinematic = true;
-        isInHand = true;
+        rb.detectCollisions = false;
+        
+        //camera view weight set
+        animator.SetLayerWeight(1, 1);
+
+        //send rpc
+        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, unit.guid);
     }
 
-    public virtual void OnDrop()
+    [PunRPC]
+    protected virtual void OnInteractRpc(string guid)
     {
-        rb.isKinematic = false;
-        isInHand = false;
+        //to chest position
+        transformView.enabled = false;
+        ownUnit = NetworkObject.GetNetworkObject(guid) as UnitBase;
+
+        //chest view weight set
+        animator.SetLayerWeight(1, 0);
     }
 
-    public void Init(ItemData data)
-    {
-        this.data = data;
-       
-    }
+    public virtual void OnUse() { }
 
-    protected virtual void Awake()
-    {
-        if (TryGetComponent(out Rigidbody _rb))
-        {
-            rb = _rb;
-        }
-        else
-        {
-            rb = gameObject.AddComponent<Rigidbody>();
-        }
-        if (TryGetComponent(out Animator _anim))
-        {
-            animator = _anim;
-        }
-        else
-        {
-            animator = gameObject.AddComponent<Animator>();
-        }
-    }
-
+    public virtual void OnThrow() { }
 }

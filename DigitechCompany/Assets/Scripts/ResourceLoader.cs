@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Service;
 
 public class ResourceLoader : MonoBehaviour
 {

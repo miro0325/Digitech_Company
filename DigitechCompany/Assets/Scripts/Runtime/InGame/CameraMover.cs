@@ -2,33 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using Game.Service;
 
-namespace Game.InGame
+public class CameraMover : MonoBehaviour
 {
-    public class CameraMover : MonoBehaviour
+    private Player player;
+    private DataContainer dataContainer;
+
+    [SerializeField] private Vector3 offset;
+    [SerializeField] private float rotXClamp;
+
+    private float rotX;
+
+    private void Start()
     {
-        private Player player => Services.Get<Player>();
-        private DataContainer dataContainer => Services.Get<DataContainer>();
+        player = Services.Get<Player>();
+        dataContainer = Services.Get<DataContainer>();
 
-        [SerializeField] private Vector3 offset;
-        [SerializeField] private float rotXClamp;
+        // transform.SetParent(player.transform);
+        transform.localPosition = Vector3.zero + offset;
+        transform.localEulerAngles = Vector3.zero;
+    }
 
-        private float rotX;
+    private void Update()
+    {
+        var mouseY = Input.GetAxis("Mouse Y");
+        rotX -= mouseY * Time.deltaTime * dataContainer.userData.mouseSensivity.y;
+        rotX = Mathf.Clamp(rotX, -rotXClamp, rotXClamp);
+        transform.localEulerAngles = new Vector3(rotX, player.transform.eulerAngles.y, 0);
+    }
 
-        private void Start()
-        {
-            transform.SetParent(player.transform);
-            transform.localPosition = Vector3.zero + offset;
-            transform.localEulerAngles = Vector3.zero;
-        }
-
-        private void Update()
-        {
-            var mouseY = Input.GetAxis("Mouse Y");
-            rotX -= mouseY * Time.deltaTime * dataContainer.settingData.mouseSensivity.y;
-            rotX = Mathf.Clamp(rotX, -rotXClamp, rotXClamp);
-            transform.localEulerAngles = new Vector3(rotX, 0, 0);
-        }
+    private void LateUpdate()
+    {
+        transform.position = player.transform.position + Vector3.up * 1.5f;
     }
 }
