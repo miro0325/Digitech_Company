@@ -1,6 +1,5 @@
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 using UnityEngine.Rendering;
 
 public class Player : UnitBase
@@ -82,15 +81,26 @@ public class Player : UnitBase
 
     private void Update()
     {
-        Debug.Log(itemContainer.GetCurrentSlotItem()?.LeftHandPoint);
         DoInteract();
         DoMovement();
         DoRotation();
         DoAnimator();
     }
 
+    private void DoItem()
+    {
+        if(!photonView.IsMine) return;
+
+        var item = itemContainer.GetCurrentSlotItem();
+        
+        if(item != null)
+        {
+
+        }
+    }
+
     [PunRPC]
-    private void SetItemParemtRpc(string guid)
+    private void SetItemParentRpc(string guid)
     {
         var item = NetworkObject.GetNetworkObject(guid);
         item.transform.SetParent(itemHolder);
@@ -104,7 +114,7 @@ public class Player : UnitBase
             lookInteractable = null;
 
         if (!photonView.IsMine) return;
-        if (playerInput.InteractInput && lookInteractable != null)
+        if (lookInteractable != null && playerInput.InteractInputs[(int)lookInteractable.TargetInteractID])
         {
             if (lookInteractable is ItemBase)
             {
@@ -113,7 +123,7 @@ public class Player : UnitBase
                 {
                     item.transform.SetParent(itemHolderCamera);
                     item.OnInteract(this);
-                    photonView.RPC(nameof(SetItemParemtRpc), RpcTarget.Others, item.guid);
+                    photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid);
                 }
             }
             else

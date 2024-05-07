@@ -18,10 +18,24 @@ public class ItemBase : NetworkObject, IInteractable
     protected PhotonTransformView transformView;
 
     //property
-    public bool InHand => ownUnit != null;
-    public virtual string InteractionExplain => "줍기";
+    public virtual bool IsInteractable => true;
+    public virtual InteractID TargetInteractID => InteractID.ID1;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
+    public bool InHand => ownUnit != null;
+
+    //method
+    public virtual string GetInteractionExplain(UnitBase unit) => "줍기";
+
+    public virtual bool IsUseable(InteractID id)
+    {
+        return false;
+    }
+
+    public virtual string GetUseExplain(InteractID id, UnitBase unit)
+    {
+        return "";
+    }
 
     public override void OnCreate()
     {
@@ -31,7 +45,7 @@ public class ItemBase : NetworkObject, IInteractable
         transformView = GetComponent<PhotonTransformView>();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         gameManager = Services.Get<GameManager>();
         networkObjectManager = Services.Get<NetworkObjectManager>();
@@ -64,7 +78,7 @@ public class ItemBase : NetworkObject, IInteractable
         animator.SetLayerWeight(1, 0);
     }
 
-    public virtual void OnUse() { }
+    public virtual void OnUse(InteractID id) { }
 
     public virtual void OnThrow() { }
 }

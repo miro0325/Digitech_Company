@@ -1,6 +1,8 @@
 public interface IInteractable
 {
-    public string InteractionExplain { get; }
+    public bool IsInteractable { get; }
+    public InteractID TargetInteractID { get; }
 
+    public string GetInteractionExplain(UnitBase unit);
     public void OnInteract(UnitBase unit);
 }

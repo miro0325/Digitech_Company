@@ -20,7 +20,7 @@ public class TestInteractableDisplay : MonoBehaviour
         display.SetActive(player.LookInteractable != null);
         if(display.activeSelf)
         {
-            text.text = player.LookInteractable.InteractionExplain;
+            text.text = player.LookInteractable.GetInteractionExplain(player);
         }
     }
 }
