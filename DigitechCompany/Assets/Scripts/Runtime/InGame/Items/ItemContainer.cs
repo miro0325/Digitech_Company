@@ -53,8 +53,8 @@ public class ItemContainer
         {
             if(TryGetEmptySlotIndex(out int index))
             {
-                this.index = index;
                 slots[index] = item;
+                Index = index;
                 return true;
             }
             else
@@ -64,15 +64,16 @@ public class ItemContainer
         }
     }
 
+    public void PopCurrentItem()
+    {
+        if(slots[index] == null) return;
+        slots[index] = null;
+    }
+
     private bool TryGetEmptySlotIndex(out int index)
     {
-        index = -1;
-        for(int i = 0; i < slots.Length; i++)
-            if(slots[i] == null)
-            {
-                index = i;
-                return true;
-            }
+        for(index = 0; index < slots.Length; index++)
+            if(slots[index] == null) return true;
         return false;
     }
 }

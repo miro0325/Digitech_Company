@@ -31,12 +31,13 @@ public class TestShovel : ItemBase, IInteractable
     public override void OnInteract(UnitBase unit)
     {
         base.OnInteract(unit);
-        delayTime = 1f;
         animator.SetTrigger(Animator_IdleHash);
     }
 
     public override void OnUse(InteractID id)
     {
+        if(id != InteractID.ID2) return;
+        delayTime = 0.75f;
         animator.SetTrigger(Animator_UseHash);
     }
 }

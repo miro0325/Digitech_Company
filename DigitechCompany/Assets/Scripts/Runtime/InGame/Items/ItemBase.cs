@@ -39,29 +39,18 @@ public class ItemBase : NetworkObject, IInteractable
 
     public override void OnCreate()
     {
-        base.OnCreate();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         transformView = GetComponent<PhotonTransformView>();
     }
-
-    protected virtual void Start()
-    {
-        gameManager = Services.Get<GameManager>();
-        networkObjectManager = Services.Get<NetworkObjectManager>();
-    }
-
+    
     public virtual void OnInteract(UnitBase unit)
     {
-        //to camera position
         ownUnit = unit;
         transformView.enabled = false;
         animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
-        
-        //camera view weight set
-        animator.SetLayerWeight(1, 1);
 
         //send rpc
         photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, unit.guid);
@@ -71,14 +60,81 @@ public class ItemBase : NetworkObject, IInteractable
     protected virtual void OnInteractRpc(string guid)
     {
         //to chest position
-        transformView.enabled = false;
         ownUnit = NetworkObject.GetNetworkObject(guid) as UnitBase;
+        transformView.enabled = false;
+        animator.enabled = true;
+        rb.isKinematic = true;
+        rb.detectCollisions = false;
 
         //chest view weight set
         animator.SetLayerWeight(1, 0);
     }
 
-    public virtual void OnUse(InteractID id) { }
+    public virtual void OnActive()
+    {
+        gameObject.SetActive(true);
+        animator.SetLayerWeight(1, 1);
 
-    public virtual void OnThrow() { }
+        //invoke rpc
+        photonView.RPC(nameof(OnActiveRpc), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    protected virtual void OnActiveRpc()
+    {
+        gameObject.SetActive(false);
+        animator.SetLayerWeight(1, 0);
+    }
+
+    public virtual void OnDisable()
+    {
+        gameObject.SetActive(false);
+
+        //invoke rpc
+        photonView.RPC(nameof(OnDisableRpc), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    protected virtual void OnDisableRpc()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public virtual void OnUse(InteractID id)
+    {
+        photonView.RPC(nameof(OnUseRpc), RpcTarget.Others, (int)id);
+    }
+
+    [PunRPC]
+    protected virtual void OnUseRpc(int id)
+    {
+        
+    }
+
+    public virtual void OnThrow()
+    {
+        ownUnit = null;
+        transformView.enabled = true;
+        animator.enabled = false;
+        rb.isKinematic = false;
+        rb.detectCollisions = true;
+
+        photonView.RPC(nameof(OnThrowRpc), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    protected virtual void OnThrowRpc()
+    {
+        ownUnit = null;
+        transformView.enabled = true;
+        animator.enabled = false;
+        rb.isKinematic = false;
+        rb.detectCollisions = true;
+    }
+
+    protected virtual void Start()
+    {
+        gameManager = Services.Get<GameManager>();
+        networkObjectManager = Services.Get<NetworkObjectManager>();
+    }
 }

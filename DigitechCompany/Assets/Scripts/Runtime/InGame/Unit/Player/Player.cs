@@ -1,6 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UniRx;
 
 public class Player : UnitBase
 {
@@ -52,8 +53,8 @@ public class Player : UnitBase
         itemContainer = new(4);
         itemContainer.OnIndexChanged += (pre, cur) =>
         {
-            itemContainer[pre]?.gameObject.SetActive(false);
-            itemContainer[cur]?.gameObject.SetActive(true);
+            itemContainer[pre]?.OnDisable();
+            itemContainer[cur]?.OnActive();
         };
 
         testBaseStat = new();
@@ -69,6 +70,12 @@ public class Player : UnitBase
         playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>().For((i, ele) => ele.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
         camView.gameObject.SetActive(true);
 
+        playerInput
+            .ObserveEveryValueChanged(i => i.MouseWheel)
+            .Where(x => x != 0)
+            .ThrottleFrame(5)
+            .Subscribe(x => itemContainer.Index += x > 0 ? 1 : -1);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Services.Register(this);
@@ -81,6 +88,7 @@ public class Player : UnitBase
 
     private void Update()
     {
+        DoItem();
         DoInteract();
         DoMovement();
         DoRotation();
@@ -89,21 +97,34 @@ public class Player : UnitBase
 
     private void DoItem()
     {
-        if(!photonView.IsMine) return;
+        if (!photonView.IsMine) return;
 
         var item = itemContainer.GetCurrentSlotItem();
-        
-        if(item != null)
+        if (item != null)
         {
+            for (int i = 0; i < (int)InteractID.End; i++)
+            {
+                if (playerInput.InteractInputs[i] && item.IsUseable((InteractID)i))
+                    item.OnUse((InteractID)i);
+            }
 
+            if (playerInput.ThrowInput)
+            {
+                itemContainer.PopCurrentItem();
+                item.OnThrow();
+                item.transform.SetParent(null);
+
+                photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, true);
+            }
         }
+
     }
 
     [PunRPC]
-    private void SetItemParentRpc(string guid)
+    private void SetItemParentRpc(string guid, bool isThrow)
     {
         var item = NetworkObject.GetNetworkObject(guid);
-        item.transform.SetParent(itemHolder);
+        item.transform.SetParent(isThrow ? null : itemHolder);
     }
 
     private void DoInteract()
@@ -123,7 +144,8 @@ public class Player : UnitBase
                 {
                     item.transform.SetParent(itemHolderCamera);
                     item.OnInteract(this);
-                    photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid);
+                    item.OnActive();
+                    photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, false);
                 }
             }
             else
