@@ -10,7 +10,7 @@ public class TestShovel : ItemBase, IInteractable
     private float delayTime;
 
     //function
-    public override bool IsUseable(InteractID id)
+    public override bool IsUsable(InteractID id)
     {
         if(id == InteractID.ID2) return delayTime <= 0;
         return false;
@@ -22,8 +22,9 @@ public class TestShovel : ItemBase, IInteractable
         return "";
     }
     
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         if(delayTime > 0)
             delayTime -= Time.deltaTime;
     }

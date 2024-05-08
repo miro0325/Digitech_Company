@@ -18,16 +18,21 @@ public class ItemBase : NetworkObject, IInteractable
     protected PhotonTransformView transformView;
 
     //property
-    public virtual bool IsInteractable => true;
-    public virtual InteractID TargetInteractID => InteractID.ID1;
+    public bool InHand => ownUnit != null;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
-    public bool InHand => ownUnit != null;
+    public float LayRotation { get; set; }
+    public virtual InteractID TargetInteractID => InteractID.ID1;
 
     //method
     public virtual string GetInteractionExplain(UnitBase unit) => "줍기";
 
-    public virtual bool IsUseable(InteractID id)
+    public virtual bool IsInteractable(UnitBase unit)
+    {
+        return true;
+    }
+
+    public virtual bool IsUsable(InteractID id)
     {
         return false;
     }
@@ -136,5 +141,11 @@ public class ItemBase : NetworkObject, IInteractable
     {
         gameManager = Services.Get<GameManager>();
         networkObjectManager = Services.Get<NetworkObjectManager>();
+    }
+
+    protected virtual void Update()
+    {
+        if(!InHand)
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(0, LayRotation, 0), Time.deltaTime * 1080);
     }
 }

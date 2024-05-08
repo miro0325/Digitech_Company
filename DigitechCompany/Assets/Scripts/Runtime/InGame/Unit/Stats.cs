@@ -39,7 +39,7 @@ public partial class Stats
     public float this[Key key]
     {
         get => GetStat(key);
-        set => ModifyStat(key, x => value);
+        set => SetStat(key, x => value);
     }
 
     public float GetStat(Key key)
@@ -52,7 +52,7 @@ public partial class Stats
         return stats;
     }
 
-    public void ModifyStat(Key key, Func<float, float> modifier)
+    public void SetStat(Key key, Func<float, float> modifier)
     {
         stats[(int)key] = modifier(stats[(int)key]);
     }
@@ -68,7 +68,7 @@ public partial class Stats
     {
         var stats = target.GetStats();
         for (int i = 0; i < stats.Count; i++)
-            ModifyStat((Key)i, x => stats[i]);
+            SetStat((Key)i, x => stats[i]);
     }
 
     public override string ToString()
