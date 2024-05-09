@@ -9,6 +9,9 @@ public class TestShovel : ItemBase, IInteractable
     //field
     private float delayTime;
 
+    //property
+    public override float Weight => 10;
+
     //function
     public override bool IsUsable(InteractID id)
     {

@@ -23,6 +23,7 @@ public class ItemBase : NetworkObject, IInteractable
     public Transform RightHandPoint => rightHandPoint;
     public float LayRotation { get; set; }
     public virtual InteractID TargetInteractID => InteractID.ID1;
+    public virtual float Weight { get; }
 
     //method
     public virtual string GetInteractionExplain(UnitBase unit) => "줍기";

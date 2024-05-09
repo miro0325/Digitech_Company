@@ -10,6 +10,7 @@ public partial class Stats
     {
         Hp,
         Strength,
+        Weight,
         Speed,
         Stamina,
         End

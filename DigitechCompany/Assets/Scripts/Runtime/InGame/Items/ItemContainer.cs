@@ -6,6 +6,7 @@ using UnityEngine;
 public class ItemContainer
 {
     private int index;
+    private float wholeWeight;
     private ItemBase[] slots;
 
     public int Index
@@ -22,6 +23,8 @@ public class ItemContainer
             OnIndexChanged?.Invoke(pre, index);
         }
     }
+
+    public float WholeWeight => wholeWeight;
 
     //old cur
     public event Action<int, int> OnIndexChanged;
@@ -47,13 +50,15 @@ public class ItemContainer
         if(slots[index] == null)
         {
             slots[index] = item;
-            return true;   
+            wholeWeight += item.Weight;
+            return true;
         }
         else
         {
             if(TryGetEmptySlotIndex(out int index))
             {
                 slots[index] = item;
+                wholeWeight += item.Weight;
                 Index = index;
                 return true;
             }
@@ -67,6 +72,7 @@ public class ItemContainer
     public void PopCurrentItem()
     {
         if(slots[index] == null) return;
+        wholeWeight -= slots[index].Weight;
         slots[index] = null;
     }
 

@@ -61,9 +61,10 @@ public class Player : UnitBase
 
         testBaseStat = new();
         testBaseStat.SetStat(Stats.Key.Hp, x => 100);
+        testBaseStat.SetStat(Stats.Key.Strength, x => 10);
+        testBaseStat.SetStat(Stats.Key.Weight, x => 80);
         testBaseStat.SetStat(Stats.Key.Speed, x => 3);
         testBaseStat.SetStat(Stats.Key.Stamina, x => 5);
-        testBaseStat.SetStat(Stats.Key.Strength, x => 10);
         maxStats.ChangeFrom(testBaseStat);
 
         cc = GetComponent<CharacterController>();
@@ -179,10 +180,12 @@ public class Player : UnitBase
                 Vector3.Lerp(camView.localPosition, new Vector3(0, 1.5f, 0), Time.deltaTime * 8f);
         }
 
-        //direction
+        //movement
         var inputMag = Mathf.Clamp01(playerInput.MoveInput.magnitude);
         var relativeDir = transform.TransformDirection(new Vector3(playerInput.MoveInput.x, 0, playerInput.MoveInput.y)).normalized;
-        var speed = curStats.GetStat(Stats.Key.Speed) * (isCrouch ? 0.5f : 1f);
+        var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
+        var crouchShave = isCrouch ? 0.5f : 1f;
+        var speed = curStats.GetStat(Stats.Key.Speed) * crouchShave * weightShave;
 
         if (!isRun)
         {
@@ -198,6 +201,7 @@ public class Player : UnitBase
                     curStats.SetStat(Stats.Key.Stamina, x => x += Time.deltaTime);
             }
 
+            //setting stamina minimums for running
             if (playerInput.RunInput && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
         }
         else
