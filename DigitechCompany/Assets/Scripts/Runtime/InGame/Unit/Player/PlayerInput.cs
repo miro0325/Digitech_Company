@@ -1,5 +1,13 @@
 using UnityEngine;
 
+public enum InteractID
+{
+    ID1,
+    ID2,
+    ID3,
+    End
+}
+
 public class PlayerInput : MonoBehaviour
 {
     [SerializeField] private Vector3 groundCastOffset;
@@ -8,29 +16,39 @@ public class PlayerInput : MonoBehaviour
 
     private Vector2 moveInput;
     private Vector2 mouseInput;
+    private float mouseWheel;
     private bool isGround;
     private bool runInput;
-    private bool interactInput;
     private bool jumpInput;
     private bool crouchInput;
+    private bool[] interactInputs = new bool[(int)InteractID.End];
+    private bool throwInput;
 
     public Vector2 MoveInput => moveInput;
     public Vector2 MouseInput => mouseInput;
+    public float MouseWheel => mouseWheel;
     public bool RunInput => runInput;
     public bool IsGround => isGround;
-    public bool InteractInput => interactInput;
     public bool JumpInput => jumpInput;
     public bool CrouchInput => crouchInput;
+    public bool[] InteractInputs => interactInputs;
+    public bool ThrowInput => throwInput;
 
     private void Update()
     {
         moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        mouseWheel = Input.mouseScrollDelta.y;
         isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
         jumpInput = Input.GetKeyDown(KeyCode.Space);
-        interactInput = Input.GetKeyDown(KeyCode.E);
         runInput = Input.GetKey(KeyCode.LeftShift);
         crouchInput = Input.GetKeyDown(KeyCode.LeftControl);
+
+        interactInputs[(int)InteractID.ID1] = Input.GetKeyDown(KeyCode.E);
+        interactInputs[(int)InteractID.ID2] = Input.GetMouseButtonDown(0);
+        interactInputs[(int)InteractID.ID3] = Input.GetKeyDown(KeyCode.R);
+
+        throwInput = Input.GetKeyDown(KeyCode.G);
     }
 
     private void OnDrawGizmosSelected()

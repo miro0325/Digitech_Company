@@ -49,7 +49,7 @@ public partial class Stats
                                 {
                                     var oldValue = p.Previous;
                                     var newValue = p.Current;
-                                    percentValues.ModifyStat(key, x => x + (newValue - oldValue));
+                                    percentValues.SetStat(key, x => x + (newValue - oldValue));
                                     Debug.Log(percentValues.ToString());
                                 });
                             add
@@ -58,11 +58,11 @@ public partial class Stats
                                 {
                                     var oldValue = p.Previous;
                                     var newValue = p.Current;
-                                    addValues.ModifyStat(key, x => x + (newValue - oldValue));
+                                    addValues.SetStat(key, x => x + (newValue - oldValue));
                                     Debug.Log(addValues.ToString());
                                 });
-                            percentValues.ModifyStat(key, x => x + percent.Value);
-                            addValues.ModifyStat(key, x => x + add.Value);
+                            percentValues.SetStat(key, x => x + percent.Value);
+                            addValues.SetStat(key, x => x + add.Value);
                         });
 
                     //remove
@@ -74,8 +74,8 @@ public partial class Stats
                             var percent = e.Value.percent.Value;
                             var add = e.Value.add.Value;
 
-                            percentValues.ModifyStat(key, x => x - percent);
-                            addValues.ModifyStat(key, x => x - add);
+                            percentValues.SetStat(key, x => x - percent);
+                            addValues.SetStat(key, x => x - add);
 
                             if (casterInfo[kvp.Key].Count == 0)
                                 casterInfo.Remove(kvp.Key);
@@ -92,8 +92,8 @@ public partial class Stats
                             var newPercent = e.NewValue.percent.Value;
                             var newAdd = e.NewValue.add.Value;
 
-                            percentValues.ModifyStat(key, x => x + (newPercent - oldPercent));
-                            addValues.ModifyStat(key, x => x + (newAdd - oldAdd));
+                            percentValues.SetStat(key, x => x + (newPercent - oldPercent));
+                            addValues.SetStat(key, x => x + (newAdd - oldAdd));
                         });
                 });
 
@@ -103,8 +103,8 @@ public partial class Stats
                 {
                     foreach (var info in kvp.Value)
                     {
-                        percentValues.ModifyStat(info.Key, x => x - info.Value.percent.Value);
-                        addValues.ModifyStat(info.Key, x => x - info.Value.add.Value);
+                        percentValues.SetStat(info.Key, x => x - info.Value.percent.Value);
+                        addValues.SetStat(info.Key, x => x - info.Value.add.Value);
                     }
                 });
 
@@ -167,9 +167,9 @@ public partial class Stats
             var add = addValues.GetStats();
 
             for(int i = 0; i < percent.Count; i++)
-                target.ModifyStat((Key)i, x => x + x * percent[i]);
+                target.SetStat((Key)i, x => x + x * percent[i]);
             for(int i = 0; i < add.Count; i++)
-                target.ModifyStat((Key)i, x => x + add[i]);
+                target.SetStat((Key)i, x => x + add[i]);
         }
 
         /// <summary>
@@ -181,8 +181,8 @@ public partial class Stats
         /// <param name="base">base stats</param>
         public void Calculate(Key key, Stats target, Stats @base)
         {
-            target.ModifyStat(key, x => @base.GetStat(key) * (percentValues.GetStat(key) + 1));
-            target.ModifyStat(key, x => x + addValues.GetStat(key));
+            target.SetStat(key, x => @base.GetStat(key) * (percentValues.GetStat(key) + 1));
+            target.SetStat(key, x => x + addValues.GetStat(key));
         }
 
         public override string ToString()

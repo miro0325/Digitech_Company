@@ -47,6 +47,11 @@ MonoBehaviour:
   - InteractItemRPC
   - OnInteractRpc
   - SetItemParemtRpc
+  - SetItemParentRpc
+  - OnActiveRpc
+  - OnDisableRpc
+  - OnThrowRpc
+  - OnUseRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
