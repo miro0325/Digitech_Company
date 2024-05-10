@@ -111,16 +111,22 @@ public class Player : UnitBase
                     item.OnUse((InteractID)i);
             }
 
-            if (playerInput.ThrowInput)
-            {
-                itemContainer.PopCurrentItem();
-                item.LayRotation = transform.eulerAngles.y;
-                item.OnThrow();
-                item.transform.SetParent(null);
-
-                photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, true);
-            }
+            if (playerInput.DiscardInput)
+                DiscardCurrentItem();
         }
+    }
+
+    public void DiscardCurrentItem()
+    {
+        var item = itemContainer.GetCurrentSlotItem();
+        if(item == null) return;
+
+        itemContainer.PopCurrentItem();
+        item.LayRotation = transform.eulerAngles.y;
+        item.OnDiscard();
+        item.transform.SetParent(null);
+
+        photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, true);
     }
 
     [PunRPC]
