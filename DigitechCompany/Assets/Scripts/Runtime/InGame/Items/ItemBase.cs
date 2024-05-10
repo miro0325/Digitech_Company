@@ -117,7 +117,7 @@ public class ItemBase : NetworkObject, IInteractable
         
     }
 
-    public virtual void OnThrow()
+    public virtual void OnDiscard()
     {
         ownUnit = null;
         transformView.enabled = true;
@@ -125,11 +125,11 @@ public class ItemBase : NetworkObject, IInteractable
         rb.isKinematic = false;
         rb.detectCollisions = true;
 
-        photonView.RPC(nameof(OnThrowRpc), RpcTarget.Others);
+        photonView.RPC(nameof(OnDiscardRpc), RpcTarget.Others);
     }
 
     [PunRPC]
-    protected virtual void OnThrowRpc()
+    protected virtual void OnDiscardRpc()
     {
         ownUnit = null;
         transformView.enabled = true;

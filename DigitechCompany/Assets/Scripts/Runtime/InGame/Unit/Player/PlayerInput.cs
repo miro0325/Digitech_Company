@@ -32,7 +32,7 @@ public class PlayerInput : MonoBehaviour
     public bool JumpInput => jumpInput;
     public bool CrouchInput => crouchInput;
     public bool[] InteractInputs => interactInputs;
-    public bool ThrowInput => throwInput;
+    public bool DiscardInput => throwInput;
 
     private void Update()
     {
