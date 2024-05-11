@@ -2,6 +2,8 @@ using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UniRx;
+using System.Collections;
+using DG.Tweening;
 
 public class Player : UnitBase
 {
@@ -26,6 +28,7 @@ public class Player : UnitBase
     [SerializeField] private Camera cam;
     [SerializeField] private Transform itemHolder;
     [SerializeField] private Transform itemHolderCamera;
+    [SerializeField] private Transform scanSphere;
     [Header("Animator")]
     [SerializeField] private Animator camAnimator;
     [SerializeField] private Animator playerModelAnimator;
@@ -35,13 +38,15 @@ public class Player : UnitBase
     private bool isRun;
     private bool isCrouch;
     private float runStaminaRecoverWaitTime;
+    private float scanWaitTime;
     private float camRotateX;
     private float velocityY;
+    private Material scanSphereMaterial;
     private PlayerInput playerInput;
     private CharacterController cc;
-    private Stats testBaseStat; //test base stat(need to change)
     private IInteractable lookInteractable;
     private ItemContainer itemContainer;
+    private Stats testBaseStat; //test base stat(need to change)
 
     //property
     public IInteractable LookInteractable => lookInteractable;
@@ -79,6 +84,8 @@ public class Player : UnitBase
             .ThrottleFrame(5)
             .Subscribe(x => itemContainer.Index += x > 0 ? 1 : -1);
 
+        scanSphereMaterial = scanSphere.GetComponent<MeshRenderer>().sharedMaterial;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Services.Register(this);
@@ -91,11 +98,45 @@ public class Player : UnitBase
 
     private void Update()
     {
+        DoScan();
         DoItem();
         DoInteract();
         DoMovement();
         DoRotation();
         DoAnimator();
+    }
+
+    private void DoScan()
+    {
+        if (scanWaitTime > 0)
+        {
+            scanWaitTime -= Time.deltaTime;
+        }
+        else
+        {
+            if (playerInput.ScanInput)
+            {
+                scanWaitTime = 1.25f;
+                StartCoroutine(ScanRoutine());
+            }
+        }
+
+        IEnumerator ScanRoutine()
+        {
+            scanSphere.gameObject.SetActive(true);
+            scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
+            yield return new WaitForSeconds(0.5f);
+
+            var startColor = scanSphereMaterial.color;
+            var targetColor = startColor;
+            targetColor.a = 0;
+            scanSphereMaterial.DOColor(targetColor, 0.5f);
+            yield return new WaitForSeconds(0.5f);
+
+            scanSphere.gameObject.SetActive(false);
+            scanSphereMaterial.color = startColor;
+            scanSphere.localScale = Vector3.one * 0.1f;
+        }
     }
 
     private void DoItem()
@@ -119,7 +160,7 @@ public class Player : UnitBase
     public void DiscardCurrentItem()
     {
         var item = itemContainer.GetCurrentSlotItem();
-        if(item == null) return;
+        if (item == null) return;
 
         itemContainer.PopCurrentItem();
         item.LayRotation = transform.eulerAngles.y;
