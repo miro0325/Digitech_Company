@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class ItemManager : MonoBehaviour
 {
+    private ResourceLoader resourceLoader;
+
     private List<ItemBase> items = new();
 
     public IReadOnlyList<ItemBase> Items => items;
@@ -13,7 +16,7 @@ public class ItemManager : MonoBehaviour
     public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
-        int averageItemAmount = wholeItemAmount / spawnAreas.Length;
+        int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
 
         foreach (var area in spawnAreas)
         {
@@ -31,7 +34,13 @@ public class ItemManager : MonoBehaviour
 
                 if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                    
+                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+                    var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
+                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
+                    item.transform.position = hit.position + Vector3.up;
+                    item.LayRotation = Random.Range(0, 360);
+                    item.Initialize(randomItemKey);
+                    items.Add(item);
                 }
             }
         }
@@ -40,5 +49,6 @@ public class ItemManager : MonoBehaviour
     private void Awake()
     {
         Services.Register(this);
+        resourceLoader = Services.Get<ResourceLoader>();
     }
 }

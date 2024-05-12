@@ -149,7 +149,7 @@ public class Player : UnitBase
             if (lookInteractable is ItemBase)
             {
                 var item = lookInteractable as ItemBase;
-                if (itemContainer.TryInsertItem(item))
+                if (itemContainer.WholeWeight < curStats.GetStat(Stats.Key.Weight) && itemContainer.TryInsertItem(item))
                 {
                     item.transform.SetParent(itemHolderCamera);
                     item.OnInteract(this);

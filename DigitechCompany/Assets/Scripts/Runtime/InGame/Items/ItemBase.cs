@@ -23,7 +23,7 @@ public class ItemBase : NetworkObject, IInteractable
     public bool InHand => ownUnit != null;
     public float LayRotation { get; set; }
     public virtual InteractID TargetInteractID => InteractID.ID1;
-    public virtual float Cost { get; protected set; }
+    public virtual float SellPrice { get; protected set; }
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.itemDatas[key];
@@ -32,7 +32,7 @@ public class ItemBase : NetworkObject, IInteractable
     public virtual void Initialize(string key)
     {
         this.key = key;
-        Cost = Random.Range(ItemData.priceMin, ItemData.priceMax);
+        SellPrice = Random.Range(ItemData.sellPriceMin, ItemData.sellPriceMax);
     }
 
     public virtual string GetInteractionExplain(UnitBase unit) => "줍기";

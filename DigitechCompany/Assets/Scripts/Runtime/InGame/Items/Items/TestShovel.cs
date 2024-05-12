@@ -9,9 +9,6 @@ public class TestShovel : ItemBase, IInteractable
     //field
     private float delayTime;
 
-    //property
-    public override float Weight => 10;
-
     //function
     public override bool IsUsable(InteractID id)
     {
@@ -23,6 +20,11 @@ public class TestShovel : ItemBase, IInteractable
     {
         if(id == InteractID.ID2) return "때리기";
         return "";
+    }
+
+    private void Start()
+    {
+        key = "Shovel";
     }
     
     protected override void Update()

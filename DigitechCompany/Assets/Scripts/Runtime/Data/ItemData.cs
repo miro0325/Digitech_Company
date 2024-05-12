@@ -9,8 +9,9 @@ public class ItemData
     public string key;
     public string name;
     public float weight;
-    public float priceMin;
-    public float priceMax;
+    public float sellPriceMin;
+    public float sellPriceMax;
+    public float buyPrice;
     public bool isTwoHand;
     public ItemType type;
     public string explain;
@@ -23,8 +24,9 @@ public class ItemData
         data.key = split[count++];
         data.name = split[count++];
         float.TryParse(split[count++], out data.weight);
-        float.TryParse(split[count++], out data.priceMin);
-        float.TryParse(split[count++], out data.priceMax);
+        float.TryParse(split[count++], out data.sellPriceMin);
+        float.TryParse(split[count++], out data.sellPriceMax);
+        float.TryParse(split[count++], out data.buyPrice);
         bool.TryParse(split[count++], out data.isTwoHand);
         Enum.TryParse(split[count++], out data.type);
         data.explain = split[count++];
