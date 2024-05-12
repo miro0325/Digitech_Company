@@ -6,12 +6,14 @@ public class ItemBase : NetworkObject, IInteractable
     //service
     private GameManager gameManager;
     private NetworkObjectManager networkObjectManager;
+    private DataContainer dataContainer;
 
     //inspector field
     [SerializeField] protected Transform leftHandPoint;
     [SerializeField] protected Transform rightHandPoint;
 
     //field
+    protected string key;
     protected UnitBase ownUnit;
     protected Animator animator;
     protected Rigidbody rb;
@@ -19,13 +21,20 @@ public class ItemBase : NetworkObject, IInteractable
 
     //property
     public bool InHand => ownUnit != null;
-    public Transform LeftHandPoint => leftHandPoint;
-    public Transform RightHandPoint => rightHandPoint;
     public float LayRotation { get; set; }
     public virtual InteractID TargetInteractID => InteractID.ID1;
-    public virtual float Weight { get; }
+    public virtual float Cost { get; protected set; }
+    public Transform LeftHandPoint => leftHandPoint;
+    public Transform RightHandPoint => rightHandPoint;
+    public ItemData ItemData => dataContainer.itemDatas[key];
 
     //method
+    public virtual void Initialize(string key)
+    {
+        this.key = key;
+        Cost = Random.Range(ItemData.priceMin, ItemData.priceMax);
+    }
+
     public virtual string GetInteractionExplain(UnitBase unit) => "줍기";
 
     public virtual bool IsInteractable(UnitBase unit)
@@ -48,6 +57,10 @@ public class ItemBase : NetworkObject, IInteractable
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         transformView = GetComponent<PhotonTransformView>();
+
+        dataContainer = Services.Get<DataContainer>();
+        gameManager = Services.Get<GameManager>();
+        networkObjectManager = Services.Get<NetworkObjectManager>();
     }
     
     public virtual void OnInteract(UnitBase unit)
@@ -136,12 +149,6 @@ public class ItemBase : NetworkObject, IInteractable
         animator.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
-    }
-
-    protected virtual void Start()
-    {
-        gameManager = Services.Get<GameManager>();
-        networkObjectManager = Services.Get<NetworkObjectManager>();
     }
 
     protected virtual void Update()

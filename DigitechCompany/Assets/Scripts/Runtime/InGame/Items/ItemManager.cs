@@ -1,45 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class ItemManager : MonoBehaviour
 {
-    public Dictionary<int, ItemBase> OriginItems => originItems;
-    
-    private DataContainer dataContainer;
-    private ResourceLoader loader;
+    private List<ItemBase> items = new();
 
-    [SerializeField]
-    private Dictionary<int,ItemBase> originItems = new();
-    private void Awake()
-    {
-        Services.Register(this, true);
-    }
+    public IReadOnlyList<ItemBase> Items => items;
 
-    private void InitItems()
+    public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
-        foreach (var itemData in dataContainer.itemData)
+        int wholeItemAmount = 35 * difficulty;
+        int averageItemAmount = wholeItemAmount / spawnAreas.Length;
+
+        foreach (var area in spawnAreas)
         {
-            
-            Debug.Log(loader.Items.ContainsKey(itemData.id));
-            if (!loader.Items.ContainsKey(itemData.id) || loader.Items[itemData.id] == null) continue;
-            var item = Instantiate(loader.Items[itemData.id],transform);
-            item.transform.localPosition = Vector3.zero;
-            // item.Init(itemData);
-            originItems.Add(itemData.id,item);
+            int spawnItemAmount = Random.Range(0, averageItemAmount * 2);
+
+            for (int i = 0; i < spawnItemAmount; i++)
+            {
+                var randomPos = 
+                    new Vector3
+                    (
+                        Random.Range(area.min.x, area.max.x), 
+                        Random.Range(area.min.y, area.max.y), 
+                        Random.Range(area.min.z, area.max.z)
+                    );
+
+                if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                {
+                    
+                }
+            }
         }
     }
 
-    private void Start()
+    private void Awake()
     {
-        dataContainer = Services.Get<DataContainer>();
-        loader = Services.Get<ResourceLoader>();
-        Debug.Log(loader.gameObject);
-        InitItems();
-    }
-
-    private void Update()
-    {
-        
+        Services.Register(this);
     }
 }

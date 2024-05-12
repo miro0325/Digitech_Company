@@ -9,7 +9,7 @@ public class DataContainer : MonoBehaviour
     private ProjectInitializer projectInitializer => Services.Get<ProjectInitializer>();
 
     //load
-    public List<ItemData> itemData = new();
+    public Dictionary<string, ItemData> itemDatas = new();
 
     //user
     public UserData userData;
@@ -23,12 +23,15 @@ public class DataContainer : MonoBehaviour
             return TSVTask
             (
                 "183Mza3_fsxYtgeTj6nnzgUrsUiC7jra8BIBfTp9c7AE",
-                0,
+                526213072,
                 tsv =>
                 {
                     var split = tsv.Split('\n');
                     for (int i = 1; i < split.Length; i++)
-                        itemData.Add(ItemData.Parse(split[i]));
+                    {
+                        var itemData = ItemData.Parse(split[i]);
+                        itemDatas.Add(itemData.key, itemData);
+                    }
                 }
             );
         }));
