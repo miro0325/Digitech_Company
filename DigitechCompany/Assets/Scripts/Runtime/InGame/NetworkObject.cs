@@ -8,7 +8,7 @@ using UnityEngine;
 public class NetworkObject : MonoBehaviourPun
 {
     private static NetworkObjectManager manager;
-    public static NetworkObjectManager Manager
+    private static NetworkObjectManager Manager
         => manager ??= FindObjectOfType<NetworkObjectManager>();
 
     public static NetworkObject GetNetworkObject(string guid)

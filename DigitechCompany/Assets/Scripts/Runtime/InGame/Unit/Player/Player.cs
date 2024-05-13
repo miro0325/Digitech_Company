@@ -2,6 +2,9 @@ using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UniRx;
+using System.Collections;
+using DG.Tweening;
+using System.Collections.Generic;
 
 public class Player : UnitBase
 {
@@ -14,6 +17,7 @@ public class Player : UnitBase
 
     //service
     private DataContainer dataContainer;
+    private ItemManager itemManager;
 
     //inspector field
     [Header("Value")]
@@ -26,6 +30,7 @@ public class Player : UnitBase
     [SerializeField] private Camera cam;
     [SerializeField] private Transform itemHolder;
     [SerializeField] private Transform itemHolderCamera;
+    [SerializeField] private Transform scanSphere;
     [Header("Animator")]
     [SerializeField] private Animator camAnimator;
     [SerializeField] private Animator playerModelAnimator;
@@ -35,16 +40,20 @@ public class Player : UnitBase
     private bool isRun;
     private bool isCrouch;
     private float runStaminaRecoverWaitTime;
+    private float scanWaitTime;
     private float camRotateX;
     private float velocityY;
+    private ScanData scanData;
+    private Material scanSphereMaterial;
     private PlayerInput playerInput;
     private CharacterController cc;
-    private Stats testBaseStat; //test base stat(need to change)
     private IInteractable lookInteractable;
     private ItemContainer itemContainer;
+    private Stats testBaseStat; //test base stat(need to change)
 
     //property
     public IInteractable LookInteractable => lookInteractable;
+    public ScanData ScanData => scanData;
     public override Stats BaseStats => testBaseStat;
 
     public override void OnCreate()
@@ -79,6 +88,8 @@ public class Player : UnitBase
             .ThrottleFrame(5)
             .Subscribe(x => itemContainer.Index += x > 0 ? 1 : -1);
 
+        scanSphereMaterial = scanSphere.GetComponent<MeshRenderer>().sharedMaterial;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Services.Register(this);
@@ -87,15 +98,87 @@ public class Player : UnitBase
     private void Start()
     {
         dataContainer = Services.Get<DataContainer>();
+        itemManager = Services.Get<ItemManager>();
     }
 
     private void Update()
     {
+        DoScan();
         DoItem();
         DoInteract();
         DoMovement();
         DoRotation();
         DoAnimator();
+    }
+
+    private void DoScan()
+    {
+        if (scanWaitTime > 0)
+        {
+            scanWaitTime -= Time.deltaTime;
+        }
+        else
+        {
+            if (playerInput.ScanInput)
+            {
+                scanWaitTime = 1.25f;
+                StartCoroutine(ScanRoutine());
+            }
+        }
+
+        IEnumerator ScanRoutine()
+        {
+            //calculate
+            scanData = new ScanData { gameTime = Time.time };
+            foreach (var item in itemManager.Items)
+            {
+                if(item.InHand) continue;
+
+                if(IsInView(item.MeshRenderer))
+                {
+                    scanData.price += item.SellPrice;
+                    scanData.items.Add(item);
+                }
+            }
+
+            //animation
+            scanSphere.gameObject.SetActive(true);
+            scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
+            yield return new WaitForSeconds(0.5f);
+
+            var startColor = scanSphereMaterial.color;
+            var targetColor = startColor;
+            targetColor.a = 0;
+            scanSphereMaterial.DOColor(targetColor, 0.5f);
+            yield return new WaitForSeconds(0.5f);
+
+            scanSphere.gameObject.SetActive(false);
+            scanSphereMaterial.color = startColor;
+            scanSphere.localScale = Vector3.one * 0.1f;
+        }
+    }
+
+    private bool IsInView(Renderer toCheck)
+    {
+        Vector3 pointOnScreen = cam.WorldToScreenPoint(toCheck.bounds.center);
+
+        //Is inactive
+        if (!toCheck.gameObject.activeSelf)
+            return false;
+
+        //Is in front
+        if (pointOnScreen.z < 0)
+            return false;
+
+        //Is in FOV
+        if ((pointOnScreen.x < 0) || (pointOnScreen.x > Screen.width) || (pointOnScreen.y < 0) || (pointOnScreen.y > Screen.height))
+            return false;
+        
+        //Is covered
+        if (Physics.Linecast(cam.transform.position, toCheck.bounds.center, out _, LayerMask.GetMask("Ground")))
+            return false;
+
+        return true;
     }
 
     private void DoItem()
@@ -119,7 +202,7 @@ public class Player : UnitBase
     public void DiscardCurrentItem()
     {
         var item = itemContainer.GetCurrentSlotItem();
-        if(item == null) return;
+        if (item == null) return;
 
         itemContainer.PopCurrentItem();
         item.LayRotation = transform.eulerAngles.y;
@@ -149,7 +232,7 @@ public class Player : UnitBase
             if (lookInteractable is ItemBase)
             {
                 var item = lookInteractable as ItemBase;
-                if (itemContainer.TryInsertItem(item))
+                if (itemContainer.WholeWeight < curStats.GetStat(Stats.Key.Weight) && itemContainer.TryInsertItem(item))
                 {
                     item.transform.SetParent(itemHolderCamera);
                     item.OnInteract(this);

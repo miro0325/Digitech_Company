@@ -1,44 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class ItemManager : MonoBehaviour
 {
-    public Dictionary<int, ItemBase> OriginItems => originItems;
-    
-    private DataContainer dataContainer;
-    private ResourceLoader loader;
+    private ResourceLoader resourceLoader;
 
-    [SerializeField]
-    private Dictionary<int,ItemBase> originItems = new();
-    private void Awake()
-    {
-        Services.Register(this, true);
-    }
+    private List<ItemBase> items = new();
 
-    private void InitItems()
+    public IReadOnlyList<ItemBase> Items => items;
+
+    public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
-        foreach (var itemData in dataContainer.itemData)
+        int wholeItemAmount = 35 * difficulty;
+        int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
+
+        foreach (var area in spawnAreas)
         {
-            Debug.Log(loader.Items.ContainsKey(itemData.id));
-            if (!loader.Items.ContainsKey(itemData.id) || loader.Items[itemData.id] == null) continue;
-            var item = Instantiate(loader.Items[itemData.id],transform);
-            item.transform.localPosition = Vector3.zero;
-            // item.Init(itemData);
-            originItems.Add(itemData.id,item);
+            int spawnItemAmount = Random.Range(0, averageItemAmount * 2);
+
+            for (int i = 0; i < spawnItemAmount; i++)
+            {
+                var randomPos = 
+                    new Vector3
+                    (
+                        Random.Range(area.min.x, area.max.x), 
+                        Random.Range(area.min.y, area.max.y), 
+                        Random.Range(area.min.z, area.max.z)
+                    );
+
+                if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                {
+                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+                    var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
+                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
+                    item.transform.position = hit.position + Vector3.up;
+                    item.LayRotation = Random.Range(0, 360);
+                    item.Initialize(randomItemKey);
+                    items.Add(item);
+                }
+            }
         }
     }
 
-    private void Start()
+    private void Awake()
     {
-        dataContainer = Services.Get<DataContainer>();
-        loader = Services.Get<ResourceLoader>();
-        Debug.Log(loader.gameObject);
-        InitItems();
-    }
-
-    private void Update()
-    {
-        
+        Services.Register(this);
+        resourceLoader = Services.Get<ResourceLoader>();
     }
 }
