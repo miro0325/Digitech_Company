@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum InteractID
 {
+    None,
     ID1,
     ID2,
     ID3,
@@ -47,6 +48,7 @@ public class PlayerInput : MonoBehaviour
         runInput = Input.GetKey(KeyCode.LeftShift);
         crouchInput = Input.GetKeyDown(KeyCode.LeftControl);
 
+        interactInputs[(int)InteractID.None] = false;
         interactInputs[(int)InteractID.ID1] = Input.GetKeyDown(KeyCode.E);
         interactInputs[(int)InteractID.ID2] = Input.GetMouseButtonDown(0);
         interactInputs[(int)InteractID.ID3] = Input.GetKeyDown(KeyCode.R);
