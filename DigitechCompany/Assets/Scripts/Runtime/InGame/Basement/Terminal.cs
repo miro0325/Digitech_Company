@@ -40,6 +40,7 @@ namespace Basements
         {
             foreach(var command in commands)
             {
+                command.Init();
                 if(!command.IsMultiple)
                     commandDic.Add(command.Cmd, command);
                 foreach(var aliases in command.Aliases)

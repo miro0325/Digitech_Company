@@ -19,6 +19,8 @@ public abstract class Command : ScriptableObject
     [SerializeField] protected bool isMultipleCommand;
     [SerializeField,TextArea(10,50)] protected string explain;
 
+    public abstract void Init();
+
     public abstract string Activate(string cmd, string[] args = null);
 
     protected abstract string GetExplainText(string cmd, string[] args);
