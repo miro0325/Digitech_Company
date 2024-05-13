@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 
 public enum InteractID
@@ -9,7 +10,7 @@ public enum InteractID
     End
 }
 
-public class PlayerInput : MonoBehaviour
+public class PlayerInput : MonoBehaviourPun, IPunObservable
 {
     [SerializeField] private Vector3 groundCastOffset;
     [SerializeField] private float groundCastRadius;
@@ -37,8 +38,14 @@ public class PlayerInput : MonoBehaviour
     public bool[] InteractInputs => interactInputs;
     public bool DiscardInput => discardInput;
 
+    private void Start()
+    {
+        interactInputs[(int)InteractID.None] = false;
+    }
+
     private void Update()
     {
+        if (!photonView.IsMine) return;
         moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         mouseWheel = Input.mouseScrollDelta.y;
@@ -48,7 +55,6 @@ public class PlayerInput : MonoBehaviour
         runInput = Input.GetKey(KeyCode.LeftShift);
         crouchInput = Input.GetKeyDown(KeyCode.LeftControl);
 
-        interactInputs[(int)InteractID.None] = false;
         interactInputs[(int)InteractID.ID1] = Input.GetKeyDown(KeyCode.E);
         interactInputs[(int)InteractID.ID2] = Input.GetMouseButtonDown(0);
         interactInputs[(int)InteractID.ID3] = Input.GetKeyDown(KeyCode.R);
@@ -60,5 +66,39 @@ public class PlayerInput : MonoBehaviour
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position + groundCastOffset, groundCastRadius);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(moveInput);
+            stream.SendNext(mouseInput);
+            stream.SendNext(mouseWheel);
+            stream.SendNext(scanInput);
+            stream.SendNext(isGround);
+            stream.SendNext(runInput);
+            stream.SendNext(jumpInput);
+            stream.SendNext(crouchInput);
+            stream.SendNext(interactInputs[(int)InteractID.ID1]);
+            stream.SendNext(interactInputs[(int)InteractID.ID2]);
+            stream.SendNext(interactInputs[(int)InteractID.ID3]);
+            stream.SendNext(discardInput);
+        }
+        else
+        {
+            moveInput = (Vector2)stream.ReceiveNext();
+            mouseInput = (Vector2)stream.ReceiveNext();
+            mouseWheel = (float)stream.ReceiveNext();
+            scanInput = (bool)stream.ReceiveNext();
+            isGround = (bool)stream.ReceiveNext();
+            runInput = (bool)stream.ReceiveNext();
+            jumpInput = (bool)stream.ReceiveNext();
+            crouchInput = (bool)stream.ReceiveNext();
+            interactInputs[(int)InteractID.ID1] = (bool)stream.ReceiveNext();
+            interactInputs[(int)InteractID.ID2] = (bool)stream.ReceiveNext();
+            interactInputs[(int)InteractID.ID3] = (bool)stream.ReceiveNext();
+            discardInput = (bool)stream.ReceiveNext();
+        }
     }
 }

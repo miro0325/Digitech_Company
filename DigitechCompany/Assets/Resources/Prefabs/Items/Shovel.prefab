@@ -93,11 +93,11 @@ GameObject:
   m_Component:
   - component: {fileID: 6668602876129647263}
   - component: {fileID: 1867706626335624248}
-  - component: {fileID: 1867706626335624255}
   - component: {fileID: 2683899643356843410}
   - component: {fileID: 1972013183655156715}
   - component: {fileID: -7927232689938285419}
   - component: {fileID: 2546274158369270311}
+  - component: {fileID: -6962608568245418359}
   m_Layer: 7
   m_Name: Shovel
   m_TagString: Untagged
@@ -141,24 +141,10 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 2546274158369270311}
+  - {fileID: -6962608568245418359}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &1867706626335624255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6323179596718751781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  guid: 
-  leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
 --- !u!65 &2683899643356843410
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -196,9 +182,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6323179596718751781}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 077f0f363f17201418190873431810f3, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -225,3 +211,18 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &-6962608568245418359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6323179596718751781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c305950de7ad5a40ab4e2cfbc0c9002, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guid: 
+  leftHandPoint: {fileID: 0}
+  rightHandPoint: {fileID: 0}

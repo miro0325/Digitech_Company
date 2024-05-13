@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        NetworkObject.Instantiate("Prefabs/Player", Vector3.up * 9, Quaternion.identity);
-        NetworkObject.Instantiate("Prefabs/TestShovel", new Vector3(1, 8));
+        NetworkObject.Instantiate("Prefabs/Player", Vector3.up, Quaternion.identity);
+        // NetworkObject.Instantiate("Prefabs/TestShovel", new Vector3(1, 8));
     }
 
     private void Start()

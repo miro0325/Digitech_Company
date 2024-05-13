@@ -28,7 +28,7 @@ public class ItemManager : MonoBehaviour
                     new Vector3
                     (
                         Random.Range(area.min.x, area.max.x), 
-                        Random.Range(area.min.y, area.max.y), 
+                        Random.Range(-2, 2), //need to fix
                         Random.Range(area.min.z, area.max.z)
                     );
 
@@ -38,7 +38,7 @@ public class ItemManager : MonoBehaviour
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
                     var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
                     item.transform.position = hit.position + Vector3.up;
-                    item.LayRotation = Random.Range(0, 360);
+                    item.SetLayRotation(Random.Range(0, 360));
                     item.Initialize(randomItemKey);
                     items.Add(item);
                 }

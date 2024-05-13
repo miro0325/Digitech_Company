@@ -14,6 +14,7 @@ public class ItemContainer
         set
         {
             if(value == index) return;
+            if(GetCurrentSlotItem() != null && GetCurrentSlotItem().ItemData.isTwoHand) return;
 
             var pre = index;
             if(value < 0) value = slots.Length - 1;
@@ -53,12 +54,23 @@ public class ItemContainer
         return slots[Index];
     }
 
-    public bool TryInsertItem(ItemBase item)
+    public bool IsInsertable()
     {
+        if(slots[index] == null) return true;
+        else
+        {
+            if(slots[index].ItemData.isTwoHand) return false;
+            return TryGetEmptySlotIndex(out _);
+        }
+    }
+
+    public void InsertItem(ItemBase item)
+    {
+        if(!IsInsertable()) return;
+
         if(slots[index] == null)
         {
             slots[index] = item;
-            return true;
         }
         else
         {
@@ -66,11 +78,6 @@ public class ItemContainer
             {
                 slots[index] = item;
                 Index = index;
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
     }
@@ -81,7 +88,7 @@ public class ItemContainer
         slots[index] = null;
     }
 
-    private bool TryGetEmptySlotIndex(out int index)
+    public bool TryGetEmptySlotIndex(out int index)
     {
         for(index = 0; index < slots.Length; index++)
             if(slots[index] == null) return true;

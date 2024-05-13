@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 7921545433663057366}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.696087, y: 0.696087, z: 0.696087}
+  m_LocalScale: {x: 0.69608706, y: 0.69608706, z: 0.69608694}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6282981278290801699}
@@ -57,6 +57,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 1291011134934247104}
   - {fileID: 344271197583523617}
   sceneViewId: 0
   InstantiationId: 0
@@ -113,9 +114,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7921545433663057366}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 39fa2c4eaa752a44880555550b1f0204, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
