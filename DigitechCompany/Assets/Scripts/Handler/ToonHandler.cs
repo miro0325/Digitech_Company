@@ -54,7 +54,7 @@ public class ToonHandler : MonoBehaviour
     {
         Gizmos.color = Color.green;
         
-        Debug.DrawRay(customLight.transform.position, customLight.transform.forward);
+        //Debug.DrawRay(customLight.transform.position, customLight.transform.forward);
     }
 
 }
