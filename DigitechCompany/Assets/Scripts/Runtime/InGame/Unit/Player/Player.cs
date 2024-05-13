@@ -227,7 +227,7 @@ public class Player : UnitBase
             lookInteractable = null;
 
         if (!photonView.IsMine) return;
-        if (lookInteractable != null && LookInteractable.IsInteractable(this) && playerInput.InteractInputs[(int)lookInteractable.TargetInteractID])
+        if (lookInteractable != null && LookInteractable.IsInteractable(this) && playerInput.InteractInputs[(int)lookInteractable.GetTargetInteractID(this)])
         {
             if (lookInteractable is ItemBase)
             {

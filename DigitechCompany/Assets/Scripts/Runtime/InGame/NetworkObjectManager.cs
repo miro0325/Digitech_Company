@@ -26,7 +26,7 @@ public class NetworkObjectManager : MonoBehaviourPun
         }
         else
         {
-            Debug.LogError("Failed to allocate a ViewId.");
+            Debug.LogWarning("Failed to allocate a ViewId.");
             Destroy(obj);
             return null;
         }
@@ -43,5 +43,25 @@ public class NetworkObjectManager : MonoBehaviourPun
         obj.guid = guid;
 
         obj.OnCreate();
+    }
+
+    internal void DestoryNetworkObjectInternal(string guid)
+    {
+        photonView.RPC(nameof(DestoryNetworkObjectRpc), RpcTarget.All, guid);
+    }
+
+    [PunRPC]
+    private void DestoryNetworkObjectRpc(string guid)
+    {
+        if (photonView.IsMine)
+        {
+            if (!networkObjects.ContainsKey(guid)) return;
+            
+            var obj = networkObjects[guid];
+            if (obj) PhotonNetwork.Destroy(obj.photonView);
+        }
+
+        if (!networkObjects.ContainsKey(guid)) return;
+        networkObjects.Remove(guid);
     }
 }

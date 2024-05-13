@@ -36,6 +36,10 @@ public class ItemBase : NetworkObject, IInteractable
         this.key = key;
         SellPrice = Random.Range(ItemData.sellPriceMin, ItemData.sellPriceMax);
     }
+    
+    public virtual InteractID GetTargetInteractID(UnitBase unit) => InteractID.ID1;
+
+    public virtual float GetInteractRequireTime(UnitBase unit) => 0;
 
     public virtual string GetInteractionExplain(UnitBase unit) => "줍기";
 
