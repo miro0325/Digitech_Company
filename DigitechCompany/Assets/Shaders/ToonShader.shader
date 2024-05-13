@@ -286,7 +286,8 @@ Shader "Unlit/ToonShader"
                 half4 finalColor;
                 Lighting_ToonShading(_Smoothness, _RimThreshold,IN.worldPos,Normal,IN.viewDir,Ramp,finalColor.rgb);
                 #ifdef USE_SPECULAR
-                    finalColor.rgb *= (col *_Color + (_EmissionColor * EmissionMap.rgb));
+                    finalColor.rgb *= (col *_Color);
+                    finalColor.rgb += + (EmissionMap.rgb * _EmissionColor);
                     //finalColor.rgb = ((col *  Ramp * (_Color  + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * (lightColor * attenuation);
                     //finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb)))  * (lightColor * attenuation);
                     //finalColor.rgb *= rim2;

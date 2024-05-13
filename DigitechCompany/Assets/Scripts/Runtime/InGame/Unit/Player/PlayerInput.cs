@@ -2,9 +2,9 @@ using UnityEngine;
 
 public enum InteractID
 {
-    ID1,
-    ID2,
-    ID3,
+    ID1, //Ex E
+    ID2, //Ex Click
+    ID3, //Ex R
     End
 }
 

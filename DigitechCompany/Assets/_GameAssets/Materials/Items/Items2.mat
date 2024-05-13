@@ -10,7 +10,6 @@ Material:
   m_Name: Items2
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords:
-  - ONLY_MAINLIGHT
   - USE_SPECULAR
   m_InvalidKeywords:
   - _USEMAINLIGHT_ON
@@ -123,7 +122,7 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _UseBumpMap: 0
-    - _UseMainLight: 1
+    - _UseMainLight: 0
     - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
