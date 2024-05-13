@@ -17,6 +17,9 @@ public class NetworkObject : MonoBehaviourPun
     public static NetworkObject Instantiate(string path, Vector3 pos = default, Quaternion rot = default)
         => Manager.InstantiateNetworkObjectInternal(path, pos, rot);
 
+    public static void Destory(string guid)
+        => Manager.DestoryNetworkObjectInternal(guid);
+
     public string guid;
     public virtual void OnCreate() { }
 }
