@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 using UniRx;
 using System.Collections;
 using DG.Tweening;
+using System.Collections.Generic;
 
 public class Player : UnitBase
 {
@@ -16,6 +17,7 @@ public class Player : UnitBase
 
     //service
     private DataContainer dataContainer;
+    private ItemManager itemManager;
 
     //inspector field
     [Header("Value")]
@@ -41,6 +43,7 @@ public class Player : UnitBase
     private float scanWaitTime;
     private float camRotateX;
     private float velocityY;
+    private ScanData scanData;
     private Material scanSphereMaterial;
     private PlayerInput playerInput;
     private CharacterController cc;
@@ -50,6 +53,7 @@ public class Player : UnitBase
 
     //property
     public IInteractable LookInteractable => lookInteractable;
+    public ScanData ScanData => scanData;
     public override Stats BaseStats => testBaseStat;
 
     public override void OnCreate()
@@ -94,6 +98,7 @@ public class Player : UnitBase
     private void Start()
     {
         dataContainer = Services.Get<DataContainer>();
+        itemManager = Services.Get<ItemManager>();
     }
 
     private void Update()
@@ -123,6 +128,20 @@ public class Player : UnitBase
 
         IEnumerator ScanRoutine()
         {
+            //calculate
+            scanData = new ScanData { gameTime = Time.time };
+            foreach (var item in itemManager.Items)
+            {
+                if(item.InHand) continue;
+
+                if(IsInView(item.MeshRenderer))
+                {
+                    scanData.price += item.SellPrice;
+                    scanData.items.Add(item);
+                }
+            }
+
+            //animation
             scanSphere.gameObject.SetActive(true);
             scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
             yield return new WaitForSeconds(0.5f);
@@ -137,6 +156,29 @@ public class Player : UnitBase
             scanSphereMaterial.color = startColor;
             scanSphere.localScale = Vector3.one * 0.1f;
         }
+    }
+
+    private bool IsInView(Renderer toCheck)
+    {
+        Vector3 pointOnScreen = cam.WorldToScreenPoint(toCheck.bounds.center);
+
+        //Is inactive
+        if (!toCheck.gameObject.activeSelf)
+            return false;
+
+        //Is in front
+        if (pointOnScreen.z < 0)
+            return false;
+
+        //Is in FOV
+        if ((pointOnScreen.x < 0) || (pointOnScreen.x > Screen.width) || (pointOnScreen.y < 0) || (pointOnScreen.y > Screen.height))
+            return false;
+        
+        //Is covered
+        if (Physics.Linecast(cam.transform.position, toCheck.bounds.center, out _, LayerMask.GetMask("Ground")))
+            return false;
+
+        return true;
     }
 
     private void DoItem()

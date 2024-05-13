@@ -18,6 +18,7 @@ public class ItemBase : NetworkObject, IInteractable
     protected Animator animator;
     protected Rigidbody rb;
     protected PhotonTransformView transformView;
+    protected MeshRenderer meshRenderer;
 
     //property
     public bool InHand => ownUnit != null;
@@ -27,6 +28,7 @@ public class ItemBase : NetworkObject, IInteractable
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.itemDatas[key];
+    public MeshRenderer MeshRenderer => meshRenderer;
 
     //method
     public virtual void Initialize(string key)
@@ -57,6 +59,7 @@ public class ItemBase : NetworkObject, IInteractable
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         transformView = GetComponent<PhotonTransformView>();
+        meshRenderer = GetComponentInChildren<MeshRenderer>();
 
         dataContainer = Services.Get<DataContainer>();
         gameManager = Services.Get<GameManager>();
