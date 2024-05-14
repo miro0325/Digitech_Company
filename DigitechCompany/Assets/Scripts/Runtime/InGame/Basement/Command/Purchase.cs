@@ -52,8 +52,13 @@ public class Purchase : Command
             list.Add(GetItem(cmd));
             args[0] = "1";
         }
-        Delivary.Instance.AddDelivaryItems(list);
+        // Delivary.Instance.AddDelivaryItems(list);
         return GetExplainText(cmd,args);
+    }
+
+    public override void Init()
+    {
+        throw new System.NotImplementedException();
     }
 
     protected override string GetExplainText(string cmd, string[] args)

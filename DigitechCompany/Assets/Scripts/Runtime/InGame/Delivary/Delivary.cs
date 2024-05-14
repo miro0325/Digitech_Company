@@ -14,7 +14,7 @@ public class MovePoint
     public Ease ease;
 }
 
-public class Delivary : Singleton<Delivary>
+public class Delivary : MonoBehaviour
 {
     [SerializeField] float delivaryDuration;
     private float curTime = 0;
@@ -56,6 +56,11 @@ public class Delivary : Singleton<Delivary>
 
     private Queue<Action> delivaryOrders = new();
     private Queue<List<ItemBase>> delivaryOrderedItems = new();
+
+    private void Awake()
+    {
+        Services.Register(this);
+    }
 
     private void Start()
     {
