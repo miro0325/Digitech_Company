@@ -344,7 +344,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &898042749
 AudioListener:
   m_ObjectHideFlags: 0
@@ -451,20 +451,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 744550891679460419, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2738935238104813522, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 2738935238104813522, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3081533927603947071, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
         type: 3}
@@ -525,16 +515,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5628984937875474230, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6426595871727544431, guid: 9e7931ce363f39049a1c9d0b2202ce8f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e7931ce363f39049a1c9d0b2202ce8f, type: 3}

@@ -24,7 +24,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     //property
     public bool InHand => ownUnit != null;
-    public virtual InteractID TargetInteractID => InteractID.ID1;
     public virtual float SellPrice { get; protected set; }
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
@@ -47,9 +46,9 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         var player = unit as Player;
         if (player)
         {
-            if (!player.ItemContainer.IsInsertable())
+            if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
                 return "손이 꽉참";
-            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.ItemContainer.WholeWeight)
+            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.ItemContainer.WholeWeight + ItemData.weight) // if player strength lack
                 return "힘 부족";
             else
                 return "줍기";

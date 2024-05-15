@@ -53,20 +53,8 @@ public class DataContainer : MonoBehaviour
                     var itemData = ItemData.Parse(split[i]);
                     itemDatas.Add(itemData.key, itemData);
                 }
-                Debug.Log("Reload");
             }
         );
-    }
-
-    private void OnGUI()
-    {
-        GUI.Window(0, new Rect(20, 20, 200, 80), OnWindowUpdate, "DataContainer");
-    }
-
-    private void OnWindowUpdate(int id)
-    {
-        if(GUI.Button(new Rect(10, 30, 180, 40), "Reload"))
-            Load().Forget();
     }
 
     private async UniTask TSVTask(string address, long gid, Action<string> action)
