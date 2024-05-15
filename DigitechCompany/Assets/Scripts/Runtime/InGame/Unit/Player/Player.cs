@@ -4,10 +4,8 @@ using UnityEngine.Rendering;
 using UniRx;
 using System.Collections;
 using DG.Tweening;
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
 
-public class Player : UnitBase
+public class Player : UnitBase, IService
 {
     //const
     private readonly static int Animator_MoveStateHash = Animator.StringToHash("MoveState"); //0 : idle, 1 : move, 2 : run
@@ -98,13 +96,13 @@ public class Player : UnitBase
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        Services.Register(this);
+        ServiceLocator.For(this).Register(this);
     }
 
     private void Start()
     {
-        dataContainer = Services.Get<DataContainer>();
-        itemManager = Services.Get<ItemManager>();
+        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
+        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
     }
 
     private void Update()
@@ -198,7 +196,7 @@ public class Player : UnitBase
         {
             for (int i = 0; i < (int)InteractID.End; i++)
             {
-                if (playerInput.InteractInputReleased[i] && item.IsUsable((InteractID)i))
+                if (playerInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
                     item.OnUse((InteractID)i);
             }
 

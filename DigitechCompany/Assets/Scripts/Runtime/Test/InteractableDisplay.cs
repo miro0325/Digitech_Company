@@ -17,7 +17,7 @@ public class InteractableDisplay : MonoBehaviour
 
     private void Start()
     {
-        player = Services.Get<Player>();
+        player = ServiceLocator.For(this).Get<Player>();
 
         for(int i = 1; i < (int)InteractID.End; i++)
             interactActions[i] = playerActionAsset[$"Interact{i}"];

@@ -14,7 +14,7 @@ public class MovePoint
     public Ease ease;
 }
 
-public class Delivary : MonoBehaviour
+public class Delivary : MonoBehaviour, IService
 {
     [SerializeField] float delivaryDuration;
     private float curTime = 0;
@@ -59,7 +59,7 @@ public class Delivary : MonoBehaviour
 
     private void Awake()
     {
-        Services.Register(this);
+        ServiceLocator.ForGlobal().Register(this);
     }
 
     private void Start()

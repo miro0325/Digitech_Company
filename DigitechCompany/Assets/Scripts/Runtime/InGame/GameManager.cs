@@ -4,7 +4,7 @@ using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IService
 {
     private ItemManager itemManager;
 
@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        itemManager = Services.Get<ItemManager>();
+        itemManager = ServiceLocator.For(this).Get<ItemManager>();
         itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
     }
 }

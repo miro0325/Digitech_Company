@@ -5,8 +5,6 @@ using UnityEngine;
 public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
-    private GameManager gameManager;
-    private NetworkObjectManager networkObjectManager;
     private DataContainer dataContainer;
 
     //inspector field
@@ -93,9 +91,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
 
-        dataContainer = Services.Get<DataContainer>();
-        gameManager = Services.Get<GameManager>();
-        networkObjectManager = Services.Get<NetworkObjectManager>();
+        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
 
         this.ObserveEveryValueChanged(x => x.ownUnit)
             .Subscribe(guid => 

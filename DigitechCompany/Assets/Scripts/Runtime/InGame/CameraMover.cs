@@ -15,8 +15,8 @@ public class CameraMover : MonoBehaviour
 
     private void Start()
     {
-        player = Services.Get<Player>();
-        dataContainer = Services.Get<DataContainer>();
+        player = ServiceLocator.GetEveryWhere<Player>();
+        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
 
         // transform.SetParent(player.transform);
         transform.localPosition = Vector3.zero + offset;

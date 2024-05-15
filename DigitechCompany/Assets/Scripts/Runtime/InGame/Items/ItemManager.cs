@@ -5,7 +5,7 @@ using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ItemManager : MonoBehaviour
+public class ItemManager : MonoBehaviour, IService
 {
     private ResourceLoader resourceLoader;
 
@@ -48,7 +48,7 @@ public class ItemManager : MonoBehaviour
 
     private void Awake()
     {
-        Services.Register(this);
-        resourceLoader = Services.Get<ResourceLoader>();
+        ServiceLocator.For(this).Register(this);
+        resourceLoader = ServiceLocator.GetEveryWhere<ResourceLoader>();
     }
 }

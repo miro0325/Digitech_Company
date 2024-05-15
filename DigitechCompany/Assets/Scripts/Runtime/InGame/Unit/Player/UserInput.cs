@@ -14,6 +14,7 @@ public enum InteractID
 
 public class UserInput : MonoBehaviourPun, IPunObservable
 {
+    //field
     private PlayerInput playerInput;
     private InputAction moveAction;
     private InputAction scanAction;
@@ -35,6 +36,7 @@ public class UserInput : MonoBehaviourPun, IPunObservable
     private bool[] interactInputReleased = new bool[(int)InteractID.End];
     private bool discardInput;
 
+    //property
     public Vector2 MoveInput => moveInput;
     public Vector2 MouseInput => mouseInput;
     public float MouseWheel => mouseWheel;
@@ -46,6 +48,7 @@ public class UserInput : MonoBehaviourPun, IPunObservable
     public bool[] InteractInputReleased => interactInputReleased;
     public bool DiscardInput => discardInput;
 
+    //method
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();

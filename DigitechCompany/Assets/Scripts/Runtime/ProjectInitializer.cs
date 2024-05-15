@@ -44,7 +44,7 @@ public class LoadingTaskData<T> : TaskData
     public Action<T> onComplete;
 }
 
-public class ProjectInitializer : MonoBehaviour
+public class ProjectInitializer : MonoBehaviour, IService
 {
     private List<TaskData> loadingTasks = new();
 
@@ -57,7 +57,7 @@ public class ProjectInitializer : MonoBehaviour
 
     public void Awake()
     {
-        Services.Register(this);
+        ServiceLocator.ForGlobal().Register(this);
         InvokeTask();
     }
 

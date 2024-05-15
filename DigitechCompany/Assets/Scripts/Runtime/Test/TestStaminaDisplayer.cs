@@ -9,7 +9,7 @@ public class TestStaminaDisplayer : MonoBehaviour
 
     private void Start()
     {
-        player = Services.Get<Player>();
+        player = ServiceLocator.GetEveryWhere<Player>();
         text = GetComponent<TextMeshProUGUI>();
     }
 
