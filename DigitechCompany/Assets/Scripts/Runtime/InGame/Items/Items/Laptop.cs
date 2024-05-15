@@ -6,8 +6,8 @@ using Photon.Pun;
 
 public class Laptop : ItemBase
 {
-    private readonly int closeAnim = Animator.StringToHash("Close");
-    private readonly int openAnim = Animator.StringToHash("Open");
+    private readonly int closeAnim = Animator.StringToHash("LaptopClose");
+    private readonly int openAnim = Animator.StringToHash("LaptopOpen");
     private readonly int textureID = Shader.PropertyToID("_MainTex");
 
     [SerializeField]
@@ -19,7 +19,7 @@ public class Laptop : ItemBase
     private Texture2D[] textures;
 
     private bool isOpen = false;
-    private bool isPlaying = false;
+    public bool isPlaying = false;
 
     protected override void Update()
     {
@@ -30,6 +30,7 @@ public class Laptop : ItemBase
     {
         base.OnInteract(unit);
         animator.Play("Idle");
+        //transform.localEulerAngles = new Vector3(-90, 0, 0);
     }
 
     public override bool IsUsable(InteractID id)
