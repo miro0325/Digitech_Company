@@ -7,30 +7,25 @@ using System.Text.RegularExpressions;
 [CreateAssetMenu(menuName ="Command/Purchase")]
 public class Purchase : Command
 {
+    
+    
+    // public override string[] Aliases
+    // {
+    //     get
+    //     {
+    //         //Debug.Log(itemList[0].Name);
+    //         var list = itemList;
+    //         if(itemDict.Count == 0)
+    //         {
+    //             foreach(var item in list)
+    //             {
+    //                 itemDict.Add(item.Name.ToLower(), item);
+    //             }
+    //         }
+    //         return list.Select(x => x.Name.ToLower()).ToArray();
+    //     }
 
-
-
-    public override string[] Aliases
-    {
-        //get
-        //{
-        //    //Debug.Log(itemList[0].Name);
-        //    var list = itemList;
-        //    if (itemDict.Count == 0)
-        //    {
-        //        foreach (var item in list)
-        //        {
-        //            itemDict.Add(item.Name.ToLower(), item);
-        //        }
-        //    }
-        //    return list.Select(x => x.Name.ToLower()).ToArray();
-        //}
-        get
-        {
-            return null;
-        }
-
-    }
+    // }
 
     [SerializeField] ItemBase[] itemList; 
     private Dictionary<string, ItemBase> itemDict = new();
@@ -57,8 +52,13 @@ public class Purchase : Command
             list.Add(GetItem(cmd));
             args[0] = "1";
         }
-        Delivary.Instance.AddDelivaryItems(list);
+        // Delivary.Instance.AddDelivaryItems(list);
         return GetExplainText(cmd,args);
+    }
+
+    public override void Init()
+    {
+        throw new System.NotImplementedException();
     }
 
     protected override string GetExplainText(string cmd, string[] args)
@@ -93,8 +93,4 @@ public class Purchase : Command
         return null;
     }
 
-    public override void Init()
-    {
-        throw new System.NotImplementedException();
-    }
 }

@@ -21,7 +21,7 @@ public class NetworkObjectManager : MonoBehaviourPun
             obj.OnCreate();
 
             //send rpc to another
-            photonView.RPC(nameof(InstantiateNetworkObjectRPC), RpcTarget.Others, path, guid, pv.ViewID, pos, rot);
+            photonView.RPC(nameof(InstantiateNetworkObjectRPC), RpcTarget.OthersBuffered, path, guid, pv.ViewID, pos, rot);
             return obj;
         }
         else
@@ -47,7 +47,7 @@ public class NetworkObjectManager : MonoBehaviourPun
 
     internal void DestoryNetworkObjectInternal(string guid)
     {
-        photonView.RPC(nameof(DestoryNetworkObjectRpc), RpcTarget.All, guid);
+        photonView.RPC(nameof(DestoryNetworkObjectRpc), RpcTarget.AllBuffered, guid);
     }
 
     [PunRPC]
@@ -61,7 +61,7 @@ public class NetworkObjectManager : MonoBehaviourPun
             if (obj) PhotonNetwork.Destroy(obj.photonView);
         }
 
-        if (!networkObjects.ContainsKey(guid)) return;
-        networkObjects.Remove(guid);
+        if (networkObjects.ContainsKey(guid))
+            networkObjects.Remove(guid);
     }
 }

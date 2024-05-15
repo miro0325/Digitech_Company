@@ -20,7 +20,8 @@ public class Player : UnitBase
     private ItemManager itemManager;
 
     //inspector field
-    [Header("Value")]
+    [Space(20)]
+    [Header("Player")]
     [SerializeField] private float gravity;
     [SerializeField] private float jumpScale;
     [SerializeField] private float camRotateXClamp;
@@ -28,7 +29,6 @@ public class Player : UnitBase
     [Header("Reference")]
     [SerializeField] private Transform camView;
     [SerializeField] private Camera cam;
-    [SerializeField] private Transform itemHolder;
     [SerializeField] private Transform itemHolderCamera;
     [SerializeField] private Transform scanSphere;
     [Header("Animator")]
@@ -43,22 +43,24 @@ public class Player : UnitBase
     private float scanWaitTime;
     private float camRotateX;
     private float velocityY;
+    private float interactRequireTime;
     private ScanData scanData;
     private Material scanSphereMaterial;
     private PlayerInput playerInput;
     private CharacterController cc;
     private IInteractable lookInteractable;
-    private ItemContainer itemContainer;
     private Stats testBaseStat; //test base stat(need to change)
 
     //property
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
+    public Transform ItemHolderCamera => itemHolderCamera;
     public override Stats BaseStats => testBaseStat;
 
     public override void OnCreate()
     {
         base.OnCreate();
+        playerInput = GetComponent<PlayerInput>();
 
         if (!photonView.IsMine) return;
         itemContainer = new(4);
@@ -77,7 +79,6 @@ public class Player : UnitBase
         maxStats.ChangeFrom(testBaseStat);
 
         cc = GetComponent<CharacterController>();
-        playerInput = GetComponent<PlayerInput>();
 
         playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>().For((i, ele) => ele.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
         camView.gameObject.SetActive(true);
@@ -113,6 +114,8 @@ public class Player : UnitBase
 
     private void DoScan()
     {
+        if (!photonView.IsMine) return;
+
         if (scanWaitTime > 0)
         {
             scanWaitTime -= Time.deltaTime;
@@ -129,12 +132,12 @@ public class Player : UnitBase
         IEnumerator ScanRoutine()
         {
             //calculate
-            scanData = new ScanData { gameTime = Time.time };
+            scanData = new ScanData { gameTime = Time.time, items = new() };
             foreach (var item in itemManager.Items)
             {
-                if(item.InHand) continue;
+                if (item.InHand) continue;
 
-                if(IsInView(item.MeshRenderer))
+                if (IsInView(item.MeshRenderer))
                 {
                     scanData.price += item.SellPrice;
                     scanData.items.Add(item);
@@ -173,7 +176,7 @@ public class Player : UnitBase
         //Is in FOV
         if ((pointOnScreen.x < 0) || (pointOnScreen.x > Screen.width) || (pointOnScreen.y < 0) || (pointOnScreen.y > Screen.height))
             return false;
-        
+
         //Is covered
         if (Physics.Linecast(cam.transform.position, toCheck.bounds.center, out _, LayerMask.GetMask("Ground")))
             return false;
@@ -205,45 +208,43 @@ public class Player : UnitBase
         if (item == null) return;
 
         itemContainer.PopCurrentItem();
-        item.LayRotation = transform.eulerAngles.y;
+        item.SetLayRotation(transform.eulerAngles.y);
         item.OnDiscard();
-        item.transform.SetParent(null);
-
-        photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, true);
-    }
-
-    [PunRPC]
-    private void SetItemParentRpc(string guid, bool isThrow)
-    {
-        var item = NetworkObject.GetNetworkObject(guid);
-        item.transform.SetParent(isThrow ? null : itemHolder);
     }
 
     private void DoInteract()
     {
+        if (!photonView.IsMine) return;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactionDistance, ~LayerMask.GetMask("Player")))
             hit.collider.TryGetComponent(out lookInteractable);
         else
             lookInteractable = null;
 
-        if (!photonView.IsMine) return;
         if (lookInteractable != null && LookInteractable.IsInteractable(this) && playerInput.InteractInputs[(int)lookInteractable.GetTargetInteractID(this)])
         {
-            if (lookInteractable is ItemBase)
+            if (interactRequireTime < lookInteractable.GetInteractRequireTime(this))
             {
-                var item = lookInteractable as ItemBase;
-                if (itemContainer.WholeWeight < curStats.GetStat(Stats.Key.Weight) && itemContainer.TryInsertItem(item))
-                {
-                    item.transform.SetParent(itemHolderCamera);
-                    item.OnInteract(this);
-                    item.OnActive();
-                    photonView.RPC(nameof(SetItemParentRpc), RpcTarget.Others, item.guid, false);
-                }
+                interactRequireTime += Time.deltaTime;
             }
             else
             {
-                lookInteractable.OnInteract(this);
+                interactRequireTime = 0;
+                if (lookInteractable is ItemBase)
+                {
+                    var item = lookInteractable as ItemBase;
+                    itemContainer.InsertItem(item);
+                    item.OnInteract(this);
+                    item.OnActive();
+                }
+                else
+                {
+                    lookInteractable.OnInteract(this);
+                }
             }
+        }
+        else
+        {
+            interactRequireTime = 0;
         }
     }
 
@@ -339,108 +340,23 @@ public class Player : UnitBase
         if (playerInput.MoveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else playerModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-        if (photonView.IsMine) //body view
-        {
-            //arm animator
-            armModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
-            armModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
-            armModelAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
+        if (!photonView.IsMine) return;
 
-            if (playerInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
-            else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
+        //arm animator
+        armModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
+        armModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
+        armModelAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
 
-            //camera animator
-            if (playerInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
-            else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
+        if (playerInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
+        else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-            if (playerInput.JumpInput && playerInput.IsGround)
-                camAnimator.SetTrigger(Animator_JumpHash);
-            camAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
-        }
-    }
+        //camera animator
+        if (playerInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
+        else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-    private void OnAnimatorIK(int layerIndex)
-    {
-        //item hand ik
-        Debug.Log("test");
-        var curItem = itemContainer.GetCurrentSlotItem();
-
-        //body view
-        if (curItem != null) //in hand
-        {
-            if (curItem.LeftHandPoint != null)
-            {
-                playerModelAnimator.SetIKPosition(AvatarIKGoal.LeftHand, curItem.LeftHandPoint.position);
-                playerModelAnimator.SetIKRotation(AvatarIKGoal.LeftHand, curItem.LeftHandPoint.rotation);
-                playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-                playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-            }
-            else
-            {
-                playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-                playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0);
-            }
-
-            if (curItem.RightHandPoint != null)
-            {
-                playerModelAnimator.SetIKPosition(AvatarIKGoal.RightHand, curItem.RightHandPoint.position);
-                playerModelAnimator.SetIKRotation(AvatarIKGoal.RightHand, curItem.RightHandPoint.rotation);
-                playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
-                playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
-            }
-            else
-            {
-                playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
-                playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0);
-            }
-        }
-        else
-        {
-            playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-            playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0);
-            playerModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
-            playerModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0);
-        }
-
-        //camera view
-        if (photonView.IsMine)
-        {
-            if (curItem != null) //in hand
-            {
-                if (curItem.LeftHandPoint != null)
-                {
-                    armModelAnimator.SetIKPosition(AvatarIKGoal.LeftHand, curItem.LeftHandPoint.position);
-                    armModelAnimator.SetIKRotation(AvatarIKGoal.LeftHand, curItem.LeftHandPoint.rotation);
-                    armModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-                    armModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-                }
-                else
-                {
-                    armModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-                    armModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0);
-                }
-
-                if (curItem.RightHandPoint != null)
-                {
-                    armModelAnimator.SetIKPosition(AvatarIKGoal.RightHand, curItem.RightHandPoint.position);
-                    armModelAnimator.SetIKRotation(AvatarIKGoal.RightHand, curItem.RightHandPoint.rotation);
-                    armModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
-                    armModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
-                }
-                else
-                {
-                    armModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
-                    armModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0);
-                }
-            }
-            else
-            {
-                armModelAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-                armModelAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0);
-                armModelAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
-                armModelAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0);
-            }
-        }
+        if (playerInput.JumpInput && playerInput.IsGround)
+            camAnimator.SetTrigger(Animator_JumpHash);
+        camAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
     }
 
     private void OnDrawGizmosSelected()
