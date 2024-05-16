@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class UIView : MonoBehaviour
+public abstract class UIView : MonoBehaviour
 {
-    
+    public abstract void Open();
+    public abstract void Close();
 }

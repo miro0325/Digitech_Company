@@ -21,6 +21,7 @@ public class Player : UnitBase, IService
     //inspector field
     [Space(20)]
     [Header("Player")]
+    [SerializeField] private float smoothInputSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpScale;
     [SerializeField] private float camRotateXClamp;
@@ -293,7 +294,7 @@ public class Player : UnitBase, IService
         }
 
         //movement
-        var inputMag = Mathf.Clamp01(playerInput.MoveInput.magnitude);
+        var inputMag = Mathf.Clamp01(playerInput.MouseInput.magnitude);
         var relativeDir = transform.TransformDirection(new Vector3(playerInput.MoveInput.x, 0, playerInput.MoveInput.y)).normalized;
         var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
         var crouchShave = isCrouch ? 0.5f : 1f;
