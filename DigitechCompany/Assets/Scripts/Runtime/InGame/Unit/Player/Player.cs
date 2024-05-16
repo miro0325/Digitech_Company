@@ -55,6 +55,7 @@ public class Player : UnitBase, IService
     private Stats testBaseStat; //test base stat(need to change)
 
     //property
+    public float[] InteractRequireTimes => interactRequireTimes;
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
     public Transform ItemHolderCamera => itemHolderCamera;
@@ -319,8 +320,11 @@ public class Player : UnitBase, IService
         else
         {
             speed *= 1.5f;
-            curStats.SetStat(Stats.Key.Stamina, x => x -= Time.deltaTime);
-            runStaminaRecoverWaitTime = 1.5f;
+            if(inputMag > 0)
+            {
+                curStats.SetStat(Stats.Key.Stamina, x => x -= Time.deltaTime);
+                runStaminaRecoverWaitTime = 1.5f;
+            }
 
             if (curStats.GetStat(Stats.Key.Stamina) <= 0) isRun = false;
             if (!playerInput.RunInput) isRun = false;
