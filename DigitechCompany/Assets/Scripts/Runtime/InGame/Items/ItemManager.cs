@@ -15,35 +15,41 @@ public class ItemManager : MonoBehaviour, IService
 
     public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
-        int wholeItemAmount = 35 * difficulty;
-        int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
+        //int wholeItemAmount = 35 * difficulty;
+        //int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
 
-        foreach (var area in spawnAreas)
-        {
-            int spawnItemAmount = Random.Range(0, averageItemAmount * 2);
+        //foreach (var area in spawnAreas)
+        //{
+        //    int spawnItemAmount = Random.Range(0, averageItemAmount * 2);
 
-            for (int i = 0; i < spawnItemAmount; i++)
-            {
-                var randomPos = 
-                    new Vector3
-                    (
-                        Random.Range(area.min.x, area.max.x), 
-                        Random.Range(-2, 2), //need to fix
-                        Random.Range(area.min.z, area.max.z)
-                    );
+        //    for (int i = 0; i < spawnItemAmount; i++)
+        //    {
+        //        var randomPos = 
+        //            new Vector3
+        //            (
+        //                Random.Range(area.min.x, area.max.x), 
+        //                Random.Range(-2, 2), //need to fix
+        //                Random.Range(area.min.z, area.max.z)
+        //            );
 
-                if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
-                {
-                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
-                    var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
-                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
-                    item.transform.position = hit.position + Vector3.up;
-                    item.SetLayRotation(Random.Range(0, 360));
-                    item.Initialize(randomItemKey);
-                    items.Add(item);
-                }
-            }
-        }
+        //        if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+        //        {
+        //            var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+        //            var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
+        //            var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
+        //            item.transform.position = hit.position + Vector3.up;
+        //            item.SetLayRotation(Random.Range(0, 360));
+        //            item.Initialize(randomItemKey);
+        //            items.Add(item);
+        //        }
+        //    }
+        //}
+        var item = NetworkObject.Instantiate($"Prefabs/Items/Laptop").GetComponent<ItemBase>();
+        item.transform.position = Vector3.one;
+        item.SetLayRotation(Random.Range(0, 360));
+        item.Initialize("Laptop");
+        items.Add(item);
+
     }
 
     private void Awake()

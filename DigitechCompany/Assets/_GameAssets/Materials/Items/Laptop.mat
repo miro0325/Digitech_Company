@@ -10,7 +10,6 @@ Material:
   m_Name: Laptop
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords:
-  - USE_BUMPMAP
   - USE_SPECULAR
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -123,7 +122,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _UseBumpMap: 1
+    - _UseBumpMap: 0
     - _UseMainLight: 0
     - _UseSpecular: 1
     - _WorkflowMode: 1

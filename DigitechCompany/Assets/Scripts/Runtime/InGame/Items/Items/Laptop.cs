@@ -23,14 +23,13 @@ public class Laptop : ItemBase
 
     protected override void Update()
     {
-        //if (!isPlaying) animator.Play("Idle");
     }
 
     public override void OnInteract(UnitBase unit)
     {
         base.OnInteract(unit);
         animator.Play("Idle");
-        //transform.localEulerAngles = new Vector3(-90, 0, 0);
+        Debug.Log("Interact");
     }
 
     public override bool IsUsable(InteractID id)

@@ -226,8 +226,8 @@ public class Player : UnitBase, IService
 
         if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
-            Debug.Log(interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)]);
-
+            //Debug.Log(interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)]);
+            Debug.Log(playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)]);
             //if pressed target interact id => mark interact is start
             if (playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
