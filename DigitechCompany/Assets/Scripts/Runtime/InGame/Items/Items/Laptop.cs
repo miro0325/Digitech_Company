@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Photon.Pun;
 
-public class Laptop : ItemBase
+public class Laptop : ItemBase, IPunObservable
 {
     private readonly int closeAnim = Animator.StringToHash("LaptopClose");
     private readonly int openAnim = Animator.StringToHash("LaptopOpen");
@@ -51,12 +51,24 @@ public class Laptop : ItemBase
     public void EndAnimation()
     {
         isPlaying = false;
-        photonView.RPC(nameof(EndAnimationRPC), RpcTarget.Others);
+        //photonView.RPC(nameof(EndAnimationRPC), RpcTarget.Others);
     }
 
-    [PunRPC]
-    private void EndAnimationRPC()
+    //[PunRPC]
+    //private void EndAnimationRPC()
+    //{
+    //    isPlaying = false;
+    //}
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        isPlaying = false;
+        if (stream.IsWriting)
+        {
+            stream.SendNext(isPlaying);
+        }
+        else
+        {
+            isPlaying = (bool)stream.ReceiveNext();
+        }
     }
 }

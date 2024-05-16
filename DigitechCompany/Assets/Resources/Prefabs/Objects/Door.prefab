@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1550975326256456482, guid: 04ea3646b3e883d4f95bbfd0dde56605, type: 3}
+  - {fileID: 2100000, guid: dd8bd08cfb71197458f85d81c7d5c0bb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -144,7 +144,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1550975326256456482, guid: 04ea3646b3e883d4f95bbfd0dde56605, type: 3}
+  - {fileID: 2100000, guid: dd8bd08cfb71197458f85d81c7d5c0bb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -232,7 +232,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1550975326256456482, guid: 04ea3646b3e883d4f95bbfd0dde56605, type: 3}
+  - {fileID: 2100000, guid: dd8bd08cfb71197458f85d81c7d5c0bb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -303,6 +303,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 5002529753773513219}
   - {fileID: 5002529753773513277}
   sceneViewId: 0
   InstantiationId: 0

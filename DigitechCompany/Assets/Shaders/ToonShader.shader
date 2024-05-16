@@ -21,6 +21,7 @@ Shader "Unlit/ToonShader"
         _Cel ("Cel", Range(1,10)) = 3
         _RimThreshold("Rim Threshold",float) = 1
         _Smoothness("Smoothness",float) = 1
+        _NormalStrength("Normal Strength",Range(0,10)) = 1
 
         _EdgeDiffuse ("Edge Diffuse", float) = 1
         _EdgeSpecular ("Edge Specular", float) = 1
@@ -105,6 +106,7 @@ Shader "Unlit/ToonShader"
                 float2 uv_Emission : TEXCOORD0;
                 float4 position : POSITION;
                 float3 normal : NORMAL;
+                float4 tangent : TANGENT;
             };
 
             struct Varyings
@@ -118,6 +120,11 @@ Shader "Unlit/ToonShader"
                 float2 uv_BumpMap : TEXCOORD2;
                 float2 uv_Emission : TEXCOORD3;
                 float3 viewDir : TEXCOORD4;
+                //#if USE_BUMPMAP
+                float3 T : TEXCOORD5;
+                float3 B : TEXCOORD6;
+                float3 N : TEXCOORD7;
+                //#endif
             };
 
             struct LightVariables {
@@ -154,6 +161,7 @@ Shader "Unlit/ToonShader"
 
             float _RimThreshold;
             float _Smoothness;
+            float _NormalStrength;
                 
             bool _UseBumpMap;
             bool _UseSpecular;
@@ -228,6 +236,21 @@ Shader "Unlit/ToonShader"
                 #endif
             }
 
+            void LocalNormalToTBN(half3 localNormal, float4 tangent, inout half3 T, inout half3 B, inout half3 N) 
+            {
+                half tangentSign = tangent.w * unity_WorldTransformParams.w;    
+                N = normalize(TransformObjectToWorld(localNormal));
+                T = normalize(mul(unity_ObjectToWorld, float4(tangent.x, tangent.y, tangent.z, 0)).xyz);
+                B = normalize(cross(N,T) * tangentSign);
+            }
+
+            half3 TangentNormalToWorldNormal(half3 tangentNormal, half3 T, half3 B, half3 N) 
+            {
+                float3x3 TBN = float3x3(T,B,N);
+                TBN = transpose(TBN);
+                return mul(TBN,tangentNormal);
+            }
+
             Varyings vert (Attributes IN)
             {
                 Varyings OUT;
@@ -243,6 +266,9 @@ Shader "Unlit/ToonShader"
                 OUT.uv_Emission = IN.uv_Emission;
                 OUT.viewDir = normalize(_WorldSpaceCameraPos.xyz - IN.position);
                 //OUT.viewDir = WorldSpaceViewDir(IN.position);    
+                #if USE_BUMPMAP
+                LocalNormalToTBN(IN.normal,IN.tangent,OUT.T,OUT.B,OUT.N);
+                #endif
                 return OUT;
             }
 
@@ -253,12 +279,14 @@ Shader "Unlit/ToonShader"
 
                 float3 Normal;
 
-
-                //#ifdef USE_BUMPMAP
-                //    Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
-                //#else
+                #ifdef USE_BUMPMAP
+                    float2 uv = TRANSFORM_TEX(IN.uv,_MainTex);
+                    half3 tangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv * _BumpMap_ST.rg));
+                    tangentNormal.xy *= _NormalStrength;
+                    Normal = (TangentNormalToWorldNormal(tangentNormal,IN.T,IN.B,IN.N));
+                #else
                     Normal = normalize(IN.worldNormal); 
-                //#endif
+                #endif
                 half3 lightDir;
                 //half3 lightColor;
                 //float attenuation;

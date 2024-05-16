@@ -250,7 +250,8 @@ Material:
     (Instance) (Instance)
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - SHADOWS_SCREEN
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -350,6 +351,7 @@ Material:
     - _GlossyReflections: 0
     - _LightStrength: 1
     - _Metallic: 0
+    - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.02
     - _Parallax: 0.005
@@ -364,6 +366,7 @@ Material:
     - _Surface: 0
     - _UseBumpMap: 0
     - _UseMainLight: 0
+    - _UseShadowScreen: 1
     - _UseSpecular: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
@@ -5440,7 +5443,7 @@ Transform:
   m_Children:
   - {fileID: 150715391}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 19.797, y: 0, z: 0}
 --- !u!114 &116349224
 MonoBehaviour:
@@ -11309,7 +11312,8 @@ Material:
     (Instance) (Instance)
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - SHADOWS_SCREEN
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -11409,6 +11413,7 @@ Material:
     - _GlossyReflections: 0
     - _LightStrength: 1
     - _Metallic: 0
+    - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.03
     - _Parallax: 0.005
@@ -11423,6 +11428,7 @@ Material:
     - _Surface: 0
     - _UseBumpMap: 0
     - _UseMainLight: 0
+    - _UseShadowScreen: 1
     - _UseSpecular: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
@@ -37347,6 +37353,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 686040211684682595, guid: 0944b911d87fee649852683b5615acdd,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 8406462539473760066, guid: 0944b911d87fee649852683b5615acdd,
         type: 3}
       propertyPath: sceneViewId
