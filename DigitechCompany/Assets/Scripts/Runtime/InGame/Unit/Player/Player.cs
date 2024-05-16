@@ -127,7 +127,7 @@ public class Player : UnitBase, IService
         {
             if (playerInput.ScanInput)
             {
-                scanWaitTime = 1.25f;
+                scanWaitTime = 1.33f;
                 StartCoroutine(ScanRoutine());
             }
         }
