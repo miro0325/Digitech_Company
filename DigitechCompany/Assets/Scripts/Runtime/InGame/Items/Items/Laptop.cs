@@ -23,7 +23,7 @@ public class Laptop : ItemBase
 
     protected override void Update()
     {
-        
+        //if (!isPlaying) animator.Play("Idle");
     }
 
     public override void OnInteract(UnitBase unit)

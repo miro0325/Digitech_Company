@@ -12,6 +12,7 @@ Material:
   m_ValidKeywords:
   - USE_SPECULAR
   m_InvalidKeywords:
+  - SHADOWS_SCREEN
   - _USEMAINLIGHT_ON
   - _USESPECULAR_ON
   m_LightmapFlags: 4
@@ -116,13 +117,14 @@ Material:
     - _ReceiveShadows: 1
     - _RimPower: 0
     - _RimThreshold: 1
-    - _Smoothness: 0.5
+    - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
     - _UseBumpMap: 0
     - _UseMainLight: 0
+    - _UseShadowScreen: 1
     - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1

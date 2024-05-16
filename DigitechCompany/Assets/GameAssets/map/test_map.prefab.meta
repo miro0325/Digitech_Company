@@ -1,6 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:DigitechCompany/Assets/GameAssets/map/test_map.prefab.meta
 guid: c92eb5b0a72ee4d40b46ccdc29d495f5
 PrefabImporter:
+========
+guid: 2eb48a38bcda6464b9b6dabba9a0342a
+folderAsset: yes
+DefaultImporter:
+>>>>>>>> feature/develop-shader:DigitechCompany/Assets/GameAssets.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

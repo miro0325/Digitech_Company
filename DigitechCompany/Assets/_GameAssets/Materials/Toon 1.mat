@@ -12,6 +12,7 @@ Material:
   m_ValidKeywords:
   - USE_SPECULAR
   m_InvalidKeywords:
+  - SHADOWS_SCREEN
   - _CLIPPLANEWORLD_ON
   - _FALLBACKOUTLINES_ON
   - _METALMATERIAL_ON
@@ -139,7 +140,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Cel: 3.43
+    - _Cel: 2.32
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _ClipAlphaThreshold: 1
@@ -274,6 +275,7 @@ Material:
     - _UseMaterial5: 1
     - _UsePattern: 1
     - _UseShadowRamp: 1
+    - _UseShadowScreen: 1
     - _UseSpecular: 1
     - _UseVertexColorAO: 1
     - _UseWeapon: 0
@@ -351,7 +353,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _ClipPlane: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0, g: 0.70638037, b: 1, a: 1}
+    - _Color: {r: 0, g: 0.54320693, b: 1, a: 1}
     - _CoolShadowMultColor: {r: 0.9, g: 0.7, b: 0.75, a: 1}
     - _CoolShadowMultColor2: {r: 0.9, g: 0.7, b: 0.75, a: 1}
     - _CoolShadowMultColor3: {r: 0.9, g: 0.7, b: 0.75, a: 1}

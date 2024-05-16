@@ -10,6 +10,7 @@ Shader "Unlit/ToonShader"
         [Toggle(USE_BUMPMAP)]_UseBumpMap("Enable Normal Map", Range(0,1)) = 0 
         [Toggle(USE_SPECULAR)]_UseSpecular("Enable Specular", Range(0,1)) = 0 
         [Toggle(ONLY_MAINLIGHT)]_UseMainLight("Enable MainLight", float) = 1
+        [Toggle(SHADOWS_SCREEN)]_UseShadowScreen("Enable Shadow Screen", float) = 1
 
         _MainTex ("Texture", 2D) = "white" {}
         _BumpMap("NormalMap", 2D) = "bump" {}
@@ -170,31 +171,31 @@ Shader "Unlit/ToonShader"
             CBUFFER_END
 
             half3 CalculateCelShading(Light l, LightVariables s) {
-                float shadowAttenuationSmoothSpeed = smoothstep(0,_EdgeShadowAttenuation,l.shadowAttenuation);
-                float distanceAttenuationSmoothSpeed = smoothstep(0,_EdgeDistanceAttenuation,l.distanceAttenuation);
-                float attenuation = shadowAttenuationSmoothSpeed * distanceAttenuationSmoothSpeed;
+                float shadowAttenuationSmoothStepped = smoothstep(0,_EdgeShadowAttenuation,l.shadowAttenuation);
+                float distanceAttenuationSmoothStepped = smoothstep(0,_EdgeDistanceAttenuation,l.distanceAttenuation);
+                float attenuation = shadowAttenuationSmoothStepped * distanceAttenuationSmoothStepped;
 
-                float diffuse = saturate(dot(s.Normal,l.direction));
-                diffuse = diffuse * 0.5 + 0.5;
+                float diffuse = saturate(dot(s.Normal,l.direction)) * 0.5 + 0.5;
                 diffuse *= attenuation;
-                half Toon = floor(diffuse * _Cel) * (1/_Cel);
-                //half Toon = diffuse;
-                Toon = smoothstep(0, _EdgeDiffuse,Toon);
+                //half Toon = floor(diffuse * _Cel) * (1/_Cel);
+                half Toon = ceil(diffuse * _Cel) / _Cel;
                 //Toon = Toon > 0 ? 1 : 0;
-
+                
                 float3 HalfVector = SafeNormalize(l.direction + s.ViewDir);
-                float specular = saturate(dot(HalfVector,s.Normal));
+                float specular = saturate(dot(s.Normal,HalfVector));
                 specular = pow(specular,s.Shininess);
-                specular = specular > 0.2 ? 1 : 0; 
                 specular *= Toon * s.Smoothness;
-                //specular = s.Smoothness * smoothstep((1 - s.Smoothness) * _EdgeSpecular + _EdgeSpecularOffset,_EdgeSpecular + _EdgeSpecularOffset,specular); 
+                specular = specular > 0.2 ? 1 : 0; 
 
                 float rim = 1 - dot(s.ViewDir,s.Normal);
-                rim *= pow(diffuse,s.RimThreshold);
+                rim *= pow(Toon,s.RimThreshold);
                 rim = rim > 0.75 ? 1 : 0;
+                
+                Toon = smoothstep(0, _EdgeDiffuse,Toon);
+                specular = s.Smoothness * smoothstep((1 - s.Smoothness) * _EdgeSpecular + _EdgeSpecularOffset,_EdgeSpecular + _EdgeSpecularOffset,specular); 
                 rim = s.Smoothness * smoothstep(_EdgeRim - 0.5f * _EdgeRimOffset,_EdgeRim + 0.5f * _EdgeRimOffset,rim);
 
-                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5)).rgb;
+                half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(1 - Toon,0.5)).rgb;
                 return l.color * (Ramp + max(specular,rim));
             }   
 
@@ -206,19 +207,22 @@ Shader "Unlit/ToonShader"
                 s.Smoothness = Smoothness;
                 s.Shininess = exp2(10 * Smoothness + 1);
                 s.RimThreshold = RimThreshold;
-                float3 viewPos = TransformWorldToView(Position);
-                float4 clipPos = TransformObjectToHClip(Position);
-                float4 shadowCoord = ComputeScreenPos(clipPos);
+                #if SHADOWS_SCREEN
+                    float4 clipPos = TransformObjectToHClip(Position);
+                    float4 shadowCoord = ComputeScreenPos(clipPos);
+                #else
+                    float4 shadowCoord = TransformWorldToShadowCoord(Position);
+                #endif
 
                 //float4 shadowCoord = TransformWorldToShadowCoord(Position);
 
-                Light light = GetMainLight();
+                Light light = GetMainLight(shadowCoord);
                 Color = CalculateCelShading(light,s);
                 #ifdef ONLY_MAINLIGHT
                 #else
                 int pixelLightCount = GetAdditionalLightsCount();
                 for(int i = 0; i < pixelLightCount; i++) {
-                    light = GetAdditionalLight(i,Position);
+                    light = GetAdditionalLight(i,Position,1);
                     Color += CalculateCelShading(light,s);
                 }
                 #endif
@@ -237,8 +241,8 @@ Shader "Unlit/ToonShader"
                 OUT.uv_BumpMap = IN.uv_BumpMap;
                 OUT.uv_RampTex = IN.uv_RampTex;
                 OUT.uv_Emission = IN.uv_Emission;
-                OUT.viewDir = normalize(_WorldSpaceCameraPos.xyz - temp);
-                    
+                OUT.viewDir = normalize(_WorldSpaceCameraPos.xyz - IN.position);
+                //OUT.viewDir = WorldSpaceViewDir(IN.position);    
                 return OUT;
             }
 
@@ -250,44 +254,44 @@ Shader "Unlit/ToonShader"
                 float3 Normal;
 
 
-                #ifdef USE_BUMPMAP
-                    Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
-                #else
+                //#ifdef USE_BUMPMAP
+                //    Normal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, TRANSFORM_TEX(IN.uv_BumpMap, _BumpMap)));
+                //#else
                     Normal = normalize(IN.worldNormal); 
-                #endif
+                //#endif
                 half3 lightDir;
-                half3 lightColor;
-                float attenuation;
+                //half3 lightColor;
+                //float attenuation;
 
                 Light light = GetMainLight();
                 lightDir = normalize(light.direction);  
-                lightColor = light.color;
-                attenuation = light.distanceAttenuation;
+                //lightColor = light.color;
+                //attenuation = light.distanceAttenuation;
 
-                half rim = 1 - max(saturate(dot(Normal,normalize(IN.viewDir))),0);
+                //half rim = 1 - max(saturate(dot(Normal,normalize(IN.viewDir))),0);
                 
                 half Ndotl = saturate(max(0,dot(Normal, lightDir)));
                 
                 half halfLambert = Ndotl * 0.5 + 0.5;
                 half Toon = floor(halfLambert * _Cel) * (1/_Cel);
-                half2 rh = Toon; 
+                //half2 rh = Toon; 
                 half3 Ramp = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5)).rgb;
-                //col *= Toon;
+                ////col *= Toon;
                 
-                float3 BandedDiffuse = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5f)).rgb;
-                float3 SpecularColor;
-                float3 HalfVector = normalize(lightDir + IN.viewDir);
-                float HDotN = saturate(dot(HalfVector, Normal));
-                float PowedHDotN = pow(HDotN, 500.0f);
+                //float3 BandedDiffuse = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, float2(Toon,0.5f)).rgb;
+                //float3 SpecularColor;
+                //float3 HalfVector = normalize(lightDir + IN.viewDir);
+                //float HDotN = saturate(dot(HalfVector, Normal));
+                //float PowedHDotN = pow(HDotN, 500.0f);
                 
-                float SpecularSmooth = smoothstep(0.005, 0.01f, PowedHDotN);
-                SpecularColor = SpecularSmooth * 1.0f;
+                //float SpecularSmooth = smoothstep(0.005, 0.01f, PowedHDotN);
+                //SpecularColor = SpecularSmooth * 1.0f;
                 
                 half4 finalColor;
                 Lighting_ToonShading(_Smoothness, _RimThreshold,IN.worldPos,Normal,IN.viewDir,Ramp,finalColor.rgb);
                 #ifdef USE_SPECULAR
                     finalColor.rgb *= (col *_Color);
-                    finalColor.rgb += + (EmissionMap.rgb * _EmissionColor);
+                    finalColor.rgb += (EmissionMap.rgb * _EmissionColor);
                     //finalColor.rgb = ((col *  Ramp * (_Color  + (_EmissionColor * EmissionMap.rgb))) + SpecularColor) * (lightColor * attenuation);
                     //finalColor.rgb = (col * Ramp * (_Color + (_EmissionColor * EmissionMap.rgb)))  * (lightColor * attenuation);
                     //finalColor.rgb *= rim2;
