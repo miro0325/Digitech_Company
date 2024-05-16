@@ -4,9 +4,8 @@ using UnityEngine.Rendering;
 using UniRx;
 using System.Collections;
 using DG.Tweening;
-using System.Collections.Generic;
 
-public class Player : UnitBase
+public class Player : UnitBase, IService
 {
     //const
     private readonly static int Animator_MoveStateHash = Animator.StringToHash("MoveState"); //0 : idle, 1 : move, 2 : run
@@ -22,10 +21,14 @@ public class Player : UnitBase
     //inspector field
     [Space(20)]
     [Header("Player")]
+    [SerializeField] private float smoothInputSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpScale;
     [SerializeField] private float camRotateXClamp;
     [SerializeField] private float interactionDistance;
+    [SerializeField] private Vector3 groundCastOffset;
+    [SerializeField] private float groundCastRadius;
+    [SerializeField] private LayerMask groundCastMask;
     [Header("Reference")]
     [SerializeField] private Transform camView;
     [SerializeField] private Camera cam;
@@ -39,14 +42,15 @@ public class Player : UnitBase
     //field
     private bool isRun;
     private bool isCrouch;
+    private bool isGround;
     private float runStaminaRecoverWaitTime;
     private float scanWaitTime;
     private float camRotateX;
     private float velocityY;
-    private float interactRequireTime;
+    private float[] interactRequireTimes = new float[(int)InteractID.End];
     private ScanData scanData;
     private Material scanSphereMaterial;
-    private PlayerInput playerInput;
+    private UserInput playerInput;
     private CharacterController cc;
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
@@ -60,7 +64,7 @@ public class Player : UnitBase
     public override void OnCreate()
     {
         base.OnCreate();
-        playerInput = GetComponent<PlayerInput>();
+        playerInput = GetComponent<UserInput>();
 
         if (!photonView.IsMine) return;
         itemContainer = new(4);
@@ -93,13 +97,13 @@ public class Player : UnitBase
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        Services.Register(this);
+        ServiceLocator.For(this).Register(this);
     }
 
     private void Start()
     {
-        dataContainer = Services.Get<DataContainer>();
-        itemManager = Services.Get<ItemManager>();
+        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
+        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
     }
 
     private void Update()
@@ -193,7 +197,7 @@ public class Player : UnitBase
         {
             for (int i = 0; i < (int)InteractID.End; i++)
             {
-                if (playerInput.InteractInputs[i] && item.IsUsable((InteractID)i))
+                if (playerInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
                     item.OnUse((InteractID)i);
             }
 
@@ -220,36 +224,55 @@ public class Player : UnitBase
         else
             lookInteractable = null;
 
-        if (lookInteractable != null && LookInteractable.IsInteractable(this) && playerInput.InteractInputs[(int)lookInteractable.GetTargetInteractID(this)])
+        if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
-            if (interactRequireTime < lookInteractable.GetInteractRequireTime(this))
+            Debug.Log(interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)]);
+
+            //if pressed target interact id => mark interact is start
+            if (playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
+                interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
+
+            //if released target interact id => set require time 0
+            if (playerInput.InteractInputReleased[(int)lookInteractable.GetTargetInteractID(this)])
+                interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
+
+            //if interact marked
+            if (interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] > 0)
             {
-                interactRequireTime += Time.deltaTime;
-            }
-            else
-            {
-                interactRequireTime = 0;
-                if (lookInteractable is ItemBase)
+                //less than require
+                if (interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] < lookInteractable.GetInteractRequireTime(this))
                 {
-                    var item = lookInteractable as ItemBase;
-                    itemContainer.InsertItem(item);
-                    item.OnInteract(this);
-                    item.OnActive();
+                    interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
                 }
-                else
+                else //reached
                 {
-                    lookInteractable.OnInteract(this);
+                    interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
+
+                    if (lookInteractable is ItemBase)
+                    {
+                        var item = lookInteractable as ItemBase;
+                        itemContainer.InsertItem(item);
+                        item.OnInteract(this);
+                        item.OnActive();
+                    }
+                    else
+                    {
+                        lookInteractable.OnInteract(this);
+                    }
                 }
             }
         }
         else
         {
-            interactRequireTime = 0;
+            for (int i = 0; i < (int)InteractID.End; i++)
+                interactRequireTimes[i] = 0;
         }
     }
 
     private void DoMovement()
     {
+        isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
+
         if (!photonView.IsMine) return;
 
         //crouch
@@ -271,7 +294,7 @@ public class Player : UnitBase
         }
 
         //movement
-        var inputMag = Mathf.Clamp01(playerInput.MoveInput.magnitude);
+        var inputMag = Mathf.Clamp01(playerInput.MouseInput.magnitude);
         var relativeDir = transform.TransformDirection(new Vector3(playerInput.MoveInput.x, 0, playerInput.MoveInput.y)).normalized;
         var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
         var crouchShave = isCrouch ? 0.5f : 1f;
@@ -309,7 +332,7 @@ public class Player : UnitBase
         if (cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
         else velocityY -= gravity * Time.deltaTime;
 
-        if (playerInput.JumpInput && playerInput.IsGround)
+        if (playerInput.JumpInput && isGround)
             velocityY = jumpScale;
 
         velocity.y = velocityY;
@@ -335,7 +358,7 @@ public class Player : UnitBase
     {
         playerModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
         playerModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
-        playerModelAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
+        playerModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
         if (playerInput.MoveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else playerModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
@@ -345,7 +368,7 @@ public class Player : UnitBase
         //arm animator
         armModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
         armModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
-        armModelAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
+        armModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
         if (playerInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
@@ -354,13 +377,16 @@ public class Player : UnitBase
         if (playerInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
         else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-        if (playerInput.JumpInput && playerInput.IsGround)
+        if (playerInput.JumpInput && isGround)
             camAnimator.SetTrigger(Animator_JumpHash);
-        camAnimator.SetBool(Animator_IsGroundHash, playerInput.IsGround);
+        camAnimator.SetBool(Animator_IsGroundHash, isGround);
     }
 
     private void OnDrawGizmosSelected()
     {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position + groundCastOffset, groundCastRadius);
+
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(cam.transform.position, cam.transform.position + cam.transform.forward * interactionDistance);
     }

@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceLoader : MonoBehaviour
+public class ResourceLoader : MonoBehaviour, IService
 {
     public Dictionary<string,ItemBase> itemPrefabs = new();
 
     private void Awake()
     {
-        Services.Register(this, true);
+        ServiceLocator.ForGlobal().Register(this);
         ResourceLoad();
     }
 

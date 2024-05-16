@@ -2923,7 +2923,7 @@ GameObject:
   - component: {fileID: 1055195006}
   - component: {fileID: 1055195005}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: UI-InGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4759,6 +4759,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf3130f79209db40b4ed23d97a9d0a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerActionAsset: {fileID: -944628639613478452, guid: 72db26d9fdc01da4e95ba446dc807563,
+    type: 3}
   display: {fileID: 299470793}
   text: {fileID: 299470795}
 --- !u!64 &1869665407
@@ -4843,7 +4845,7 @@ GameObject:
   - component: {fileID: 1956452661}
   - component: {fileID: 1956452662}
   m_Layer: 0
-  m_Name: '[NetworkObjectManager]'
+  m_Name: NetworkObjectManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
