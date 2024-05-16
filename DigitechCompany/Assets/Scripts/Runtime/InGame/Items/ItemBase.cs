@@ -27,6 +27,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.itemDatas[key];
     public MeshRenderer MeshRenderer => meshRenderer;
+    public string Key => key;   
 
     //method
     public virtual void Initialize(string key)

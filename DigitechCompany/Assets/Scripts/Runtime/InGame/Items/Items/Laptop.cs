@@ -8,15 +8,6 @@ public class Laptop : ItemBase
 {
     private readonly int closeAnim = Animator.StringToHash("LaptopClose");
     private readonly int openAnim = Animator.StringToHash("LaptopOpen");
-    private readonly int textureID = Shader.PropertyToID("_MainTex");
-
-    [SerializeField]
-    private MeshRenderer[] renderers;
-
-    
-
-    [SerializeField]
-    private Texture2D[] textures;
 
     private bool isOpen = false;
     public bool isPlaying = false;
@@ -29,7 +20,8 @@ public class Laptop : ItemBase
     {
         base.OnInteract(unit);
         animator.Play("Idle");
-        Debug.Log("Interact");
+        isOpen = false;
+        isPlaying = false;
     }
 
     public override bool IsUsable(InteractID id)
@@ -54,26 +46,6 @@ public class Laptop : ItemBase
         isPlaying = true;
         var anim = (isOpen ? openAnim : closeAnim);
         animator.Play(anim);
-    }
-
-    public void ControlLight()
-    {
-        var tex = textures[(isOpen) ? 0 : 1];
-        foreach(var renderer in renderers)
-        {
-            renderer.material.SetTexture(textureID, tex);
-        }
-        photonView.RPC(nameof(ControlLightRPC), RpcTarget.Others);
-    }
-
-    [PunRPC]
-    private void ControlLightRPC()
-    {
-        var tex = textures[(isOpen) ? 0 : 1];
-        foreach (var renderer in renderers)
-        {
-            renderer.material.SetTexture(textureID, tex);
-        }
     }
 
     public void EndAnimation()

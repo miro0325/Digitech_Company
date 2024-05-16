@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 686040211684682596}
   - component: {fileID: 686040211684682599}
   - component: {fileID: 686040211684682598}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Laptop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,12 +77,6 @@ MonoBehaviour:
   guid: 
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 6574232113794164927}
-  renderers:
-  - {fileID: 7037962801116836781}
-  - {fileID: 5725086458558802985}
-  textures:
-  - {fileID: 2800000, guid: 696917b9694b56048bfca936456d9890, type: 3}
-  - {fileID: 2800000, guid: 97499e4b1fdf49d4b9c26006610b0b58, type: 3}
   isPlaying: 0
 --- !u!95 &686040211684682597
 Animator:
@@ -120,7 +114,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &686040211684682599
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -161,7 +155,7 @@ GameObject:
   - component: {fileID: 7908316790650034769}
   - component: {fileID: 2739614727231661079}
   - component: {fileID: 7037962801116836781}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: laptop_down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -242,7 +236,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3715488924972464038}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LaptopObj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -276,7 +270,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6574232113794164927}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GrabPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +303,7 @@ GameObject:
   - component: {fileID: 1760502910503592259}
   - component: {fileID: 6790007615808235035}
   - component: {fileID: 5725086458558802985}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: laptop_up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
