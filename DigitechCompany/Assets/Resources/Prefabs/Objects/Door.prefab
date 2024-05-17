@@ -281,7 +281,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   door: {fileID: 5002529753773513278}
   doorState: 1
-  interactDelay: 0
+  openDelay: 1
+  closeDelay: 0
+  unlockDelay: 0.2
   rotSpeed: 5
   openAngle: 90
 --- !u!114 &5002529753773513276
@@ -300,7 +302,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 5002529753773513219}
@@ -323,7 +325,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
-  m_UseLocal: 1
+  m_UseLocal: 0
 --- !u!1 &7859588432210938467
 GameObject:
   m_ObjectHideFlags: 0

@@ -123,7 +123,7 @@ MonoBehaviour:
     m_Value: 1920
   pixelWidth:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 128
   pixelHeight:
     m_OverrideState: 1
     m_Value: 4

@@ -118,7 +118,7 @@ Material:
     - _LightStrength: 1
     - _Metallic: 1
     - _Mode: 0
-    - _NormalStrength: 1.5
+    - _NormalStrength: 2
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.03
     - _Parallax: 0.005

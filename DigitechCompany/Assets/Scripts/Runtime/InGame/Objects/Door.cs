@@ -12,7 +12,9 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 {
     [SerializeField] private Transform door;
     [SerializeField] private DoorState doorState = DoorState.Close;
-    [SerializeField] private float interactDelay;
+    [SerializeField] private float openDelay;
+    [SerializeField] private float closeDelay;
+    [SerializeField] private float unlockDelay;
     [SerializeField] private float rotSpeed;
     [SerializeField] private float openAngle;
 
@@ -82,7 +84,20 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public float GetInteractRequireTime(UnitBase unit)
     {
-        return interactDelay;
+        switch (doorState)
+        {
+            case DoorState.Open:
+                return closeDelay;
+            case DoorState.Close:
+                return openDelay;
+            case DoorState.Lock:
+                if (CheckKeyItem(unit))
+                    return unlockDelay;
+                return 0;
+
+            default:
+                return 0;
+        }
     }
 
     public InteractID GetTargetInteractID(UnitBase unit)
@@ -117,10 +132,36 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public void OnInteract(UnitBase unit)
     {
-        switch(doorState)
+        if (photonView.IsMine)
+        {
+            photonView.RPC(nameof(OnInteractRPC), RpcTarget.Others, unit.GetComponent<PhotonView>().ViewID);
+        }
+        switch (doorState)
         {
             case DoorState.Lock:
                 if(CheckKeyItem(unit))
+                {
+                    doorState = DoorState.Close;
+                    NetworkObject.Destory(unit.ItemContainer.GetCurrentSlotItem().guid);
+                }
+                break;
+            case DoorState.Close:
+                OpenDoor(unit);
+                break;
+            case DoorState.Open:
+                CloseDoor();
+                break;
+        }
+    }
+
+    [PunRPC]
+    private void OnInteractRPC(int unitViewID)
+    {
+        UnitBase unit = PhotonView.Find(unitViewID).GetComponent<UnitBase>();
+        switch (doorState)
+        {
+            case DoorState.Lock:
+                if (CheckKeyItem(unit))
                 {
                     doorState = DoorState.Close;
                     NetworkObject.Destory(unit.ItemContainer.GetCurrentSlotItem().guid);
@@ -151,17 +192,17 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
         }
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if(stream.IsWriting)
-        {
-            stream.SendNext(isOpening);
-            stream.SendNext((int)doorState);
-        }
-        else
-        {
-            isOpening = (bool)stream.ReceiveNext();
-            doorState = (DoorState)stream.ReceiveNext();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if(stream.IsWriting)
+    //    {
+    //        stream.SendNext(isOpening);
+    //        stream.SendNext((int)doorState);
+    //    }
+    //    else
+    //    {
+    //        isOpening = (bool)stream.ReceiveNext();
+    //        doorState = (DoorState)(int)stream.ReceiveNext();
+    //    }
+    //}
 }
