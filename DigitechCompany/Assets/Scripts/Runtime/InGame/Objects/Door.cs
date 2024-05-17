@@ -28,6 +28,7 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     void Update()
     {
+        Debug.DrawRay(transform.parent.position,transform.parent.forward, Color.yellow);
         if (doorState == DoorState.Lock) return;
         if(isOpening)
         {
@@ -40,8 +41,9 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     private void OpenDoor(UnitBase unit)
     {
-        var dirToUnit = unit.transform.position - transform.position;
-        float dot = Vector3.Dot(transform.forward, dirToUnit.normalized);
+        var dirToUnit = unit.transform.position - transform.parent.position;
+        float dot = Vector3.Dot(transform.parent.right, dirToUnit.normalized);
+        Debug.Log(dot);
         if(dot > 0)
         {
             openRot = Quaternion.Euler(0, -openAngle, 0);

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6587181995780307401}
   - component: {fileID: 4292036682120245053}
   - component: {fileID: 115871878896903428}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: door_handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 7042454993933676724}
   - component: {fileID: 5922003981530913214}
   - component: {fileID: 3749237758565446531}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: door_case
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 5002529753773513219}
   - component: {fileID: 5002529753773513276}
   - component: {fileID: 5002529753773513277}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,7 +334,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7374941967098286297}
   - component: {fileID: 7859588432210938465}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
