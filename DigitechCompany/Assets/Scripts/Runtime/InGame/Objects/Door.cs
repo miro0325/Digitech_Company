@@ -205,4 +205,9 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
     //        doorState = (DoorState)(int)stream.ReceiveNext();
     //    }
     //}
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        
+    }
 }
