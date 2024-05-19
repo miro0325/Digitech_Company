@@ -96,8 +96,8 @@ GameObject:
   - component: {fileID: 9088025503594459978}
   - component: {fileID: 7789889365340322510}
   - component: {fileID: 7997949989272727679}
-  - component: {fileID: -6921009946078824676}
   - component: {fileID: 8960898186201242132}
+  - component: {fileID: 1152228089}
   m_Layer: 7
   m_Name: Mop
   m_TagString: Untagged
@@ -137,11 +137,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: -6921009946078824676}
   - {fileID: 8960898186201242132}
+  - {fileID: 1152228089}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -195,22 +195,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-6921009946078824676
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2226178173274958013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!114 &8960898186201242132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,6 +207,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 251087110cb68984583fee285fe36d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 0}
+--- !u!114 &1152228089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226178173274958013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 0
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

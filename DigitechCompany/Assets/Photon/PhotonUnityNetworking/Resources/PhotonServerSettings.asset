@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: hk
+  DevRegion: kr
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -56,6 +56,17 @@ MonoBehaviour:
   - DestoryNetworkObjectRpc
   - ControlLightRPC
   - EndAnimationRPC
+  - OnInteractRPC
+  - NotifyPlayerJoin
+  - SendGameToPlayer
+  - DestoryItemRpc
+  - NotifyItemDestoryRpc
+  - InstantiateNetworkObjectRpc
+  - OnGameInfoReceive
+  - OnReceiveSyncItemData
+  - RequestSyncItemData
+  - SetLayRotationRpc
+  - SetLayRotationRPC
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1

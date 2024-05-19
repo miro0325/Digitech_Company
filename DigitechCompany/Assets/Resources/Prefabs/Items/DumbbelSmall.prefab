@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2583995036342436614}
   - component: {fileID: 4888095108523991710}
   - component: {fileID: -951277935068281527}
-  - component: {fileID: 5797489967325952058}
+  - component: {fileID: 2011398358}
   m_Layer: 7
   m_Name: DumbbelSmall
   m_TagString: Untagged
@@ -105,11 +105,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 7990375100083719291}
-  - {fileID: 5797489967325952058}
+  - {fileID: 2011398358}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -125,7 +125,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 0}
 --- !u!54 &2583995036342436614
@@ -178,7 +177,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &5797489967325952058
+--- !u!114 &2011398358
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,6 +190,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
