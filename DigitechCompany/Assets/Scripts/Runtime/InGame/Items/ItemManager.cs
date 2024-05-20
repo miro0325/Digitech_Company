@@ -46,7 +46,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                     new Vector3
                     (
                         Random.Range(area.min.x, area.max.x),
-                        Random.Range(-2, 2), //need to fix
+                        Random.Range(area.center.y - 1, area.center.y + 2),
                         Random.Range(area.min.z, area.max.z)
                     );
 
@@ -58,7 +58,6 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                     item.SetLayRotation(Random.Range(0, 360));
                     item.Initialize(randomItemKey);
                     items.Add(item);
-                    // itemNetworkDatas.Add(item.photonView.ViewID, item.Key);
                 }
             }
         }

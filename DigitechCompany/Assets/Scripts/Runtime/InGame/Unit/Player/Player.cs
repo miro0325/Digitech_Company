@@ -61,6 +61,19 @@ public class Player : UnitBase, IService
     public Transform ItemHolderCamera => itemHolderCamera;
     public override Stats BaseStats => testBaseStat;
 
+    public void SetPosition(Vector3 pos)
+    {
+        photonView.RPC(nameof(SetPositionRpc), RpcTarget.All, pos);
+    }
+
+    [PunRPC]
+    private void SetPositionRpc(Vector3 pos)
+    {
+        cc.enabled = false;
+        transform.position = pos;
+        cc.enabled = true;
+    }
+
     public override void OnCreate()
     {
         base.OnCreate();
