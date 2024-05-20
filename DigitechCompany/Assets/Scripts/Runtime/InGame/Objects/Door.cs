@@ -132,10 +132,7 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public void OnInteract(UnitBase unit)
     {
-        if (photonView.IsMine)
-        {
-            photonView.RPC(nameof(OnInteractRPC), RpcTarget.Others, unit.GetComponent<PhotonView>().ViewID);
-        }
+        photonView.RPC(nameof(OnInteractRPC), RpcTarget.Others, unit.GetComponent<PhotonView>().ViewID);
         switch (doorState)
         {
             case DoorState.Lock:
