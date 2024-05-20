@@ -15,12 +15,22 @@ public class NetworkItemData
 
 public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
+    //service
     private ResourceLoader resourceLoader;
+    private InGameLoader inGameLoader;
 
+    //field
     private HashSet<ItemBase> items = new();
 
+    //property
     public HashSet<ItemBase> Items => items;
 
+    //function
+    /// <summary>
+    /// This function must be executed only when you are a host.
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <param name="spawnAreas"></param>
     public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
@@ -61,12 +71,6 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     public void SyncItem()
     {
         photonView.RPC(nameof(RequestSyncItemData), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
-        // foreach(var itemdata in itemNetworkDatas)
-        // {
-        //     var item = NetworkObject.SyncInstantiate($"Prefabs/Items/{itemdata.Value}", itemdata.Key) as ItemBase;
-        //     item.Initialize(itemdata.Value);
-        //     items.Add(item);
-        // }
     }
 
     [PunRPC]
@@ -104,30 +108,10 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
-        resourceLoader = ServiceLocator.GetEveryWhere<ResourceLoader>();
     }
 
-    // public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    // {
-    //     if(stream.IsWriting)
-    //     {
-    //         stream.SendNext(itemNetworkDatas.Count);
-    //         foreach(var itemInfo in itemNetworkDatas)
-    //         {
-    //             stream.SendNext(itemInfo.Key);
-    //             stream.SendNext(itemInfo.Value);
-    //         }
-    //     }
-    //     else
-    //     {
-    //         itemNetworkDatas.Clear();
-    //         var iteration = (int)stream.ReceiveNext();
-    //         for(int i = 0; i < iteration; i++)
-    //         {
-    //             var key = (int)stream.ReceiveNext();
-    //             var value = (string)stream.ReceiveNext();
-    //             itemNetworkDatas.Add(key, value);
-    //         }
-    //     }
-    // }
+    private void Start()
+    {
+        resourceLoader = ServiceLocator.GetEveryWhere<ResourceLoader>();
+    }
 }
