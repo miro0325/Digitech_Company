@@ -21,11 +21,6 @@ public class TestShovel : ItemBase, IInteractable
         if(id == InteractID.ID2) return "때리기";
         return "";
     }
-
-    private void Start()
-    {
-        key = "Shovel";
-    }
     
     protected override void Update()
     {

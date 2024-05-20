@@ -191,7 +191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ce6e54d9df5b0245ba19f425c54012c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
   itemHolder: {fileID: 5628984938304067508}
   gravity: 9.8
   jumpScale: 4

@@ -40,6 +40,7 @@ public class Laptop : ItemBase, IPunObservable
         animator.Play(anim);
     }
 
+    [PunRPC]
     protected override void OnUseRpc(int id)
     {
         isOpen = !isOpen;
@@ -60,8 +61,10 @@ public class Laptop : ItemBase, IPunObservable
     //    isPlaying = false;
     //}
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        base.OnPhotonSerializeView(stream, info);
+
         if (stream.IsWriting)
         {
             stream.SendNext(isPlaying);

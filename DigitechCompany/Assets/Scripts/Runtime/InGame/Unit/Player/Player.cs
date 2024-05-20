@@ -64,9 +64,11 @@ public class Player : UnitBase, IService
     public override void OnCreate()
     {
         base.OnCreate();
+
         playerInput = GetComponent<UserInput>();
 
         if (!photonView.IsMine) return;
+
         itemContainer = new(4);
         itemContainer.OnIndexChanged += (pre, cur) =>
         {
@@ -206,14 +208,15 @@ public class Player : UnitBase, IService
         }
     }
 
-    public void DiscardCurrentItem()
+    public ItemBase DiscardCurrentItem()
     {
         var item = itemContainer.GetCurrentSlotItem();
-        if (item == null) return;
+        if (item == null) return null;
 
         itemContainer.PopCurrentItem();
         item.SetLayRotation(transform.eulerAngles.y);
         item.OnDiscard();
+        return item;
     }
 
     private void DoInteract()
@@ -226,8 +229,6 @@ public class Player : UnitBase, IService
 
         if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
-            //Debug.Log(interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)]);
-            Debug.Log(playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)]);
             //if pressed target interact id => mark interact is start
             if (playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;

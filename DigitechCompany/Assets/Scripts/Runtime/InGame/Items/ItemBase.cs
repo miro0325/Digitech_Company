@@ -6,34 +6,37 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
     private DataContainer dataContainer;
+    private ItemManager itemManager;
 
     //inspector field
     [SerializeField] protected Transform leftHandPoint;
     [SerializeField] protected Transform rightHandPoint;
 
     //field
+    protected int ownUnit;
     protected float layRotation;
+    protected float sellPrice;
     protected string key;
-    protected string ownUnit;
     protected Animator animator;
     protected Rigidbody rb;
     protected PhotonTransformView transformView;
     protected MeshRenderer meshRenderer;
 
     //property
-    public bool InHand => ownUnit != null;
-    public virtual float SellPrice { get; protected set; }
+    public bool InHand => ownUnit != 0;
+    public virtual float SellPrice => sellPrice;
+    public float LayRotation => layRotation;
+    public string Key => key;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.itemDatas[key];
     public MeshRenderer MeshRenderer => meshRenderer;
-    public string Key => key;   
 
     //method
     public virtual void Initialize(string key)
     {
         this.key = key;
-        SellPrice = Random.Range(ItemData.sellPriceMin, ItemData.sellPriceMax);
+        sellPrice = Random.Range(ItemData.sellPriceMin, ItemData.sellPriceMax);
     }
 
     public virtual InteractID GetTargetInteractID(UnitBase unit) => InteractID.ID1;
@@ -46,11 +49,11 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         if (player)
         {
             if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
-                return "ÏÜêÏù¥ ÍΩâÏ∞∏";
+                return "º’¿Ã ≤À¬¸";
             else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.ItemContainer.WholeWeight + ItemData.weight) // if player strength lack
-                return "Ìûò Î∂ÄÏ°±";
+                return "»˚ ∫Œ¡∑";
             else
-                return "Ï§çÍ∏∞";
+                return "¡›±‚";
         }
         return "";
     }
@@ -82,60 +85,76 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public void SetLayRotation(float f)
     {
+        photonView.RPC(nameof(SetLayRotationRPC), RpcTarget.All, f);
+    }
+
+    [PunRPC]
+    protected void SetLayRotationRPC(float f)
+    {
         layRotation = f;
     }
 
     public override void OnCreate()
     {
+        //getcomponent
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
 
+        //service
         dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
+        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
 
         this.ObserveEveryValueChanged(x => x.ownUnit)
-            .Subscribe(guid => 
-            {
-                Debug.Log(guid);
-                
-                if(string.IsNullOrEmpty(guid))
+            .Subscribe(viewId => 
+            {                
+                if(viewId == 0)
                 {
                     transform.SetParent(null);
                     return;
                 }
 
-                var unit = NetworkObject.GetNetworkObject(guid) as UnitBase;
+                var unit = PhotonView.Find(viewId).GetComponent<UnitBase>();
                 var player = unit as Player;
 
                 if(player)
-                {
-                    //if player view is camera set camera holder other is body holder 
+                    //if player view is camera set camera holder other is body holder
                     transform.SetParent(player.photonView.IsMine ? player.ItemHolderCamera : player.ItemHolder);
-                    return;
-                }
-
-                transform.SetParent(unit.ItemHolder);
+                else
+                    transform.SetParent(unit.ItemHolder);
             });
+    }
+
+    public virtual void DestroyItem()
+    {
+        photonView.RPC(nameof(DestoryItemRpc), RpcTarget.All);
+    }
+
+    [PunRPC]
+    protected virtual void DestoryItemRpc()
+    {
+        itemManager.Items.Remove(this);
+        NetworkObject.Destory(photonView.ViewID);
     }
 
     public virtual void OnInteract(UnitBase unit)
     {
-        ownUnit = unit.guid;
+        ownUnit = unit.photonView.ViewID;
         transformView.enabled = false;
         animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
 
         //send rpc
-        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, unit.guid);
+        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, ownUnit);
     }
 
     [PunRPC]
-    protected virtual void OnInteractRpc(string guid)
+    protected virtual void OnInteractRpc(int viewId)
     {
         //to chest position
-        ownUnit = guid;
+        ownUnit = viewId;
         transformView.enabled = false;
         animator.enabled = true;
         rb.isKinematic = true;
@@ -151,7 +170,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         animator.SetLayerWeight(1, 1);
 
         //invoke rpc
-        photonView.RPC(nameof(OnActiveRpc), RpcTarget.OthersBuffered);
+        photonView.RPC(nameof(OnActiveRpc), RpcTarget.Others);
     }
 
     [PunRPC]
@@ -168,7 +187,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         gameObject.SetActive(false);
 
         //invoke rpc
-        photonView.RPC(nameof(OnDisableRpc), RpcTarget.OthersBuffered);
+        photonView.RPC(nameof(OnDisableRpc), RpcTarget.Others);
     }
 
     [PunRPC]
@@ -179,7 +198,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual void OnUse(InteractID id)
     {
-        photonView.RPC(nameof(OnUseRpc), RpcTarget.OthersBuffered, (int)id);
+        photonView.RPC(nameof(OnUseRpc), RpcTarget.Others, (int)id);
     }
 
     [PunRPC]
@@ -190,19 +209,19 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual void OnDiscard()
     {
-        ownUnit = null;
+        ownUnit = 0;
         transformView.enabled = true;
         animator.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
 
-        photonView.RPC(nameof(OnDiscardRpc), RpcTarget.OthersBuffered);
+        photonView.RPC(nameof(OnDiscardRpc), RpcTarget.Others);
     }
 
     [PunRPC]
     protected virtual void OnDiscardRpc()
     {
-        ownUnit = null;
+        ownUnit = 0;
         transformView.enabled = true;
         animator.enabled = false;
         rb.isKinematic = false;
@@ -215,19 +234,21 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(0, layRotation, 0), Time.deltaTime * 1080);
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if(stream.IsWriting)
         {
             stream.SendNext(key);
             stream.SendNext(layRotation);
             stream.SendNext(ownUnit);
+            stream.SendNext(sellPrice);
         }
         else
         {
             key = (string)stream.ReceiveNext();
             layRotation = (float)stream.ReceiveNext();
-            ownUnit = (string)stream.ReceiveNext();
+            ownUnit = (int)stream.ReceiveNext();
+            sellPrice = (float)stream.ReceiveNext();
         }
     }
 }

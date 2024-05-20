@@ -49,7 +49,7 @@ public class ScanInfomationUI : MonoBehaviour
             var itemNameBackgroundStartSize = new Vector2(0, itemNameBackgroundTargetSize.y);
             var itemInfoBackgroundTargetSize = itemInfoBackground.sizeDelta;
             var itemInfoBackgroundStartSize = new Vector2(0, itemInfoBackgroundTargetSize.y);
-            
+
             //initialize
             image.color = circleStartColor;
             rectTransform.sizeDelta = circleStartSize;
@@ -68,23 +68,26 @@ public class ScanInfomationUI : MonoBehaviour
             targetItem = null;
             gameObject.SetActive(false);
             poolAction?.Invoke(this);
-        }   
+        }
     }
 
     private void Update()
     {
-        if(targetItem.InHand)
+        if (targetItem.InHand)
         {
             StopCoroutine(displayRoutine);
             transform.DOKill();
-            
+
             targetItem = null;
             gameObject.SetActive(false);
             poolAction?.Invoke(this);
         }
 
-        rectTransform.anchoredPosition =
-            mainCamera.WorldToScreenPoint(targetItem.transform.position);
+        if (targetItem)
+        {
+            rectTransform.anchoredPosition =
+                mainCamera.WorldToScreenPoint(targetItem.transform.position);
+        }
     }
 
     private void Awake()

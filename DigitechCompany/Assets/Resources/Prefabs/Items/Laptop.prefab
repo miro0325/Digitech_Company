@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 686040211684682597}
   - component: {fileID: 686040211684682596}
   - component: {fileID: 686040211684682599}
-  - component: {fileID: 686040211684682598}
+  - component: {fileID: 1774282250}
   m_Layer: 7
   m_Name: Laptop
   m_TagString: Untagged
@@ -54,11 +54,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 686040211684682594}
-  - {fileID: 686040211684682598}
+  - {fileID: 1774282250}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -74,7 +74,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18e2ce86a7f7b954b9c9bb7a6e025e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 6574232113794164927}
   isPlaying: 0
@@ -113,7 +112,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 1
 --- !u!65 &686040211684682599
 BoxCollider:
@@ -128,7 +127,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 0.76, z: 0.09}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &686040211684682598
+--- !u!114 &1774282250
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!1 &2970431649715225879

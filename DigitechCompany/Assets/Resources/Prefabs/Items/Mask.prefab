@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 509302545011878877}
   - component: {fileID: 8761190563286211451}
   - component: {fileID: -3623021762427984762}
-  - component: {fileID: 1193965662450067697}
+  - component: {fileID: 625903227}
   m_Layer: 7
   m_Name: Mask
   m_TagString: Untagged
@@ -54,11 +54,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 6957136983906310594}
-  - {fileID: 1193965662450067697}
+  - {fileID: 625903227}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -74,7 +74,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 0}
 --- !u!65 &509302545011878877
@@ -127,7 +126,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1193965662450067697
+--- !u!114 &625903227
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!1 &4693542583219635768

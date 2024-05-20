@@ -281,7 +281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   door: {fileID: 5002529753773513278}
   doorState: 1
-  openDelay: 1
+  openDelay: 0.4
   closeDelay: 0
   unlockDelay: 0.2
   rotSpeed: 5

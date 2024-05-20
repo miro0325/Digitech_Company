@@ -5,10 +5,10 @@ using Photon.Pun;
 
 public enum DoorState
 {
-    Open,Close,Lock
+    Open, Close, Lock
 }
 
-public class Door : MonoBehaviourPun,IInteractable,IPunObservable
+public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 {
     [SerializeField] private Transform door;
     [SerializeField] private DoorState doorState = DoorState.Close;
@@ -21,23 +21,19 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
     private bool isOpening = false;
 
     private Quaternion openRot;
-    private Quaternion closeRot = Quaternion.Euler(0,0,0);
-
-    void Start()
-    {
-        
-    }
+    private Quaternion closeRot = Quaternion.Euler(0, 0, 0);
 
     void Update()
     {
-        Debug.DrawRay(transform.parent.position,transform.parent.forward, Color.yellow);
+        Debug.DrawRay(transform.parent.position, transform.parent.forward, Color.yellow);
         if (doorState == DoorState.Lock) return;
-        if(isOpening)
+        if (isOpening)
         {
-            door.transform.rotation = Quaternion.Slerp(door.transform.rotation, openRot, Time.deltaTime * rotSpeed);
-        } else
+            door.transform.localRotation = Quaternion.Slerp(door.transform.localRotation, openRot, Time.deltaTime * rotSpeed);
+        }
+        else
         {
-            door.transform.rotation = Quaternion.Slerp(door.transform.rotation,closeRot, Time.deltaTime * rotSpeed);
+            door.transform.localRotation = Quaternion.Slerp(door.transform.localRotation, closeRot, Time.deltaTime * rotSpeed);
         }
     }
 
@@ -46,10 +42,11 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
         var dirToUnit = unit.transform.position - transform.parent.position;
         float dot = Vector3.Dot(transform.parent.right, dirToUnit.normalized);
         Debug.Log(dot);
-        if(dot > 0)
+        if (dot > 0)
         {
             openRot = Quaternion.Euler(0, -openAngle, 0);
-        } else
+        }
+        else
         {
             openRot = Quaternion.Euler(0, openAngle, 0);
         }
@@ -65,14 +62,14 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        switch(doorState)
+        switch (doorState)
         {
             case DoorState.Open:
                 return "닫기";
             case DoorState.Close:
                 return "열기";
             case DoorState.Lock:
-                if(CheckKeyItem(unit))
+                if (CheckKeyItem(unit))
                 {
                     return "잠금 해제";
                 }
@@ -102,10 +99,11 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public InteractID GetTargetInteractID(UnitBase unit)
     {
-        if(doorState == DoorState.Lock)
+        if (doorState == DoorState.Lock)
         {
             return InteractID.ID2;
-        } else
+        }
+        else
         {
             return InteractID.ID1;
         }
@@ -113,9 +111,9 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public bool IsInteractable(UnitBase unit)
     {
-        if(doorState == DoorState.Lock)
+        if (doorState == DoorState.Lock)
         {
-            if(CheckKeyItem(unit))
+            if (CheckKeyItem(unit))
             {
                 return true;
             }
@@ -132,37 +130,25 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
 
     public void OnInteract(UnitBase unit)
     {
-        photonView.RPC(nameof(OnInteractRPC), RpcTarget.Others, unit.GetComponent<PhotonView>().ViewID);
-        switch (doorState)
+        var haskey = CheckKeyItem(unit);
+        if(doorState == DoorState.Lock && haskey)
         {
-            case DoorState.Lock:
-                if(CheckKeyItem(unit))
-                {
-                    doorState = DoorState.Close;
-                    NetworkObject.Destory(unit.ItemContainer.GetCurrentSlotItem().guid);
-                }
-                break;
-            case DoorState.Close:
-                OpenDoor(unit);
-                break;
-            case DoorState.Open:
-                CloseDoor();
-                break;
+            var key = unit.ItemContainer.GetCurrentSlotItem();
+            var player = unit as Player;
+            player.DiscardCurrentItem();
+            key.DestroyItem();
         }
+        photonView.RPC(nameof(OnInteractRPC), RpcTarget.MasterClient, unit.photonView.ViewID, haskey);
     }
 
     [PunRPC]
-    private void OnInteractRPC(int unitViewID)
+    private void OnInteractRPC(int viewId, bool hasKey)
     {
-        UnitBase unit = PhotonView.Find(unitViewID).GetComponent<UnitBase>();
+        UnitBase unit = PhotonView.Find(viewId).GetComponent<UnitBase>();
         switch (doorState)
         {
             case DoorState.Lock:
-                if (CheckKeyItem(unit))
-                {
-                    doorState = DoorState.Close;
-                    NetworkObject.Destory(unit.ItemContainer.GetCurrentSlotItem().guid);
-                }
+                if (hasKey) doorState = DoorState.Close;
                 break;
             case DoorState.Close:
                 OpenDoor(unit);
@@ -183,28 +169,26 @@ public class Door : MonoBehaviourPun,IInteractable,IPunObservable
                 return true;
             }
             return false;
-        } else
+        }
+        else
         {
             return false;
         }
     }
 
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if(stream.IsWriting)
-    //    {
-    //        stream.SendNext(isOpening);
-    //        stream.SendNext((int)doorState);
-    //    }
-    //    else
-    //    {
-    //        isOpening = (bool)stream.ReceiveNext();
-    //        doorState = (DoorState)(int)stream.ReceiveNext();
-    //    }
-    //}
-
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        
+        if (stream.IsWriting)
+        {
+            stream.SendNext(isOpening);
+            stream.SendNext((int)doorState);
+            stream.SendNext(openRot);
+        }
+        else
+        {
+            isOpening = (bool)stream.ReceiveNext();
+            doorState = (DoorState)(int)stream.ReceiveNext();
+            openRot = (Quaternion)stream.ReceiveNext();
+        }
     }
 }

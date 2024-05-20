@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour, IService
     private UIView current;
     private Stack<UIView> viewStack = new();
     private UIViewContainer globalViews;
-    private Dictionary<Scene, UIViewContainer> sceneViews;
+    private Dictionary<Scene, UIViewContainer> sceneViews = new();
 
     private void Awake()
     {
