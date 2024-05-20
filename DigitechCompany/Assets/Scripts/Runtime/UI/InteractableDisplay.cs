@@ -8,6 +8,7 @@ public class InteractableDisplay : MonoBehaviour
 {
     //service
     private Player player;
+    private InGameLoader inGameLoader;
 
     //inspector field
     [SerializeField] InputActionAsset playerActionAsset;
@@ -19,14 +20,20 @@ public class InteractableDisplay : MonoBehaviour
 
     private void Start()
     {
-        player = ServiceLocator.For(this).Get<Player>();
+        inGameLoader = ServiceLocator.For(this).Get<InGameLoader>();
+        inGameLoader.OnLoadComplete += () =>
+        {
+            player = ServiceLocator.For(this).Get<Player>();
 
-        for(int i = 1; i < (int)InteractID.End; i++)
-            interactActions[i] = playerActionAsset[$"Interact{i}"];
+            for (int i = 1; i < (int)InteractID.End; i++)
+                interactActions[i] = playerActionAsset[$"Interact{i}"];
+        };
     }
 
     private void Update()
     {
+        if (ReferenceEquals(player, null)) return;
+        
         display.SetActive(player.LookInteractable != null);
 
         requireTime.fillAmount =
@@ -34,13 +41,13 @@ public class InteractableDisplay : MonoBehaviour
             player.InteractRequireTimes[(int)player.LookInteractable.GetTargetInteractID(player)] / player.LookInteractable.GetInteractRequireTime(player) :
             0;
 
-        if(display.activeSelf)
+        if (display.activeSelf)
         {
             var targetInteractId = player.LookInteractable.GetTargetInteractID(player);
             var targetAction = interactActions[(int)targetInteractId].bindings[0];
             var keyString = InputControlPath.ToHumanReadableString(targetAction.effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
 
-            if(player.LookInteractable.IsInteractable(player))
+            if (player.LookInteractable.IsInteractable(player))
                 text.text = $"{player.LookInteractable.GetInteractionExplain(player)} ({keyString})";
             else //only display explain
                 text.text = player.LookInteractable.GetInteractionExplain(player);

@@ -1,63 +1,64 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 
 public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
     //service
+    private TestBasement testBasement;
     private ItemManager itemManager;
 
     //inspector
     [SerializeField] private MeshRenderer[] rooms;
 
     //field
-    private HashSet<int> playerViewIDs = new();
-    private bool isGameStart;
+    private bool isGameWaiting = true;
+    private bool isGameLoading;
+
+    //property
+    public bool IsGameWaiting => isGameWaiting;
+    public bool IsGameLoading => isGameLoading;
+
+    private void Awake()
+    {
+        ServiceLocator.For(this).Register(this);
+    }
+
+    public void SpawnPlayer()
+    {
+        testBasement = ServiceLocator.GetEveryWhere<TestBasement>();
+        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
+
+        NetworkObject.InstantiateBuffered("Prefabs/Player", testBasement.transform.position + Vector3.up * 2, Quaternion.identity);
+    }
+
+    public void StartGame()
+    {
+        isGameWaiting = false;
+        itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
+        photonView.RPC(nameof(StartGameRpc), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    private void StartGameRpc()
+    {
+        itemManager.SyncItem();
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if(stream.IsWriting)
         {
-            stream.SendNext(isGameStart);
+            stream.SendNext(isGameLoading);
+            stream.SendNext(isGameWaiting);
         }
         else
         {
-            isGameStart = (bool)stream.ReceiveNext();
-        }
-    }
-
-    private void Awake()
-    {
-        NetworkObject.InstantiateBuffered("Prefabs/Player", Vector3.up, Quaternion.identity);
-        // NetworkObject.Instantiate("Prefabs/TestShovel", new Vector3(1, 8));
-    }
-
-    private void Start()
-    {
-        itemManager = ServiceLocator.For(this).Get<ItemManager>();
-
-        photonView.RPC(nameof(NotifyPlayerJoin), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
-    }
-
-    [PunRPC]
-    private void NotifyPlayerJoin(Photon.Realtime.Player player)
-    {
-        photonView.RPC(nameof(OnGameInfoReceive), player, isGameStart);
-        isGameStart = true;
-    }
-
-    [PunRPC]
-    private void OnGameInfoReceive(bool isHost)
-    {
-        if(!isHost)
-        {
-            itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
-        }
-        else
-        {
-            itemManager.SyncItem();
+            isGameLoading = (bool)stream.ReceiveNext();
+            isGameWaiting = (bool)stream.ReceiveNext();
         }
     }
 }

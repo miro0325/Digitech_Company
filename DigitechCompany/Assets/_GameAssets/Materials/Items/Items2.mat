@@ -89,7 +89,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Cel: 5
+    - _Cel: 4.51
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -110,6 +110,7 @@ Material:
     - _GlossyReflections: 0
     - _LightStrength: 1
     - _Metallic: 0
+    - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.7
     - _Parallax: 0.005

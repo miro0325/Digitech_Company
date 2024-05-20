@@ -67,6 +67,11 @@ MonoBehaviour:
   - RequestSyncItemData
   - SetLayRotationRpc
   - SetLayRotationRPC
+  - OnLoad
+  - RequestLoad
+  - StartGameRpc
+  - MovePositionRpc
+  - SetPositionRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

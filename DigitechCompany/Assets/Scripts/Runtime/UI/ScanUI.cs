@@ -10,6 +10,7 @@ public class ScanUI : MonoBehaviour
 
     //service
     private Player player;
+    private InGameLoader inGameLoader;
 
     //inspector
     [SerializeField] private ScanInfomationUI scanInfomationUIPrefab;
@@ -19,40 +20,44 @@ public class ScanUI : MonoBehaviour
 
     private void Start()
     {
-        player = ServiceLocator.GetEveryWhere<Player>();
-
-        for(int i = 0; i < UIPoolMaxCount; i++)
+        inGameLoader = ServiceLocator.For(this).Get<InGameLoader>();
+        inGameLoader.OnLoadComplete += () =>
         {
-            var inst = Instantiate(scanInfomationUIPrefab, transform);
-            inst.gameObject.SetActive(false);
-            inst.Initialize(PoolUIToQueue);
-            uiPool.Enqueue(inst);
-        }
+            player = ServiceLocator.GetEveryWhere<Player>();
 
-        player
-            .ObserveEveryValueChanged(p => p.ScanData)
-            .Skip(1)
-            .Subscribe(scandata =>
+            for (int i = 0; i < UIPoolMaxCount; i++)
             {
-                foreach(var item in scandata.items)
-                    GetUIFromQueue().StartDisplay(item);
-            });
+                var inst = Instantiate(scanInfomationUIPrefab, transform);
+                inst.gameObject.SetActive(false);
+                inst.Initialize(PoolUIToQueue);
+                uiPool.Enqueue(inst);
+            }
+
+            player
+                .ObserveEveryValueChanged(p => p.ScanData)
+                .Skip(1)
+                .Subscribe(scandata =>
+                {
+                    foreach (var item in scandata.items)
+                        GetUIFromQueue().StartDisplay(item);
+                });
+        };
     }
 
     private ScanInfomationUI GetUIFromQueue()
     {
-        if(uiPool.TryDequeue(out var inst))
+        if (uiPool.TryDequeue(out var inst))
         {
             inst.Initialize(PoolUIToQueue);
             return inst;
         }
-            
+
         return Instantiate(scanInfomationUIPrefab, transform);
     }
 
     private void PoolUIToQueue(ScanInfomationUI ui)
     {
-        if(uiPool.Count >= UIPoolMaxCount)
+        if (uiPool.Count >= UIPoolMaxCount)
             Destroy(ui.gameObject);
         else
             uiPool.Enqueue(ui);
