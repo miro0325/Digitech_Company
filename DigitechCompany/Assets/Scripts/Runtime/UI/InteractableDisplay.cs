@@ -8,7 +8,7 @@ public class InteractableDisplay : MonoBehaviour
 {
     //service
     private Player player;
-    private InGameLoader inGameLoader;
+    private GameManager gameManager;
 
     //inspector field
     [SerializeField] InputActionAsset playerActionAsset;
@@ -20,8 +20,8 @@ public class InteractableDisplay : MonoBehaviour
 
     private void Start()
     {
-        inGameLoader = ServiceLocator.For(this).Get<InGameLoader>();
-        inGameLoader.OnLoadComplete += () =>
+        gameManager = ServiceLocator.For(this).Get<GameManager>();
+        gameManager.OnInitializeComplete += () =>
         {
             player = ServiceLocator.For(this).Get<Player>();
 

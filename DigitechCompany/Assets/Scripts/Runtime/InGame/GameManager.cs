@@ -5,6 +5,18 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 
+public enum SyncTarget
+{
+    Item
+}
+
+public enum GameState
+{
+    Waiting,
+    Loading,
+    Progressing
+}
+
 public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
     //service
@@ -15,50 +27,96 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     [SerializeField] private MeshRenderer[] rooms;
 
     //field
-    private bool isGameWaiting = true;
-    private bool isGameLoading;
+    private GameState gameState;
+    private Dictionary<Photon.Realtime.Player, bool[]> syncData;
 
     //property
-    public bool IsGameWaiting => isGameWaiting;
-    public bool IsGameLoading => isGameLoading;
+    public GameState GameState => gameState;
+
+    //event
+    public event Action OnInitializeComplete;
 
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
     }
 
-    public void SpawnPlayer()
+    private void Start()
     {
-        testBasement = ServiceLocator.GetEveryWhere<TestBasement>();
-        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
+        testBasement = ServiceLocator.For(this).Get<TestBasement>();
+        itemManager = ServiceLocator.For(this).Get<ItemManager>();
+
+        if(photonView.IsMine) InitializeGame();
+        else SyncGame();
 
         NetworkObject.InstantiateBuffered("Prefabs/Player", testBasement.transform.position + Vector3.up * 2, Quaternion.identity);
+
+        OnInitializeComplete?.Invoke();
     }
 
-    public void StartGame()
+    private void InitializeGame()
     {
-        isGameWaiting = false;
-        itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
-        photonView.RPC(nameof(StartGameRpc), RpcTarget.Others);
+
+    }
+
+    private void SyncGame()
+    {
+
+    }
+
+    public void RequestStartGame()
+    {
+        photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
     }
 
     [PunRPC]
     private void StartGameRpc()
     {
-        itemManager.SyncItem();
+        if(gameState != GameState.Waiting) return;
+        gameState = GameState.Loading;
+
+        StartGameRoutine().Forget();
+    }
+
+    /// <summary>
+    /// This function must be executed only when you are a host.
+    /// </summary>
+    /// <returns></returns>
+    private async UniTaskVoid StartGameRoutine()
+    {
+        //initialize
+        var itemDataJson = itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
+
+        //send rpc
+        photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemDataJson);
+    }
+
+    [PunRPC]
+    private void SyncRpc(int syncTarget, string data)
+    {
+        switch ((SyncTarget)syncTarget)
+        {
+            case SyncTarget.Item:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    {
+        Debug.Log("Join");
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if(stream.IsWriting)
         {
-            stream.SendNext(isGameLoading);
-            stream.SendNext(isGameWaiting);
+            stream.SendNext((int)gameState);
         }
         else
         {
-            isGameLoading = (bool)stream.ReceiveNext();
-            isGameWaiting = (bool)stream.ReceiveNext();
+            gameState = (GameState)(int)stream.ReceiveNext();
         }
     }
 }

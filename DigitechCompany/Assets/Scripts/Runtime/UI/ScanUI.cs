@@ -10,7 +10,7 @@ public class ScanUI : MonoBehaviour
 
     //service
     private Player player;
-    private InGameLoader inGameLoader;
+    private GameManager gameManager;
 
     //inspector
     [SerializeField] private ScanInfomationUI scanInfomationUIPrefab;
@@ -20,8 +20,8 @@ public class ScanUI : MonoBehaviour
 
     private void Start()
     {
-        inGameLoader = ServiceLocator.For(this).Get<InGameLoader>();
-        inGameLoader.OnLoadComplete += () =>
+        gameManager = ServiceLocator.For(this).Get<GameManager>();
+        gameManager.OnInitializeComplete += () =>
         {
             player = ServiceLocator.GetEveryWhere<Player>();
 

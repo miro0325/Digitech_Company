@@ -7,7 +7,7 @@ public class TestGameStartLever : MonoBehaviour, IInteractable
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        return "Ãâ¹ß";
+        return gameManager.GameState == GameState.Waiting ? "Ãâ¹ß" : "Âø·ú Áß";
     }
 
     public float GetInteractRequireTime(UnitBase unit)
@@ -22,12 +22,12 @@ public class TestGameStartLever : MonoBehaviour, IInteractable
 
     public bool IsInteractable(UnitBase unit)
     {
-        return gameManager.IsGameWaiting;
+        return gameManager.GameState == GameState.Waiting;
     }
 
     public void OnInteract(UnitBase unit)
     {
-        gameManager.StartGame();
+        gameManager.RequestStartGame();
     }
 
     private void Start()

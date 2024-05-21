@@ -6,15 +6,15 @@ using UnityEngine.UI;
 public class ProfileUI : MonoBehaviour
 {
     private Player player;
-    private InGameLoader inGameLoader;
+    private GameManager gameManager;
 
     [SerializeField] private Image hp;
     [SerializeField] private Image stamina;
 
     private void Start()
     {
-        inGameLoader = ServiceLocator.For(this).Get<InGameLoader>();
-        inGameLoader.OnLoadComplete += () =>
+        gameManager = ServiceLocator.For(this).Get<GameManager>();
+        gameManager.OnInitializeComplete += () =>
             player = ServiceLocator.GetEveryWhere<Player>();
     }
 

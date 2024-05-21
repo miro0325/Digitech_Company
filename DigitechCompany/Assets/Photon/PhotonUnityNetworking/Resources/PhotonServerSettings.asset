@@ -72,6 +72,7 @@ MonoBehaviour:
   - StartGameRpc
   - MovePositionRpc
   - SetPositionRpc
+  - SyncRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

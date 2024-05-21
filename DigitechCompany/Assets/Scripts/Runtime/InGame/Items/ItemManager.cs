@@ -17,7 +17,6 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
     //service
     private ResourceLoader resourceLoader;
-    private InGameLoader inGameLoader;
 
     //field
     private HashSet<ItemBase> items = new();
@@ -31,7 +30,8 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// </summary>
     /// <param name="difficulty"></param>
     /// <param name="spawnAreas"></param>
-    public void SpawnItem(int difficulty, Bounds[] spawnAreas)
+    /// <returns></returns>
+    public string SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
         int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
@@ -61,24 +61,16 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 }
             }
         }
+
         var item2 = NetworkObject.Instantiate($"Prefabs/Items/Key", Vector3.up, Quaternion.identity).GetComponent<ItemBase>();
         item2.SetLayRotation(Random.Range(0, 360));
         item2.Initialize("Key");
         items.Add(item2);
-    }
 
-    public void SyncItem()
-    {
-        photonView.RPC(nameof(RequestSyncItemData), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
-    }
-
-    [PunRPC]
-    private void RequestSyncItemData(Photon.Realtime.Player player)
-    {
-        var array = new NetworkItemData[items.Count];
+        var networkItemData = new NetworkItemData[items.Count];
         var count = 0;
         foreach(var item in items)
-            array[count++] = new NetworkItemData()
+            networkItemData[count++] = new()
             {
                 viewId = item.photonView.ViewID,
                 key = item.Key,
@@ -86,11 +78,10 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 layRotation = item.LayRotation
             };
 
-        photonView.RPC(nameof(OnReceiveSyncItemData), player, array.ToJson());
+        return networkItemData.ToJson();
     }
 
-    [PunRPC]
-    private void OnReceiveSyncItemData(string networkItemDataJson)
+    public void SyncItem(string networkItemDataJson)
     {
         var datas = JsonSerializer.JsonToArray<NetworkItemData>(networkItemDataJson);
         for (int i = 0; i < datas.Length; i++)
