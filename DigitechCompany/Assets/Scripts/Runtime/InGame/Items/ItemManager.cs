@@ -30,7 +30,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// </summary>
     /// <param name="difficulty"></param>
     /// <param name="spawnAreas"></param>
-    /// <returns></returns>
+    /// <returns>Items data</returns>
     public string SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
@@ -81,13 +81,19 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         return networkItemData.ToJson();
     }
 
+    /// <summary>
+    /// This function must be executed only when you are a client.
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <param name="spawnAreas"></param>
+    /// <returns>Items data</returns>
     public void SyncItem(string networkItemDataJson)
     {
         var datas = JsonSerializer.JsonToArray<NetworkItemData>(networkItemDataJson);
         for (int i = 0; i < datas.Length; i++)
         {
             var data = datas[i];
-            var item = NetworkObject.SyncInstantiate($"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
+            var item = NetworkObject.Sync(data.viewId, $"Prefabs/Items/{data.key}") as ItemBase;
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);

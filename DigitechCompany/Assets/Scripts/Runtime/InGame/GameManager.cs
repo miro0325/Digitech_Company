@@ -21,7 +21,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
     //service
     private TestBasement testBasement;
+    private TestBasement TestBasement
+    {
+        get
+        {
+            if(ReferenceEquals(testBasement, null))
+                testBasement = ServiceLocator.For(this).Get<TestBasement>();
+            return testBasement;
+        }
+    }
     private ItemManager itemManager;
+    private ItemManager ItemManager
+    {
+        get
+        {
+            if(ReferenceEquals(itemManager, null))
+                itemManager = ServiceLocator.For(this).Get<ItemManager>();
+            return itemManager;
+        }
+    }
 
     //inspector
     [SerializeField] private MeshRenderer[] rooms;
@@ -33,9 +51,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //property
     public GameState GameState => gameState;
 
-    //event
-    public event Action OnInitializeComplete;
-
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
@@ -43,15 +58,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void Start()
     {
-        testBasement = ServiceLocator.For(this).Get<TestBasement>();
-        itemManager = ServiceLocator.For(this).Get<ItemManager>();
-
         if(photonView.IsMine) InitializeGame();
         else SyncGame();
 
-        NetworkObject.InstantiateBuffered("Prefabs/Player", testBasement.transform.position + Vector3.up * 2, Quaternion.identity);
-
-        OnInitializeComplete?.Invoke();
+        NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
     }
 
     private void InitializeGame()
@@ -66,6 +76,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     public void RequestStartGame()
     {
+        if(gameState != GameState.Waiting) return;
+        gameState = GameState.Loading;
+        
         photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
     }
 
@@ -85,7 +98,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private async UniTaskVoid StartGameRoutine()
     {
         //initialize
-        var itemDataJson = itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
+        var itemDataJson = ItemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
 
         //send rpc
         photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemDataJson);
@@ -97,6 +110,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         switch ((SyncTarget)syncTarget)
         {
             case SyncTarget.Item:
+                ItemManager.SyncItem(data);
                 break;
             default:
                 break;

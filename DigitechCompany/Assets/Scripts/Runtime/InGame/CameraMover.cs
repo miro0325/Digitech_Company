@@ -5,9 +5,30 @@ using UnityEngine;
 
 public class CameraMover : MonoBehaviour
 {
+    //service
     private Player player;
-    private DataContainer dataContainer;
+    private Player Player
+    {
+        get
+        {
+            if(ReferenceEquals(player, null))
+                player = ServiceLocator.For(this).Get<Player>();
+            return player;
+        }
+    }
 
+    private DataContainer dataContainer;
+    private DataContainer DataContainer
+    {
+        get
+        {
+            if(ReferenceEquals(dataContainer, null))
+                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
+            return dataContainer;
+        }
+    }
+
+    //inspector
     [SerializeField] private Vector3 offset;
     [SerializeField] private float rotXClamp;
 
@@ -15,9 +36,6 @@ public class CameraMover : MonoBehaviour
 
     private void Start()
     {
-        player = ServiceLocator.GetEveryWhere<Player>();
-        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
-
         // transform.SetParent(player.transform);
         transform.localPosition = Vector3.zero + offset;
         transform.localEulerAngles = Vector3.zero;
@@ -26,13 +44,13 @@ public class CameraMover : MonoBehaviour
     private void Update()
     {
         var mouseY = Input.GetAxis("Mouse Y");
-        rotX -= mouseY * Time.deltaTime * dataContainer.userData.mouseSensivity.y;
+        rotX -= mouseY * Time.deltaTime * DataContainer.userData.mouseSensivity.y;
         rotX = Mathf.Clamp(rotX, -rotXClamp, rotXClamp);
-        transform.localEulerAngles = new Vector3(rotX, player.transform.eulerAngles.y, 0);
+        transform.localEulerAngles = new Vector3(rotX, Player.transform.eulerAngles.y, 0);
     }
 
     private void LateUpdate()
     {
-        transform.position = player.transform.position + Vector3.up * 1.5f;
+        transform.position = Player.transform.position + Vector3.up * 1.5f;
     }
 }

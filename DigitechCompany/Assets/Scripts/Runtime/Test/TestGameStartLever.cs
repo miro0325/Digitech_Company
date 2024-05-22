@@ -4,10 +4,19 @@ public class TestGameStartLever : MonoBehaviour, IInteractable
 {
     //service
     private GameManager gameManager;
+    private GameManager GameManager
+    {
+        get
+        {
+            if(ReferenceEquals(gameManager, null))
+                gameManager = ServiceLocator.For(this).Get<GameManager>();
+            return gameManager;
+        }
+    }
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        return gameManager.GameState == GameState.Waiting ? "Ãâ¹ß" : "Âø·ú Áß";
+        return GameManager.GameState == GameState.Waiting ? "Ãâ¹ß" : "Âø·ú Áß";
     }
 
     public float GetInteractRequireTime(UnitBase unit)
@@ -22,16 +31,11 @@ public class TestGameStartLever : MonoBehaviour, IInteractable
 
     public bool IsInteractable(UnitBase unit)
     {
-        return gameManager.GameState == GameState.Waiting;
+        return GameManager.GameState == GameState.Waiting;
     }
 
     public void OnInteract(UnitBase unit)
     {
-        gameManager.RequestStartGame();
-    }
-
-    private void Start()
-    {
-        gameManager = ServiceLocator.For(this).Get<GameManager>();
+        GameManager.RequestStartGame();
     }
 }

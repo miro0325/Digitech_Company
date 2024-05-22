@@ -10,38 +10,46 @@ public class ScanUI : MonoBehaviour
 
     //service
     private Player player;
-    private GameManager gameManager;
+    private Player Player
+    {
+        get
+        {
+            if (ReferenceEquals(player, null))
+                player = ServiceLocator.For(this).Get<Player>();
+            return player;
+        }
+    }
 
     //inspector
     [SerializeField] private ScanInfomationUI scanInfomationUIPrefab;
 
     //field
+    private bool isInitialized;
     private Queue<ScanInfomationUI> uiPool = new();
 
-    private void Start()
+    private void Update()
     {
-        gameManager = ServiceLocator.For(this).Get<GameManager>();
-        gameManager.OnInitializeComplete += () =>
+        if (ReferenceEquals(Player, null)) return;
+        if (isInitialized) return;
+
+        isInitialized = true;
+
+        for (int i = 0; i < UIPoolMaxCount; i++)
         {
-            player = ServiceLocator.GetEveryWhere<Player>();
+            var inst = Instantiate(scanInfomationUIPrefab, transform);
+            inst.gameObject.SetActive(false);
+            inst.Initialize(PoolUIToQueue);
+            uiPool.Enqueue(inst);
+        }
 
-            for (int i = 0; i < UIPoolMaxCount; i++)
+        Player
+            .ObserveEveryValueChanged(p => p.ScanData)
+            .Skip(1)
+            .Subscribe(scandata =>
             {
-                var inst = Instantiate(scanInfomationUIPrefab, transform);
-                inst.gameObject.SetActive(false);
-                inst.Initialize(PoolUIToQueue);
-                uiPool.Enqueue(inst);
-            }
-
-            player
-                .ObserveEveryValueChanged(p => p.ScanData)
-                .Skip(1)
-                .Subscribe(scandata =>
-                {
-                    foreach (var item in scandata.items)
-                        GetUIFromQueue().StartDisplay(item);
-                });
-        };
+                foreach (var item in scandata.items)
+                    GetUIFromQueue().StartDisplay(item);
+            });
     }
 
     private ScanInfomationUI GetUIFromQueue()

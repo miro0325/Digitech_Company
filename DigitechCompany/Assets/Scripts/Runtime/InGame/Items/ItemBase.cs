@@ -6,7 +6,26 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
     private DataContainer dataContainer;
+    private DataContainer DataContainer
+    {
+        get
+        {
+            if(ReferenceEquals(dataContainer, null))
+                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
+            return dataContainer;
+        }
+    }
+
     private ItemManager itemManager;
+    private ItemManager ItemManager
+    {
+        get
+        {
+            if(ReferenceEquals(itemManager, null))
+                itemManager = ServiceLocator.For(this).Get<ItemManager>();
+            return itemManager;
+        }
+    }
 
     //inspector field
     [SerializeField] protected Transform leftHandPoint;
@@ -29,7 +48,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     public string Key => key;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
-    public ItemData ItemData => dataContainer.itemDatas[key];
+    public ItemData ItemData => DataContainer.itemDatas[key];
     public MeshRenderer MeshRenderer => meshRenderer;
 
     //method
@@ -102,10 +121,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
 
-        //service
-        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
-        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
-
         this.ObserveEveryValueChanged(x => x.ownUnit)
             .Subscribe(viewId => 
             {                
@@ -134,7 +149,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     [PunRPC]
     protected virtual void DestoryItemRpc()
     {
-        itemManager.Items.Remove(this);
+        ItemManager.Items.Remove(this);
         NetworkObject.Destory(photonView.ViewID);
     }
 

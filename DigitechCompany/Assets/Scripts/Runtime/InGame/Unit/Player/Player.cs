@@ -15,8 +15,28 @@ public class Player : UnitBase, IService
     private readonly static int Animator_JumpHash = Animator.StringToHash("Jump");
 
     //service
+    //service
     private DataContainer dataContainer;
+    private DataContainer DataContainer
+    {
+        get
+        {
+            if(ReferenceEquals(dataContainer, null))
+                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
+            return dataContainer;
+        }
+    }
+
     private ItemManager itemManager;
+    private ItemManager ItemManager
+    {
+        get
+        {
+            if(ReferenceEquals(itemManager, null))
+                itemManager = ServiceLocator.For(this).Get<ItemManager>();
+            return itemManager;
+        }
+    }
 
     //inspector field
     [Space(20)]
@@ -62,12 +82,6 @@ public class Player : UnitBase, IService
     public override Stats BaseStats => testBaseStat;
 
     public void SetPosition(Vector3 pos)
-    {
-        photonView.RPC(nameof(SetPositionRpc), RpcTarget.All, pos);
-    }
-
-    [PunRPC]
-    private void SetPositionRpc(Vector3 pos)
     {
         cc.enabled = false;
         transform.position = pos;
@@ -115,12 +129,6 @@ public class Player : UnitBase, IService
         ServiceLocator.For(this).Register(this);
     }
 
-    private void Start()
-    {
-        dataContainer = ServiceLocator.GetEveryWhere<DataContainer>();
-        itemManager = ServiceLocator.GetEveryWhere<ItemManager>();
-    }
-
     private void Update()
     {
         DoScan();
@@ -152,7 +160,7 @@ public class Player : UnitBase, IService
         {
             //calculate
             scanData = new ScanData { gameTime = Time.time, items = new() };
-            foreach (var item in itemManager.Items)
+            foreach (var item in ItemManager.Items)
             {
                 if (item.InHand) continue;
 
@@ -363,12 +371,12 @@ public class Player : UnitBase, IService
         if (!photonView.IsMine) return;
 
         //camera rotation
-        camRotateX -= playerInput.MouseInput.y * dataContainer.userData.mouseSensivity.y;
+        camRotateX -= playerInput.MouseInput.y * DataContainer.userData.mouseSensivity.y;
         camRotateX = Mathf.Clamp(camRotateX, -camRotateXClamp, camRotateXClamp);
         camView.transform.localEulerAngles = new Vector3(camRotateX, 0, 0);
 
         //transfom rotate
-        transform.Rotate(0, playerInput.MouseInput.x * dataContainer.userData.mouseSensivity.x, 0);
+        transform.Rotate(0, playerInput.MouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
     }
 
     private void DoAnimator()

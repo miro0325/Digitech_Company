@@ -8,7 +8,7 @@ public class NetworkObject : MonoBehaviourPun
     {
         get
         {
-            if(!networkObjectManager)
+            if(ReferenceEquals(networkObjectManager, null))
                 networkObjectManager = ServiceLocator.ForGlobal().Get<NetworkObjectManager>();
             return networkObjectManager;
         }
@@ -47,13 +47,14 @@ public class NetworkObject : MonoBehaviourPun
 
     /// <summary>
     /// Instantiate prefab from resources folder and sync using view id<br/>
+    /// If photon view is not exist, Instantiate new prefab at prefab path and sync view id
     /// You can use this with NetworkObject.Instantiate()
     /// </summary>
-    /// <param name="prefab">resource fild path</param>
     /// <param name="viewId">view id to sync</param>
+    /// <param name="prefab">resource fild path</param>
     /// <returns></returns>
-    public static NetworkObject SyncInstantiate(string prefab, int viewId)
-        => NetworkObjectManager.SyncNetworkObjectInternal(prefab, viewId);
+    public static NetworkObject Sync(int viewId, string prefab = null)
+        => NetworkObjectManager.SyncNetworkObjectInternal(viewId, prefab);
 
     public virtual void OnCreate() { }
 }

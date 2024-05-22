@@ -16,7 +16,7 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
         if (PhotonNetwork.AllocateViewID(pv))
         {
             PhotonNetwork.RegisterPhotonView(photonView);
-            
+
             @object.OnCreate();
 
             photonView.RPC(nameof(InstantiateNetworkObjectRpc), isBufferd ? RpcTarget.OthersBuffered : RpcTarget.Others, prefab, pv.ViewID, pos, quat);
@@ -37,7 +37,7 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
     {
         var @object = Instantiate(Resources.Load<NetworkObject>(prefab), pos, quat);
         var pv = @object.GetComponent<PhotonView>();
-        
+
         pv.ViewID = viewId;
 
         PhotonNetwork.RegisterPhotonView(photonView);
@@ -54,18 +54,26 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
     private void DestoryNetworkObjectRpc(int viewId)
     {
         var pv = PhotonView.Find(viewId);
-        if(pv && pv.IsMine) PhotonNetwork.Destroy(pv);
+        if (pv && pv.IsMine) PhotonNetwork.Destroy(pv);
     }
 
-    internal NetworkObject SyncNetworkObjectInternal(string prefab, int viewId)
+    internal NetworkObject SyncNetworkObjectInternal(int viewId, string prefab)
     {
-        var @object = Instantiate(Resources.Load<NetworkObject>(prefab));
-        var pv = @object.GetComponent<PhotonView>();
-        pv.ViewID = viewId;
-        
-        PhotonNetwork.RegisterPhotonView(photonView);
+        var pv = PhotonView.Find(viewId);
+        if (pv != null) //already object exist
+        {
+            return pv.GetComponent<NetworkObject>();
+        }
+        else //instantiate new one
+        {
+            var @object = Instantiate(Resources.Load<NetworkObject>(prefab));
+            var getPv = @object.GetComponent<PhotonView>();
+            getPv.ViewID = viewId;
 
-        @object.OnCreate();
-        return @object;
+            PhotonNetwork.RegisterPhotonView(photonView);
+
+            @object.OnCreate();
+            return @object;
+        }
     }
 }
