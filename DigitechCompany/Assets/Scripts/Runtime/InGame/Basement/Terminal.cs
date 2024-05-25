@@ -56,7 +56,7 @@ namespace Basements
         // Update is called once per frame
         void Update()
         {
-            InputKey();
+            //InputKey();
         }
 
         private void InputKey()

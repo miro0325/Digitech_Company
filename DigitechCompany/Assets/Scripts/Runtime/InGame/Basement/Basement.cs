@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class Basement : MonoBehaviour
+
+public class Basement : MonoBehaviour, IService
 {
+    public bool IsOpenDoor => isOpenDoor;
+    public bool IsMovingDoor => isMovingDoor;
+    
     [SerializeField] Transform doorOpenTrans;
     [SerializeField] Transform backDoor;
     [SerializeField] float openDelay;
     private Vector3 prevPos, prevRot;
     private bool isOpenDoor = true;
+    private bool isMovingDoor = false;
 
     [SerializeField] Transform[] tires;
     [SerializeField] float tireRotDelay;
@@ -20,43 +25,38 @@ public class Basement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        ServiceLocator.For(this).Register(this);
+        OpenDoor();
     }
 
     // Update is called once per frame
     void Update()
     {
-        InteractDoor();
     }
 
-    private void InteractDoor()
+    public void InteractDoor()
     {
-        if(Input.GetKeyUp(KeyCode.Space))
-        {
-            isOpenDoor = !isOpenDoor;
-            if (isOpenDoor)
-                CloseDoor();
-            else
-                OpenDoor();
-        }
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Leave();
-        }
+        isOpenDoor = !isOpenDoor;
+        if (isOpenDoor)
+            CloseDoor();
+        else
+            OpenDoor();
 
     }
 
     private void OpenDoor()
     {
+        isMovingDoor = true;
         prevPos = backDoor.localPosition;
         prevRot = backDoor.localEulerAngles;
-        backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay);
+        backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay).OnComplete(() => isMovingDoor = false);
         backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles,openDelay);
     }
 
     private void CloseDoor()
     {
-        backDoor.DOLocalMove(prevPos, openDelay);
+        isMovingDoor = true;
+        backDoor.DOLocalMove(prevPos, openDelay).OnComplete(() => isMovingDoor = false);
         backDoor.DOLocalRotate(prevRot, openDelay);
     }
 

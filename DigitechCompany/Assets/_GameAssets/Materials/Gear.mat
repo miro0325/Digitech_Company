@@ -23,8 +23,10 @@ Material:
   m_Name: Gear
   m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
   m_ValidKeywords:
-  - ONLY_MAINLIGHT
+  - USE_BUMPMAP
+  - USE_SPECULAR
   m_InvalidKeywords:
+  - SHADOWS_SCREEN
   - _USEMAINLIGHT_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -125,6 +127,7 @@ Material:
     - _GlossyReflections: 0
     - _LightStrength: 1
     - _Metallic: 0
+    - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.03
     - _Parallax: 0.005
@@ -137,9 +140,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _UseBumpMap: 0
-    - _UseMainLight: 1
-    - _UseSpecular: 0
+    - _UseBumpMap: 1
+    - _UseMainLight: 0
+    - _UseShadowScreen: 1
+    - _UseSpecular: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
