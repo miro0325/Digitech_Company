@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TestDoor : MonoBehaviour, IInteractable
 {
+    [SerializeField] private Vector3 position;
+
     public string GetInteractionExplain(UnitBase unit)
     {
         return "¡¯¿‘";
@@ -27,6 +29,6 @@ public class TestDoor : MonoBehaviour, IInteractable
     public void OnInteract(UnitBase unit)
     {
         var player = unit as Player;
-        if(player) player.SetPosition(new(0, -10, 0));
+        if(player) player.SetPosition(position);
     }
 }

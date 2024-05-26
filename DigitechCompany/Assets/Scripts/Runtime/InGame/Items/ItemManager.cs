@@ -17,6 +17,26 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
     //service
     private ResourceLoader resourceLoader;
+    private ResourceLoader ResourceLoader
+    {
+        get
+        {
+            if(ReferenceEquals(resourceLoader, null))
+                resourceLoader = ServiceLocator.ForGlobal().Get<ResourceLoader>();
+            return resourceLoader;
+        }
+    }
+
+    private TestBasement testBasement;
+    private TestBasement TestBasement
+    {
+        get
+        {
+            if(ReferenceEquals(testBasement, null))
+                testBasement = ServiceLocator.For(this).Get<TestBasement>();
+            return testBasement;
+        }
+    }
 
     //field
     private HashSet<ItemBase> items = new();
@@ -52,7 +72,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 
                 if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+                    var itemKeys = ResourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
                     var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity).GetComponent<ItemBase>();
                     item.SetLayRotation(Random.Range(0, 360));
@@ -61,11 +81,6 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 }
             }
         }
-
-        var item2 = NetworkObject.Instantiate($"Prefabs/Items/Key", Vector3.up, Quaternion.identity).GetComponent<ItemBase>();
-        item2.SetLayRotation(Random.Range(0, 360));
-        item2.Initialize("Key");
-        items.Add(item2);
 
         var networkItemData = new NetworkItemData[items.Count];
         var count = 0;
@@ -101,13 +116,28 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         }
     }
 
+    /// <summary>
+    /// This function must be executed only when you are a client.
+    /// </summary>
+    /// <param name="withoutBasement">Whether to clear the items in the foundation</param>
+    public void DestoryItems(bool withoutBasement)
+    {
+        HashSet<ItemBase> excepts = new();
+        if(withoutBasement) excepts = TestBasement.Items;
+        
+        foreach(var item in items.ToArray())
+        {
+            if(!excepts.Contains(item))
+                NetworkObject.Destory(item.photonView.ViewID);
+        }
+
+        items.Clear();
+        if(withoutBasement)
+            items = excepts;
+    }
+
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
-    }
-
-    private void Start()
-    {
-        resourceLoader = ServiceLocator.GetEveryWhere<ResourceLoader>();
     }
 }
