@@ -83,6 +83,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2960460522283444554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5922099111990150510}
+  m_Layer: 7
+  m_Name: RightHandIKTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5922099111990150510
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2960460522283444554}
+  m_LocalRotation: {x: 0.04283836, y: 0.14021873, z: -0.98912036, w: -0.012021316}
+  m_LocalPosition: {x: 0.32701448, y: 0.0395661, z: 0.036233168}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6668602876129647263}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6323179596718751781
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +149,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4786156904981980080}
+  - {fileID: 7186773845848759113}
+  - {fileID: 5922099111990150510}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -207,8 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 251087110cb68984583fee285fe36d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
+  leftHandPoint: {fileID: 7186773845848759113}
+  rightHandPoint: {fileID: 5922099111990150510}
 --- !u!114 &784093169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,3 +258,34 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!1 &6837367370792780110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7186773845848759113}
+  m_Layer: 7
+  m_Name: LeftHandIKTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7186773845848759113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6837367370792780110}
+  m_LocalRotation: {x: -0.019005416, y: 0.1525598, z: 0.96305454, w: 0.22111166}
+  m_LocalPosition: {x: -0.103976466, y: 0.089873165, z: -0.05103444}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6668602876129647263}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

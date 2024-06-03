@@ -4,8 +4,10 @@ using UnityEngine.Rendering;
 using UniRx;
 using System.Collections;
 using DG.Tweening;
+using UnityEngine.Animations.Rigging;
+using System;
 
-public class Player : UnitBase, IService
+public class Player : UnitBase, IService, IPunObservable
 {
     //const
     private readonly static int Animator_MoveStateHash = Animator.StringToHash("MoveState"); //0 : idle, 1 : move, 2 : run
@@ -21,7 +23,7 @@ public class Player : UnitBase, IService
     {
         get
         {
-            if(ReferenceEquals(dataContainer, null))
+            if (ReferenceEquals(dataContainer, null))
                 dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
             return dataContainer;
         }
@@ -32,7 +34,7 @@ public class Player : UnitBase, IService
     {
         get
         {
-            if(ReferenceEquals(itemManager, null))
+            if (ReferenceEquals(itemManager, null))
                 itemManager = ServiceLocator.For(this).Get<ItemManager>();
             return itemManager;
         }
@@ -53,6 +55,12 @@ public class Player : UnitBase, IService
     [SerializeField] private Camera cam;
     [SerializeField] private Transform itemHolderCamera;
     [SerializeField] private Transform scanSphere;
+    [SerializeField] private TwoBoneIKConstraint leftHandIK;
+    [SerializeField] private TwoBoneIKConstraint rightHandIK;
+    [SerializeField] private TwoBoneIKConstraint leftHandIKCam;
+    [SerializeField] private TwoBoneIKConstraint rightHandIKCam;
+    [SerializeField] private Transform leftHandIKTarget;
+    [SerializeField] private Transform rightHandIKTarget;
     [Header("Animator")]
     [SerializeField] private Animator camAnimator;
     [SerializeField] private Animator playerModelAnimator;
@@ -73,6 +81,7 @@ public class Player : UnitBase, IService
     private CharacterController cc;
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
+    private ReactiveProperty<int> curHandItemViewId = new();
 
     //property
     public float[] InteractRequireTimes => interactRequireTimes;
@@ -93,6 +102,45 @@ public class Player : UnitBase, IService
         base.OnCreate();
 
         playerInput = GetComponent<UserInput>();
+        curHandItemViewId.Subscribe(x =>
+        {
+            Debug.Log(x);
+            if (x == 0)
+            {
+                leftHandIKTarget.SetParent(transform);
+                leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+                rightHandIKTarget.SetParent(transform);
+                rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+                if (photonView.IsMine)
+                {
+                    leftHandIKCam.weight = 0;
+                    rightHandIKCam.weight = 0;
+                }
+                else
+                {
+                    leftHandIK.weight = 0;
+                    rightHandIK.weight = 0;
+                }
+                return;
+            }
+
+            var curItem = PhotonView.Find(x).GetComponent<ItemBase>();
+
+            leftHandIKTarget.SetParent(curItem.LeftHandPoint != null ? curItem.LeftHandPoint : transform);
+            leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+            rightHandIKTarget.SetParent(curItem.RightHandPoint != null ? curItem.RightHandPoint : transform);
+            rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+            if (photonView.IsMine)
+            {
+                leftHandIKCam.weight = curItem.LeftHandPoint != null ? 1 : 0;
+                rightHandIKCam.weight = curItem.RightHandPoint != null ? 1 : 0;
+            }
+            else
+            {
+                leftHandIK.weight = curItem.LeftHandPoint != null ? 1 : 0;
+                rightHandIK.weight = curItem.RightHandPoint != null ? 1 : 0;
+            }
+        });
 
         if (!photonView.IsMine) return;
 
@@ -218,6 +266,7 @@ public class Player : UnitBase, IService
         var item = itemContainer.GetCurrentSlotItem();
         if (item != null)
         {
+            curHandItemViewId.Value = item.photonView.ViewID;
             for (int i = 0; i < (int)InteractID.End; i++)
             {
                 if (playerInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
@@ -226,6 +275,10 @@ public class Player : UnitBase, IService
 
             if (playerInput.DiscardInput)
                 DiscardCurrentItem();
+        }
+        else
+        {
+            curHandItemViewId.Value = 0;
         }
     }
 
@@ -342,7 +395,7 @@ public class Player : UnitBase, IService
         else
         {
             speed *= 1.5f;
-            if(inputMag > 0)
+            if (inputMag > 0)
             {
                 curStats.SetStat(Stats.Key.Stamina, x => x -= Time.deltaTime);
                 runStaminaRecoverWaitTime = 1.5f;
@@ -414,5 +467,17 @@ public class Player : UnitBase, IService
 
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(cam.transform.position, cam.transform.position + cam.transform.forward * interactionDistance);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(curHandItemViewId.Value);
+        }
+        else
+        {
+            curHandItemViewId.Value = (int)stream.ReceiveNext();
+        }
     }
 }

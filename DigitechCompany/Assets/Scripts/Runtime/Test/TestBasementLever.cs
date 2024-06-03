@@ -55,9 +55,12 @@ public class TestBasementLever : MonoBehaviour, IInteractable
         
         switch (TestBasement.State)
         {
-            case TestBasementState.TakingOff: return false;
-            case TestBasementState.Up: return true;
+            //moving
+            case TestBasementState.TakingOff:
             case TestBasementState.Landing: return false;
+
+            //stopping
+            case TestBasementState.Up:
             case TestBasementState.Down: return true;
         }
         return false;
