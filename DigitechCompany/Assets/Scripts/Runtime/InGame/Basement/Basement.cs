@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class Basement : MonoBehaviour
+
+public class Basement : MonoBehaviour, IService
 {
+    public bool IsOpenDoor => isOpenDoor;
+    public bool IsMovingDoor => isMovingDoor;
+    
     [SerializeField] Transform doorOpenTrans;
     [SerializeField] Transform backDoor;
     [SerializeField] float openDelay;
     private Vector3 prevPos, prevRot;
     private bool isOpenDoor = true;
+    private bool isMovingDoor = false;
 
     [SerializeField] Transform[] tires;
     [SerializeField] float tireRotDelay;
@@ -17,47 +22,48 @@ public class Basement : MonoBehaviour
     [SerializeField] Ease ease;
 
     [SerializeField] Animator animator;
+
+    private Sequence sequence;
     // Start is called before the first frame update
     void Start()
     {
-        
+        ServiceLocator.For(this).Register(this);
+        sequence = DOTween.Sequence();
+        InteractDoor();
     }
 
     // Update is called once per frame
     void Update()
     {
-        InteractDoor();
     }
 
-    private void InteractDoor()
+    public void InteractDoor()
     {
-        if(Input.GetKeyUp(KeyCode.Space))
-        {
-            isOpenDoor = !isOpenDoor;
-            if (isOpenDoor)
-                CloseDoor();
-            else
-                OpenDoor();
-        }
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Leave();
-        }
+        
+        sequence.Kill();
+        isOpenDoor = !isOpenDoor;
+        if (isOpenDoor)
+            CloseDoor();
+        else
+            OpenDoor();
 
     }
 
     private void OpenDoor()
     {
+        isMovingDoor = true;
         prevPos = backDoor.localPosition;
         prevRot = backDoor.localEulerAngles;
-        backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay);
-        backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles,openDelay);
+
+        sequence.Append(backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay).OnComplete(() => isMovingDoor = false));
+        sequence.Append(backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles,openDelay));
     }
 
     private void CloseDoor()
     {
-        backDoor.DOLocalMove(prevPos, openDelay);
-        backDoor.DOLocalRotate(prevRot, openDelay);
+        isMovingDoor = true;
+        sequence.Append(backDoor.DOLocalMove(prevPos, openDelay).OnComplete(() => isMovingDoor = false));
+        sequence.Append(backDoor.DOLocalRotate(prevRot, openDelay));
     }
 
     private void Leave()

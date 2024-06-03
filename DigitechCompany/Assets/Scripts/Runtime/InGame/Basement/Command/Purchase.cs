@@ -58,7 +58,6 @@ public class Purchase : Command
 
     public override void Init()
     {
-        throw new System.NotImplementedException();
     }
 
     protected override string GetExplainText(string cmd, string[] args)

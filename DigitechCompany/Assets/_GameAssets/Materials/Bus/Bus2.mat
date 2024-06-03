@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5196830244135187960
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -7,14 +20,10 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Charge_Button
-  m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
-  m_ValidKeywords:
-  - USE_BUMPMAP
-  - USE_SPECULAR
-  m_InvalidKeywords:
-  - SHADOWS_SCREEN
-  - _USEMAINLIGHT_ON
+  m_Name: Bus2
+  m_Shader: {fileID: 4800000, guid: 3dcfb4324f765e848ae759e788445bdd, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -25,7 +34,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 9b8f88ce486769a4fb0cca593f2b708d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 15a56a0cbe35b0045a75135048bf28f2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BrushTex:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -48,12 +61,8 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _LUT_Tex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 9b8f88ce486769a4fb0cca593f2b708d, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -65,10 +74,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _RampTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -93,7 +98,6 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _Cel: 3
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -101,58 +105,48 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EdgeDiffuse: 1
-    - _EdgeDistanceAttenuation: 1
-    - _EdgeRim: 1
-    - _EdgeRimOffset: 1
-    - _EdgeShadowAttenuation: 1
-    - _EdgeSpecular: 1
-    - _EdgeSpecularOffset: 1
     - _EnvironmentReflections: 1
+    - _FresnelIntensity: 1.57
+    - _FresnelSmooth: 0
+    - _FresnelThreshold: 0.191
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _LightStrength: 1
+    - _MedBrushStrength: 0
+    - _MedSmooth: 0
+    - _MedThreshold: 0.504
+    - _MetalReflectProbeIntensity: 1
     - _Metallic: 0
-    - _NormalStrength: 1
     - _OcclusionStrength: 1
-    - _Outline_Bold: 0.03
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _RimPower: 1
-    - _RimThreshold: 1
+    - _ReflectBrushStrength: 0
+    - _ReflectProbeIntensity: 1
+    - _ReflectProbeRotation: 0
+    - _ReflectSmooth: 0
+    - _ReflectThreshold: 0.2
+    - _ShadowBrushStrength: 0
+    - _ShadowSmooth: 0
+    - _ShadowThreshold: 0.23
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
+    - _SpecularIntensity: 1.61
+    - _SpecularSmooth: 0
+    - _SpecularThreshold: 0.161
     - _SrcBlend: 1
     - _Surface: 0
-    - _UseBumpMap: 1
-    - _UseMainLight: 0
-    - _UseShadowScreen: 1
-    - _UseSpecular: 1
+    - _UseBrushTex: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _LightColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LightDir: {r: 0, g: 0, b: 0, a: 0}
-    - _LightPos: {r: 0, g: 0, b: 0, a: 0}
-    - _Outline_Color: {r: 0, g: 0, b: 0, a: 1}
+    - _MedColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 1}
+    - _ReflectColor: {r: 0.38679248, g: 0.38131902, b: 0.38131902, a: 1}
+    - _ShadowColor: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecularLightOffset: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
---- !u!114 &6867903807368597042
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 5
