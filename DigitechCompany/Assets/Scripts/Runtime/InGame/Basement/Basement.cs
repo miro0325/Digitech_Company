@@ -22,11 +22,14 @@ public class Basement : MonoBehaviour, IService
     [SerializeField] Ease ease;
 
     [SerializeField] Animator animator;
+
+    private Sequence sequence;
     // Start is called before the first frame update
     void Start()
     {
         ServiceLocator.For(this).Register(this);
-        OpenDoor();
+        sequence = DOTween.Sequence();
+        InteractDoor();
     }
 
     // Update is called once per frame
@@ -36,6 +39,8 @@ public class Basement : MonoBehaviour, IService
 
     public void InteractDoor()
     {
+        
+        sequence.Kill();
         isOpenDoor = !isOpenDoor;
         if (isOpenDoor)
             CloseDoor();
@@ -49,15 +54,16 @@ public class Basement : MonoBehaviour, IService
         isMovingDoor = true;
         prevPos = backDoor.localPosition;
         prevRot = backDoor.localEulerAngles;
-        backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay).OnComplete(() => isMovingDoor = false);
-        backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles,openDelay);
+
+        sequence.Append(backDoor.DOLocalMove(doorOpenTrans.localPosition, openDelay).OnComplete(() => isMovingDoor = false));
+        sequence.Append(backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles,openDelay));
     }
 
     private void CloseDoor()
     {
         isMovingDoor = true;
-        backDoor.DOLocalMove(prevPos, openDelay).OnComplete(() => isMovingDoor = false);
-        backDoor.DOLocalRotate(prevRot, openDelay);
+        sequence.Append(backDoor.DOLocalMove(prevPos, openDelay).OnComplete(() => isMovingDoor = false));
+        sequence.Append(backDoor.DOLocalRotate(prevRot, openDelay));
     }
 
     private void Leave()
