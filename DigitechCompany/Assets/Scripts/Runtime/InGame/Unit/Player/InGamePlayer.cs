@@ -7,7 +7,7 @@ using DG.Tweening;
 using UnityEngine.Animations.Rigging;
 using System;
 
-public class Player : UnitBase, IService, IPunObservable
+public class InGamePlayer : UnitBase, IService, IPunObservable
 {
     //const
     private readonly static int Animator_MoveStateHash = Animator.StringToHash("MoveState"); //0 : idle, 1 : move, 2 : run
@@ -77,7 +77,7 @@ public class Player : UnitBase, IService, IPunObservable
     private float[] interactRequireTimes = new float[(int)InteractID.End];
     private ScanData scanData;
     private Material scanSphereMaterial;
-    private UserInput playerInput;
+    private UserInput userInput;
     private CharacterController cc;
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
@@ -101,7 +101,7 @@ public class Player : UnitBase, IService, IPunObservable
     {
         base.OnCreate();
 
-        playerInput = GetComponent<UserInput>();
+        userInput = GetComponent<UserInput>();
         curHandItemViewId.Subscribe(x =>
         {
             Debug.Log(x);
@@ -164,7 +164,7 @@ public class Player : UnitBase, IService, IPunObservable
         playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>().For((i, ele) => ele.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
         camView.gameObject.SetActive(true);
 
-        playerInput
+        userInput
             .ObserveEveryValueChanged(i => i.MouseWheel)
             .Where(x => x != 0)
             .ThrottleFrame(5)
@@ -197,7 +197,7 @@ public class Player : UnitBase, IService, IPunObservable
         }
         else
         {
-            if (playerInput.ScanInput)
+            if (userInput.ScanInput)
             {
                 scanWaitTime = 1.33f;
                 StartCoroutine(ScanRoutine());
@@ -269,11 +269,11 @@ public class Player : UnitBase, IService, IPunObservable
             curHandItemViewId.Value = item.photonView.ViewID;
             for (int i = 0; i < (int)InteractID.End; i++)
             {
-                if (playerInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
+                if (userInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
                     item.OnUse((InteractID)i);
             }
 
-            if (playerInput.DiscardInput)
+            if (userInput.DiscardInput)
                 DiscardCurrentItem();
         }
         else
@@ -304,11 +304,11 @@ public class Player : UnitBase, IService, IPunObservable
         if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
             //if pressed target interact id => mark interact is start
-            if (playerInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
+            if (userInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
 
             //if released target interact id => set require time 0
-            if (playerInput.InteractInputReleased[(int)lookInteractable.GetTargetInteractID(this)])
+            if (userInput.InteractInputReleased[(int)lookInteractable.GetTargetInteractID(this)])
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
 
             //if interact marked
@@ -351,12 +351,12 @@ public class Player : UnitBase, IService, IPunObservable
         if (!photonView.IsMine) return;
 
         //crouch
-        if (playerInput.CrouchInput)
+        if (userInput.CrouchInput)
             isCrouch = !isCrouch;
 
         if (isCrouch)
         {
-            if (playerInput.RunInput)
+            if (userInput.RunInput)
                 isCrouch = false;
 
             camView.localPosition =
@@ -369,8 +369,8 @@ public class Player : UnitBase, IService, IPunObservable
         }
 
         //movement
-        var inputMag = Mathf.Clamp01(playerInput.MoveInput.magnitude);
-        var relativeDir = transform.TransformDirection(new Vector3(playerInput.MoveInput.x, 0, playerInput.MoveInput.y)).normalized;
+        var inputMag = Mathf.Clamp01(userInput.MoveInput.magnitude);
+        var relativeDir = transform.TransformDirection(new Vector3(userInput.MoveInput.x, 0, userInput.MoveInput.y)).normalized;
         var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
         var crouchShave = isCrouch ? 0.5f : 1f;
         var speed = curStats.GetStat(Stats.Key.Speed) * crouchShave * weightShave;
@@ -390,7 +390,7 @@ public class Player : UnitBase, IService, IPunObservable
             }
 
             //setting stamina minimums for running
-            if (playerInput.RunInput && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
+            if (userInput.RunInput && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
         }
         else
         {
@@ -402,7 +402,7 @@ public class Player : UnitBase, IService, IPunObservable
             }
 
             if (curStats.GetStat(Stats.Key.Stamina) <= 0) isRun = false;
-            if (!playerInput.RunInput) isRun = false;
+            if (!userInput.RunInput) isRun = false;
         }
         var velocity = speed * inputMag * relativeDir;
 
@@ -410,7 +410,7 @@ public class Player : UnitBase, IService, IPunObservable
         if (cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
         else velocityY -= gravity * Time.deltaTime;
 
-        if (playerInput.JumpInput && isGround)
+        if (userInput.JumpInput && isGround)
             velocityY = jumpScale;
 
         velocity.y = velocityY;
@@ -424,38 +424,38 @@ public class Player : UnitBase, IService, IPunObservable
         if (!photonView.IsMine) return;
 
         //camera rotation
-        camRotateX -= playerInput.MouseInput.y * DataContainer.userData.mouseSensivity.y;
+        camRotateX -= userInput.MouseInput.y * DataContainer.userData.mouseSensivity.y;
         camRotateX = Mathf.Clamp(camRotateX, -camRotateXClamp, camRotateXClamp);
         camView.transform.localEulerAngles = new Vector3(camRotateX, 0, 0);
 
         //transfom rotate
-        transform.Rotate(0, playerInput.MouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
+        transform.Rotate(0, userInput.MouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
     }
 
     private void DoAnimator()
     {
-        playerModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
-        playerModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
+        playerModelAnimator.SetFloat(Animator_MoveXHash, userInput.MoveInput.x);
+        playerModelAnimator.SetFloat(Animator_MoveYHash, userInput.MoveInput.y);
         playerModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
-        if (playerInput.MoveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (userInput.MoveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else playerModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
         if (!photonView.IsMine) return;
 
         //arm animator
-        armModelAnimator.SetFloat(Animator_MoveXHash, playerInput.MoveInput.x);
-        armModelAnimator.SetFloat(Animator_MoveYHash, playerInput.MoveInput.y);
+        armModelAnimator.SetFloat(Animator_MoveXHash, userInput.MoveInput.x);
+        armModelAnimator.SetFloat(Animator_MoveYHash, userInput.MoveInput.y);
         armModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
-        if (playerInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (userInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
         //camera animator
-        if (playerInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (userInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
         else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-        if (playerInput.JumpInput && isGround)
+        if (userInput.JumpInput && isGround)
             camAnimator.SetTrigger(Animator_JumpHash);
         camAnimator.SetBool(Animator_IsGroundHash, isGround);
     }

@@ -40,6 +40,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 
     //field
     private HashSet<ItemBase> items = new();
+    private string itemJsonData;
 
     //property
     public HashSet<ItemBase> Items => items;
@@ -93,7 +94,9 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 layRotation = item.LayRotation
             };
 
-        return networkItemData.ToJson();
+        var json = networkItemData.ToJson();
+        itemJsonData = json;
+        return json;
     }
 
     /// <summary>

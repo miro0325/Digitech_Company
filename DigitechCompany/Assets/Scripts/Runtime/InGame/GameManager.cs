@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
+using Photon.Realtime;
 
 public enum SyncTarget
 {
@@ -19,7 +20,7 @@ public enum GameState
     Processing
 }
 
-public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
+public class GameManager : MonoBehaviourPun, IService, IPunObservable
 {
     //service
     private TestBasement testBasement;
@@ -42,13 +43,33 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             return itemManager;
         }
     }
+    private SpectatorView spectatorView;
+    private SpectatorView SpectatorView
+    {
+        get
+        {
+            if(ReferenceEquals(spectatorView, null))
+                spectatorView = ServiceLocator.For(this).Get<SpectatorView>();
+            return spectatorView;
+        }
+    }
+    private InGamePlayer player;
+    private InGamePlayer Player
+    {
+        get
+        {
+            if(ReferenceEquals(player, null))
+                player = ServiceLocator.For(this).Get<InGamePlayer>();
+            return player;
+        }
+    }
 
     //inspector
     [SerializeField] private MeshRenderer[] rooms;
 
     //field
     private GameState state;
-    private Dictionary<Photon.Realtime.Player, bool[]> syncDatas = new();
+    private Dictionary<Player, bool[]> syncDatas = new();
 
     //property
     public GameState State => state;
@@ -60,20 +81,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void Start()
     {
-        if (photonView.IsMine) InitializeGame();
-        else SyncGame();
-
-        NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
+        var player = NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
+        player.gameObject.SetActive(false);
+        photonView.RPC(nameof(PlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
     }
 
-    private void InitializeGame()
+    [PunRPC]
+    private void PlayerJoinRpc(Player newPlayer)
     {
+        Debug.Log("Join");
+        syncDatas.Add(newPlayer, new bool[(int)SyncTarget.End]);
+    } 
 
-    }
-
-    private void SyncGame()
+    private void GameInstantiateRpc(GameState gameState)
     {
-
+        state = gameState;
+        switch (state)
+        {
+            case GameState.Waiting:
+                Player.gameObject.SetActive(true);
+                break;
+            case GameState.Loading:
+                
+                break;
+            case GameState.Processing:
+                break;
+            default:
+                break;
+        }
     }
 
     public void RequestStartGame()
@@ -134,7 +169,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     }
 
     [PunRPC]
-    private void NotifySyncComplete(Photon.Realtime.Player player, int syncTarget)
+    private void NotifySyncComplete(Player player, int syncTarget)
     {
         syncDatas[player][syncTarget] = true;
     }
@@ -156,12 +191,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         await UniTask.WaitUntil(() => TestBasement.State == TestBasementState.Up);
 
         ItemManager.DestoryItems(true);
-    }
-
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-    {
-        Debug.Log("Join");
-        syncDatas.Add(newPlayer, new bool[(int)SyncTarget.End]);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

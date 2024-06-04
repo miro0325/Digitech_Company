@@ -64,7 +64,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual string GetInteractionExplain(UnitBase unit)
     {
-        var player = unit as Player;
+        var player = unit as InGamePlayer;
         if (player)
         {
             if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
@@ -79,7 +79,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual bool IsInteractable(UnitBase unit)
     {
-        var player = unit as Player;
+        var player = unit as InGamePlayer;
         if (player)
         {
             if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
@@ -131,7 +131,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
                 }
 
                 var unit = PhotonView.Find(viewId).GetComponent<UnitBase>();
-                var player = unit as Player;
+                var player = unit as InGamePlayer;
 
                 if(player)
                     //if player view is camera set camera holder other is body holder

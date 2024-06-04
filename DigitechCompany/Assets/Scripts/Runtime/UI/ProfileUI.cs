@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class ProfileUI : MonoBehaviour
 {
     //service
-    private Player player;
-    private Player Player
+    private InGamePlayer player;
+    private InGamePlayer Player
     {
         get
         {
             if(ReferenceEquals(player, null))
-                player = ServiceLocator.For(this).Get<Player>();
+                player = ServiceLocator.For(this).Get<InGamePlayer>();
             return player;
         }
     }
