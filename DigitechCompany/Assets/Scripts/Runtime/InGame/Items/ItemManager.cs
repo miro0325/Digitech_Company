@@ -17,26 +17,9 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
     //service
     private ResourceLoader resourceLoader;
-    private ResourceLoader ResourceLoader
-    {
-        get
-        {
-            if(ReferenceEquals(resourceLoader, null))
-                resourceLoader = ServiceLocator.ForGlobal().Get<ResourceLoader>();
-            return resourceLoader;
-        }
-    }
-
+    private ResourceLoader ResourceLoader => resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
     private TestBasement testBasement;
-    private TestBasement TestBasement
-    {
-        get
-        {
-            if(ReferenceEquals(testBasement, null))
-                testBasement = ServiceLocator.For(this).Get<TestBasement>();
-            return testBasement;
-        }
-    }
+    private TestBasement TestBasement => testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
     //field
     private HashSet<ItemBase> items = new();

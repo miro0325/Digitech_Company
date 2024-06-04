@@ -12,7 +12,7 @@ public enum InteractID
     End
 }
 
-public class UserInput : MonoBehaviourPun, IPunObservable, IService
+public class InputManager : MonoBehaviourPun, IPunObservable, IService
 {
     //field
     private PlayerInput playerInput;
@@ -52,10 +52,10 @@ public class UserInput : MonoBehaviourPun, IPunObservable, IService
     private void Start()
     {
         if (!photonView.IsMine) return;
-
         ServiceLocator.For(this).Register(this);
 
         playerInput = GetComponent<PlayerInput>();
+        
         interactInputPressed[(int)InteractID.None] = false;
 
         moveAction = playerInput.actions["Move"];

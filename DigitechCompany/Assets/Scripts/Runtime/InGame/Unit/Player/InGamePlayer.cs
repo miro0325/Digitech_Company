@@ -6,6 +6,7 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine.Animations.Rigging;
 using System;
+using UnityEngine.InputSystem;
 
 public class InGamePlayer : UnitBase, IService, IPunObservable
 {
@@ -19,26 +20,10 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
     //service
     //service
     private DataContainer dataContainer;
-    private DataContainer DataContainer
-    {
-        get
-        {
-            if (ReferenceEquals(dataContainer, null))
-                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
-            return dataContainer;
-        }
-    }
+    private DataContainer DataContainer => dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
 
     private ItemManager itemManager;
-    private ItemManager ItemManager
-    {
-        get
-        {
-            if (ReferenceEquals(itemManager, null))
-                itemManager = ServiceLocator.For(this).Get<ItemManager>();
-            return itemManager;
-        }
-    }
+    private ItemManager ItemManager => itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
 
     //inspector field
     [Space(20)]
@@ -77,11 +62,12 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
     private float[] interactRequireTimes = new float[(int)InteractID.End];
     private ScanData scanData;
     private Material scanSphereMaterial;
-    private UserInput userInput;
+    // private InputManager userInput;
     private CharacterController cc;
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
     private ReactiveProperty<int> curHandItemViewId = new();
+    private UserInputAction userInput;
 
     //property
     public float[] InteractRequireTimes => interactRequireTimes;
@@ -101,7 +87,9 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
     {
         base.OnCreate();
 
-        userInput = GetComponent<UserInput>();
+        // userInput = GetComponent<InputManager>();
+        userInput = new();
+        userInput.Enable();
         curHandItemViewId.Subscribe(x =>
         {
             Debug.Log(x);
@@ -165,7 +153,7 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         camView.gameObject.SetActive(true);
 
         userInput
-            .ObserveEveryValueChanged(i => i.MouseWheel)
+            .ObserveEveryValueChanged(i => i.Player.MouseWheel.ReadValue<Vector2>().y)
             .Where(x => x != 0)
             .ThrottleFrame(5)
             .Subscribe(x => itemContainer.Index += x > 0 ? 1 : -1);
@@ -197,7 +185,7 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         }
         else
         {
-            if (userInput.ScanInput)
+            if (userInput.Player.Scan.WasPressedThisFrame())
             {
                 scanWaitTime = 1.33f;
                 StartCoroutine(ScanRoutine());
@@ -259,6 +247,18 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         return true;
     }
 
+    private InputAction GetInteractInputAction(InteractID id)
+    {
+        return id switch
+        {
+            InteractID.ID1 => userInput.Player.Interact1,
+            InteractID.ID2 => userInput.Player.Interact2,
+            InteractID.ID3 => userInput.Player.Interact3,
+            InteractID.ID4 => userInput.Player.Interact4,
+            _ => null,
+        };
+    }
+
     private void DoItem()
     {
         if (!photonView.IsMine) return;
@@ -267,13 +267,15 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         if (item != null)
         {
             curHandItemViewId.Value = item.photonView.ViewID;
+
             for (int i = 0; i < (int)InteractID.End; i++)
             {
-                if (userInput.InteractInputPressed[i] && item.IsUsable((InteractID)i))
+                if (GetInteractInputAction((InteractID)i) != null && GetInteractInputAction((InteractID)i).WasPressedThisFrame() && item.IsUsable((InteractID)i))
                     item.OnUse((InteractID)i);
             }
 
-            if (userInput.DiscardInput)
+
+            if (userInput.Player.Discard.WasPressedThisFrame())
                 DiscardCurrentItem();
         }
         else
@@ -303,12 +305,15 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
 
         if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
+            var targetInteractId = lookInteractable.GetTargetInteractID(this);
+            var interactAction = GetInteractInputAction(targetInteractId);
+
             //if pressed target interact id => mark interact is start
-            if (userInput.InteractInputPressed[(int)lookInteractable.GetTargetInteractID(this)])
+            if (interactAction.WasPressedThisFrame())
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
 
             //if released target interact id => set require time 0
-            if (userInput.InteractInputReleased[(int)lookInteractable.GetTargetInteractID(this)])
+            if (interactAction.WasReleasedThisFrame())
                 interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
 
             //if interact marked
@@ -351,12 +356,12 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         if (!photonView.IsMine) return;
 
         //crouch
-        if (userInput.CrouchInput)
+        if (userInput.Player.Crouch.WasPressedThisFrame())
             isCrouch = !isCrouch;
 
         if (isCrouch)
         {
-            if (userInput.RunInput)
+            if (userInput.Player.Run.IsPressed())
                 isCrouch = false;
 
             camView.localPosition =
@@ -369,11 +374,12 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         //movement
-        var inputMag = Mathf.Clamp01(userInput.MoveInput.magnitude);
-        var relativeDir = transform.TransformDirection(new Vector3(userInput.MoveInput.x, 0, userInput.MoveInput.y)).normalized;
+        var moveInput = userInput.Player.Move.ReadValue<Vector2>();
+        var moveInputMag = Mathf.Clamp01(moveInput.magnitude);
+        var relativeDir = transform.TransformDirection(new Vector3(moveInput.x, 0, moveInput.y)).normalized;
         var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
         var crouchShave = isCrouch ? 0.5f : 1f;
-        var speed = curStats.GetStat(Stats.Key.Speed) * crouchShave * weightShave;
+        var speed = curStats.GetStat(Stats.Key.Speed) * crouchShave * weightShave * moveInputMag;
 
         if (!isRun)
         {
@@ -390,27 +396,27 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
             }
 
             //setting stamina minimums for running
-            if (userInput.RunInput && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
+            if (userInput.Player.Run.IsPressed() && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
         }
         else
         {
             speed *= 1.5f;
-            if (inputMag > 0)
+            if (moveInputMag > 0)
             {
                 curStats.SetStat(Stats.Key.Stamina, x => x -= Time.deltaTime);
                 runStaminaRecoverWaitTime = 1.5f;
             }
 
             if (curStats.GetStat(Stats.Key.Stamina) <= 0) isRun = false;
-            if (!userInput.RunInput) isRun = false;
+            if (!userInput.Player.Run.IsPressed()) isRun = false;
         }
-        var velocity = speed * inputMag * relativeDir;
+        var velocity = speed * moveInputMag * relativeDir;
 
         //gravity
         if (cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
         else velocityY -= gravity * Time.deltaTime;
 
-        if (userInput.JumpInput && isGround)
+        if (userInput.Player.Jump.WasPressedThisFrame() && isGround)
             velocityY = jumpScale;
 
         velocity.y = velocityY;
@@ -423,39 +429,43 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (!photonView.IsMine) return;
 
+        var mouseInput = userInput.Player.Mouse.ReadValue<Vector2>();// * Time.deltaTime;
+
         //camera rotation
-        camRotateX -= userInput.MouseInput.y * DataContainer.userData.mouseSensivity.y;
+        camRotateX -= mouseInput.y * DataContainer.userData.mouseSensivity.y;
         camRotateX = Mathf.Clamp(camRotateX, -camRotateXClamp, camRotateXClamp);
-        camView.transform.localEulerAngles = new Vector3(camRotateX, 0, 0);
+        camView.localEulerAngles = new Vector3(camRotateX, 0, 0);
 
         //transfom rotate
-        transform.Rotate(0, userInput.MouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
+        transform.Rotate(0, mouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
     }
 
     private void DoAnimator()
     {
-        playerModelAnimator.SetFloat(Animator_MoveXHash, userInput.MoveInput.x);
-        playerModelAnimator.SetFloat(Animator_MoveYHash, userInput.MoveInput.y);
+        var moveInput = userInput.Player.Move.ReadValue<Vector2>();
+
+        playerModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
+        playerModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
         playerModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
-        if (userInput.MoveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (moveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else playerModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
         if (!photonView.IsMine) return;
 
         //arm animator
-        armModelAnimator.SetFloat(Animator_MoveXHash, userInput.MoveInput.x);
-        armModelAnimator.SetFloat(Animator_MoveYHash, userInput.MoveInput.y);
+        armModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
+        armModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
         armModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
-        if (userInput.MoveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (moveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
         else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
         //camera animator
-        if (userInput.MoveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
+        if (moveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
         else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
 
-        if (userInput.JumpInput && isGround)
+        if (userInput.Player.Jump.WasPressedThisFrame() && isGround)
             camAnimator.SetTrigger(Animator_JumpHash);
         camAnimator.SetBool(Animator_IsGroundHash, isGround);
     }

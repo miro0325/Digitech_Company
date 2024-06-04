@@ -6,26 +6,9 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
     private DataContainer dataContainer;
-    private DataContainer DataContainer
-    {
-        get
-        {
-            if(ReferenceEquals(dataContainer, null))
-                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
-            return dataContainer;
-        }
-    }
-
+    private DataContainer DataContainer => dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager itemManager;
-    private ItemManager ItemManager
-    {
-        get
-        {
-            if(ReferenceEquals(itemManager, null))
-                itemManager = ServiceLocator.For(this).Get<ItemManager>();
-            return itemManager;
-        }
-    }
+    private ItemManager ItemManager => itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
 
     //inspector field
     [SerializeField] protected Transform leftHandPoint;

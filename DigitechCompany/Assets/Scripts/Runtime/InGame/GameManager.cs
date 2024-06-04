@@ -81,9 +81,9 @@ public class GameManager : MonoBehaviourPun, IService, IPunObservable
 
     private void Start()
     {
-        var player = NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
-        player.gameObject.SetActive(false);
-        photonView.RPC(nameof(PlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+        NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
+        // player.gameObject.SetActive(false);
+        // photonView.RPC(nameof(PlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
     }
 
     [PunRPC]

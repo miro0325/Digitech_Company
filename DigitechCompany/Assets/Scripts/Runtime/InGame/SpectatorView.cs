@@ -5,13 +5,13 @@ using UnityEngine.Rendering.Universal;
 
 public class SpectatorView : MonoBehaviour, IService
 {
-    private UserInput userInput;
-    private UserInput UserInput
+    private InputManager userInput;
+    private InputManager UserInput
     {
         get
         {
             if(ReferenceEquals(userInput, null))
-                userInput = ServiceLocator.For(this).Get<UserInput>();
+                userInput = ServiceLocator.For(this).Get<InputManager>();
             return userInput;
         }
     }

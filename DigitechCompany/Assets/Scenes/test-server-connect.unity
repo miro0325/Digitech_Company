@@ -1274,4 +1274,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   userData:
     playerIdentifier: 
-    mouseSensivity: {x: 1, y: 1}
+    mouseSensivity: {x: 0.05, y: 0.05}

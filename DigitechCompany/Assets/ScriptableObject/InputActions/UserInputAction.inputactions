@@ -1,5 +1,5 @@
 {
-    "name": "PlayerAction",
+    "name": "UserInputAction",
     "maps": [
         {
             "name": "Player",
@@ -10,7 +10,25 @@
                     "type": "Value",
                     "id": "8f5e3673-48e1-489f-b622-c08f0d4b2737",
                     "expectedControlType": "Vector2",
-                    "processors": "NormalizeVector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Mouse",
+                    "type": "Value",
+                    "id": "8a8356c0-1724-496c-87f9-bc8045dbc3a4",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "MouseWheel",
+                    "type": "Value",
+                    "id": "b235e784-f8da-4c4a-9716-0c8b248ac81b",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -61,9 +79,9 @@
                 },
                 {
                     "name": "Interact1",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "57720e7d-0e79-4d10-a3d5-e170776eea10",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Integer",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -250,8 +268,36 @@
                     "action": "Interact4",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b042275-4546-40fc-91c9-16c3fe79d82d",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "MouseWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b253f81-1b0a-4d7c-bc3d-8594894c5ad0",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Mouse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "UIOpen",
+            "id": "e38fa875-5526-4e2e-91d7-382b44b847e5",
+            "actions": [],
+            "bindings": []
         }
     ],
     "controlSchemes": [
