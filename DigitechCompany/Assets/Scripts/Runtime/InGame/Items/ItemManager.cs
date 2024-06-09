@@ -22,11 +22,12 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     private TestBasement TestBasement => testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
     //field
-    private HashSet<ItemBase> items = new();
-    private string itemJsonData;
+    private string itemDataJson;
+    private Dictionary<int, ItemBase> items = new();
 
     //property
-    public HashSet<ItemBase> Items => items;
+    public string ItemDataJson => itemDataJson;
+    public Dictionary<int, ItemBase> Items => items;
 
     //function
     /// <summary>
@@ -35,7 +36,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// <param name="difficulty"></param>
     /// <param name="spawnAreas"></param>
     /// <returns>Items data</returns>
-    public string SpawnItem(int difficulty, Bounds[] spawnAreas)
+    public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
         int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
@@ -61,25 +62,24 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                     var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity).GetComponent<ItemBase>();
                     item.SetLayRotation(Random.Range(0, 360));
                     item.Initialize(randomItemKey);
-                    items.Add(item);
+                    items.Add(item.photonView.ViewID, item);
                 }
             }
         }
 
         var networkItemData = new NetworkItemData[items.Count];
         var count = 0;
-        foreach(var item in items)
+        foreach(var kvp in items)
             networkItemData[count++] = new()
             {
-                viewId = item.photonView.ViewID,
-                key = item.Key,
-                position = item.transform.position,
-                layRotation = item.LayRotation
+                viewId = kvp.Key,
+                key = kvp.Value.Key,
+                position = kvp.Value.transform.position,
+                layRotation = kvp.Value.LayRotation
             };
 
         var json = networkItemData.ToJson();
-        itemJsonData = json;
-        return json;
+        itemDataJson = json;
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);
-            items.Add(item);
+            items.Add(item.photonView.ViewID, item);
         }
     }
 
@@ -108,13 +108,13 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// <param name="withoutBasement">Whether to clear the items in the foundation</param>
     public void DestoryItems(bool withoutBasement)
     {
-        HashSet<ItemBase> excepts = new();
+        Dictionary<int ,ItemBase> excepts = new();
         if(withoutBasement) excepts = TestBasement.Items;
         
-        foreach(var item in items.ToArray())
+        foreach(var kvp in items.ToArray())
         {
-            if(!excepts.Contains(item))
-                NetworkObject.Destory(item.photonView.ViewID);
+            if(!excepts.ContainsKey(kvp.Key))
+                NetworkObject.Destory(kvp.Value.photonView.ViewID);
         }
 
         items.Clear();

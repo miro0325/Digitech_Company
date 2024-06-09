@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 using Photon.Realtime;
+using UnityEngine.InputSystem;
 
 public enum SyncTarget
 {
@@ -20,138 +21,162 @@ public enum GameState
     Processing
 }
 
-public class GameManager : MonoBehaviourPun, IService, IPunObservable
+public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
     //service
-    private TestBasement testBasement;
-    private TestBasement TestBasement
-    {
-        get
-        {
-            if (ReferenceEquals(testBasement, null))
-                testBasement = ServiceLocator.For(this).Get<TestBasement>();
-            return testBasement;
-        }
-    }
-    private ItemManager itemManager;
-    private ItemManager ItemManager
-    {
-        get
-        {
-            if (ReferenceEquals(itemManager, null))
-                itemManager = ServiceLocator.For(this).Get<ItemManager>();
-            return itemManager;
-        }
-    }
-    private SpectatorView spectatorView;
-    private SpectatorView SpectatorView
-    {
-        get
-        {
-            if(ReferenceEquals(spectatorView, null))
-                spectatorView = ServiceLocator.For(this).Get<SpectatorView>();
-            return spectatorView;
-        }
-    }
-    private InGamePlayer player;
-    private InGamePlayer Player
-    {
-        get
-        {
-            if(ReferenceEquals(player, null))
-                player = ServiceLocator.For(this).Get<InGamePlayer>();
-            return player;
-        }
-    }
+    private ItemManager _itemManager;
+    private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
+    private SpectatorView _spectatorView;
+    private SpectatorView spectatorView => _spectatorView ??= ServiceLocator.For(this).Get<SpectatorView>();
+    private InGamePlayer _player;
+    private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
 
     //inspector
     [SerializeField] private MeshRenderer[] rooms;
+    [SerializeField] private TestBasement testBasement;
 
     //field
-    private GameState state;
+    private bool gameEndSign;
+    private bool gameStartSign;
     private Dictionary<Player, bool[]> syncDatas = new();
+    /* sync */ private GameState state;
+    /* sync */ Dictionary<Player, int> inGamePlayerViewIds = new();
+    /* sync */ private HashSet<int> alivePlayers = new();
 
     //property
     public GameState State => state;
+    public HashSet<int> AlivePlayers => alivePlayers;
 
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
-    }
-
-    private void Start()
-    {
-        NetworkObject.InstantiateBuffered("Prefabs/Player", TestBasement.transform.position + Vector3.up * 2, Quaternion.identity);
-        // player.gameObject.SetActive(false);
-        // photonView.RPC(nameof(PlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+        
+        var viewId = NetworkObject.InstantiateBuffered("Prefabs/Player", testBasement.transform.position + Vector3.up * 2, Quaternion.identity).photonView.ViewID;
+        photonView.RPC(nameof(NotifyPlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, viewId);
     }
 
     [PunRPC]
-    private void PlayerJoinRpc(Player newPlayer)
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
+    private void NotifyPlayerJoinRpc(Player newPlayer, int inGamePlayerViewId)
     {
-        Debug.Log("Join");
         syncDatas.Add(newPlayer, new bool[(int)SyncTarget.End]);
-    } 
+        inGamePlayerViewIds.Add(newPlayer, inGamePlayerViewId);
+        photonView.RPC(nameof(GameInstantiateRpc), newPlayer, (int)state);
+    }
 
-    private void GameInstantiateRpc(GameState gameState)
+    [PunRPC]
+    private void GameInstantiateRpc(int gameState)
     {
-        state = gameState;
+        if(photonView.IsMine) GameRoutine().Forget();
+
+        state = (GameState)gameState;
+
         switch (state)
         {
             case GameState.Waiting:
-                Player.gameObject.SetActive(true);
+                player.Revive();
                 break;
             case GameState.Loading:
-                
-                break;
             case GameState.Processing:
-                break;
-            default:
+                photonView.RPC(nameof(RequestSyncRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
                 break;
         }
+    }
+
+    [PunRPC]
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
+    private void RequestSyncRpc(Player player)
+    {
+        photonView.RPC(nameof(SyncRpc), player, (int)SyncTarget.Item, itemManager.ItemDataJson);
     }
 
     public void RequestStartGame()
     {
         if (state != GameState.Waiting) return;
         state = GameState.Loading;
-        
-        if(photonView.IsMine) StartGameRoutine().Forget();
+
+        if (photonView.IsMine) gameStartSign = true;
         else photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
     }
 
     [PunRPC]
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
     private void StartGameRpc()
     {
         if (state != GameState.Waiting) return;
         state = GameState.Loading;
 
-        StartGameRoutine().Forget();
+        gameStartSign = true;
+    }
+
+    public void RequestEndGame()
+    {
+        if (testBasement.State != TestBasementState.Down) return;
+
+        if (photonView.IsMine) gameEndSign = true;
+        else photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
+    private void EndGameRpc()
+    {
+        if (testBasement.State != TestBasementState.Down) return;
+        
+        gameEndSign = true;
     }
 
     /// <summary>
-    /// This function must be executed only when you are a host.
+    /// Must run in Master Client
     /// </summary>
     /// <returns></returns>
-    private async UniTaskVoid StartGameRoutine()
+    private async UniTaskVoid GameRoutine()
     {
-        //initialize
-        var itemDataJson = ItemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
-
-        //send rpc
-        photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemDataJson);
-
-        await UniTask.WaitUntil(() =>
+        while (true)
         {
-            foreach(var syncData in syncDatas)
-                foreach(var b in syncData.Value)
-                    if(!b) return false;
-            return true;
-        });
+            //game start
+            await UniTask.WaitUntil(() => gameStartSign);
+            gameStartSign = false;
+            
+            alivePlayers = inGamePlayerViewIds.Values.ToHashSet();
 
-        state = GameState.Processing;
-        Debug.Log("Complete Crew");
-        testBasement.MoveDown();
+            itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
+            syncDatas[PhotonNetwork.LocalPlayer][(int)SyncTarget.Item] = true;
+
+            //send rpc
+            photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
+
+            await UniTask.WaitUntil(() =>
+            {
+                foreach (var syncData in syncDatas)
+                    foreach (var b in syncData.Value)
+                        if (!b) return false;
+                return true;
+            });
+
+            state = GameState.Processing;
+            testBasement.MoveDown();
+
+            //game end
+            await UniTask.WaitUntil(() => gameEndSign || alivePlayers.Count == 0);
+            gameEndSign = true;
+            
+            testBasement.MoveUp();
+            await UniTask.WaitUntil(() => testBasement.State == TestBasementState.Up);
+            itemManager.DestoryItems(true);
+        }
     }
 
     [PunRPC]
@@ -160,7 +185,7 @@ public class GameManager : MonoBehaviourPun, IService, IPunObservable
         switch ((SyncTarget)syncTarget)
         {
             case SyncTarget.Item:
-                ItemManager.SyncItem(data);
+                itemManager.SyncItem(data);
                 photonView.RPC(nameof(NotifySyncComplete), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, syncTarget);
                 break;
             default:
@@ -169,28 +194,13 @@ public class GameManager : MonoBehaviourPun, IService, IPunObservable
     }
 
     [PunRPC]
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
     private void NotifySyncComplete(Player player, int syncTarget)
     {
         syncDatas[player][syncTarget] = true;
-    }
-
-    public void RequestEndGame()
-    {
-        if(TestBasement.State != TestBasementState.Down) return;
-        EndGameRoutine().Forget();
-    }
-
-    /// <summary>
-    /// This function must be executed only when you are a host.
-    /// </summary>
-    /// <returns></returns>
-    private async UniTaskVoid EndGameRoutine()
-    {
-        TestBasement.MoveUp();
-
-        await UniTask.WaitUntil(() => TestBasement.State == TestBasementState.Up);
-
-        ItemManager.DestoryItems(true);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -198,10 +208,34 @@ public class GameManager : MonoBehaviourPun, IService, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext((int)state);
+            stream.SendNext(alivePlayers.Count);
+            foreach(var player in alivePlayers)
+                stream.SendNext(player);
+            stream.SendNext(inGamePlayerViewIds.Count);
+            foreach(var viewid in inGamePlayerViewIds)
+            {
+                stream.SendNext(viewid.Key);
+                stream.SendNext(viewid.Value);
+            }
         }
         else
         {
             state = (GameState)(int)stream.ReceiveNext();
+            var count = (int)stream.ReceiveNext();
+            alivePlayers.Clear();
+            for(int i = 0; i < count; i++)
+                alivePlayers.Add((int)stream.ReceiveNext());
+            count = (int)stream.ReceiveNext();
+            inGamePlayerViewIds.Clear();
+            for(int i = 0; i < count; i++)
+                inGamePlayerViewIds.Add((Player)stream.ReceiveNext(), (int)stream.ReceiveNext());
         }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        syncDatas.Remove(otherPlayer);
+        alivePlayers.Remove(inGamePlayerViewIds[otherPlayer]);
+        inGamePlayerViewIds.Remove(otherPlayer);
     }
 }

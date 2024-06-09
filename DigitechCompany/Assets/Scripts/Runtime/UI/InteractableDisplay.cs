@@ -12,30 +12,28 @@ public class InteractableDisplay : MonoBehaviour
     {
         get
         {
-            if(ReferenceEquals(player, null))
+            if (ReferenceEquals(player, null))
                 player = ServiceLocator.For(this).Get<InGamePlayer>();
             return player;
         }
     }
 
     //inspector field
-    [SerializeField] InputActionAsset playerActionAsset;
     [SerializeField] private GameObject display;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private Image requireTime;
 
-    private InputAction[] interactActions = new InputAction[(int)InteractID.End];
+    private UserInputAction userInput;
 
     private void Start()
     {
-        for (int i = 1; i < (int)InteractID.End; i++)
-            interactActions[i] = playerActionAsset[$"Interact{i}"];
+        userInput = new();
     }
 
     private void Update()
     {
         if (ReferenceEquals(Player, null)) return;
-        
+
         display.SetActive(Player.LookInteractable != null);
 
         requireTime.fillAmount =
@@ -43,14 +41,19 @@ public class InteractableDisplay : MonoBehaviour
             Player.InteractRequireTimes[(int)Player.LookInteractable.GetTargetInteractID(Player)] / Player.LookInteractable.GetInteractRequireTime(Player) :
             0;
 
-        if (display.activeSelf)
+        if (Player.LookInteractable != null)
         {
-            var targetInteractId = Player.LookInteractable.GetTargetInteractID(Player);
-            var targetAction = interactActions[(int)targetInteractId].bindings[0];
-            var keyString = InputControlPath.ToHumanReadableString(targetAction.effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
 
             if (Player.LookInteractable.IsInteractable(Player))
+            {
+                var targetInteractId = Player.LookInteractable.GetTargetInteractID(Player);
+                var keyString = InputControlPath.ToHumanReadableString
+                (
+                    userInput.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
+                    InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames
+                );
                 text.text = $"{Player.LookInteractable.GetInteractionExplain(Player)} ({keyString})";
+            }
             else //only display explain
                 text.text = Player.LookInteractable.GetInteractionExplain(Player);
         }

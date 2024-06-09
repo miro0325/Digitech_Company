@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public class ItemContainer
+public class Inventory
 {
     private int index;
     private ItemBase[] slots;
@@ -35,6 +35,8 @@ public class ItemContainer
         }
     }
 
+    public int Size { get; private set; }
+
     //old cur
     public event Action<int, int> OnIndexChanged;
 
@@ -44,9 +46,10 @@ public class ItemContainer
         set => slots[index] = value;
     }
 
-    public ItemContainer(int size)
+    public Inventory(int size)
     {
         slots = new ItemBase[size];
+        Size = size;
     }
 
     public ItemBase GetCurrentSlotItem()

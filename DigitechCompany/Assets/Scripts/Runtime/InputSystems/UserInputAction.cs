@@ -49,7 +49,7 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
                     ""name"": ""MouseWheel"",
                     ""type"": ""Value"",
                     ""id"": ""b235e784-f8da-4c4a-9716-0c8b248ac81b"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -100,36 +100,18 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact1"",
-                    ""type"": ""PassThrough"",
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
                     ""id"": ""57720e7d-0e79-4d10-a3d5-e170776eea10"",
-                    ""expectedControlType"": ""Integer"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Interact2"",
-                    ""type"": ""Button"",
-                    ""id"": ""e456d6f1-ac40-4040-8a2d-06696559cfd1"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Interact3"",
+                    ""name"": ""NumKeys"",
                     ""type"": ""Button"",
-                    ""id"": ""ec56c1e0-d358-482c-9c62-894c7b96c7ab"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Interact4"",
-                    ""type"": ""Button"",
-                    ""id"": ""f65a7621-e2ab-4689-8de6-87f0463fb08c"",
+                    ""id"": ""e0b577fb-e851-4d89-aa74-0d7bb78d79ed"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -140,7 +122,7 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""WASD"",
                     ""id"": ""a406362a-4080-4259-8bc0-d0db2d40c4fe"",
-                    ""path"": ""2DVector"",
+                    ""path"": ""2DVector(mode=2)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -249,52 +231,8 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""10e89344-0cf9-42da-8677-d005f749c5e8"",
-                    ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""a532533a-9fd6-433a-b470-a169fb48c76d"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""1da573a2-b8b8-464b-82b2-2c172829e284"",
-                    ""path"": ""<Keyboard>/r"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact3"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b5263033-bb5a-4556-892e-989bf5f112a0"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact4"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""9b042275-4546-40fc-91c9-16c3fe79d82d"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>/scroll/y"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
@@ -310,6 +248,153 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Mouse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""10e89344-0cf9-42da-8677-d005f749c5e8"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d013a56f-d38c-47a4-84b7-8d5abf60d479"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""NumKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""86204b36-8fe0-4962-a49c-b92104c74d40"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""NumKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ecbd8474-7df3-48bc-9c03-5c13d6298b86"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": """",
+                    ""action"": ""NumKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e355f439-9282-4020-ab14-9f3c4c1ae598"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": """",
+                    ""action"": ""NumKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a532533a-9fd6-433a-b470-a169fb48c76d"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1da573a2-b8b8-464b-82b2-2c172829e284"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b5263033-bb5a-4556-892e-989bf5f112a0"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Spectator"",
+            ""id"": ""d0e610e9-db12-4d61-aeae-0287fb74b509"",
+            ""actions"": [
+                {
+                    ""name"": ""Mouse"",
+                    ""type"": ""Value"",
+                    ""id"": ""17c311e8-c4b5-4b4a-931f-b5c39bc7272c"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Change"",
+                    ""type"": ""Button"",
+                    ""id"": ""d010ae63-4beb-4345-bf50-800a26bd2907"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""c3dfa3fd-2dc0-42e1-a256-16fcf026e449"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Mouse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3a4067c9-53c1-4b5e-a289-c287aa9487f6"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=-1)"",
+                    ""groups"": """",
+                    ""action"": ""Change"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""499e1577-e0ec-4026-8e9a-47fd61053593"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""Change"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -395,10 +480,12 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Discard = m_Player.FindAction("Discard", throwIfNotFound: true);
-        m_Player_Interact1 = m_Player.FindAction("Interact1", throwIfNotFound: true);
-        m_Player_Interact2 = m_Player.FindAction("Interact2", throwIfNotFound: true);
-        m_Player_Interact3 = m_Player.FindAction("Interact3", throwIfNotFound: true);
-        m_Player_Interact4 = m_Player.FindAction("Interact4", throwIfNotFound: true);
+        m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_NumKeys = m_Player.FindAction("NumKeys", throwIfNotFound: true);
+        // Spectator
+        m_Spectator = asset.FindActionMap("Spectator", throwIfNotFound: true);
+        m_Spectator_Mouse = m_Spectator.FindAction("Mouse", throwIfNotFound: true);
+        m_Spectator_Change = m_Spectator.FindAction("Change", throwIfNotFound: true);
         // UIOpen
         m_UIOpen = asset.FindActionMap("UIOpen", throwIfNotFound: true);
     }
@@ -470,10 +557,8 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Discard;
-    private readonly InputAction m_Player_Interact1;
-    private readonly InputAction m_Player_Interact2;
-    private readonly InputAction m_Player_Interact3;
-    private readonly InputAction m_Player_Interact4;
+    private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_NumKeys;
     public struct PlayerActions
     {
         private @UserInputAction m_Wrapper;
@@ -486,10 +571,8 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Discard => m_Wrapper.m_Player_Discard;
-        public InputAction @Interact1 => m_Wrapper.m_Player_Interact1;
-        public InputAction @Interact2 => m_Wrapper.m_Player_Interact2;
-        public InputAction @Interact3 => m_Wrapper.m_Player_Interact3;
-        public InputAction @Interact4 => m_Wrapper.m_Player_Interact4;
+        public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @NumKeys => m_Wrapper.m_Player_NumKeys;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -523,18 +606,12 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
             @Discard.started += instance.OnDiscard;
             @Discard.performed += instance.OnDiscard;
             @Discard.canceled += instance.OnDiscard;
-            @Interact1.started += instance.OnInteract1;
-            @Interact1.performed += instance.OnInteract1;
-            @Interact1.canceled += instance.OnInteract1;
-            @Interact2.started += instance.OnInteract2;
-            @Interact2.performed += instance.OnInteract2;
-            @Interact2.canceled += instance.OnInteract2;
-            @Interact3.started += instance.OnInteract3;
-            @Interact3.performed += instance.OnInteract3;
-            @Interact3.canceled += instance.OnInteract3;
-            @Interact4.started += instance.OnInteract4;
-            @Interact4.performed += instance.OnInteract4;
-            @Interact4.canceled += instance.OnInteract4;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
+            @NumKeys.started += instance.OnNumKeys;
+            @NumKeys.performed += instance.OnNumKeys;
+            @NumKeys.canceled += instance.OnNumKeys;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -563,18 +640,12 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
             @Discard.started -= instance.OnDiscard;
             @Discard.performed -= instance.OnDiscard;
             @Discard.canceled -= instance.OnDiscard;
-            @Interact1.started -= instance.OnInteract1;
-            @Interact1.performed -= instance.OnInteract1;
-            @Interact1.canceled -= instance.OnInteract1;
-            @Interact2.started -= instance.OnInteract2;
-            @Interact2.performed -= instance.OnInteract2;
-            @Interact2.canceled -= instance.OnInteract2;
-            @Interact3.started -= instance.OnInteract3;
-            @Interact3.performed -= instance.OnInteract3;
-            @Interact3.canceled -= instance.OnInteract3;
-            @Interact4.started -= instance.OnInteract4;
-            @Interact4.performed -= instance.OnInteract4;
-            @Interact4.canceled -= instance.OnInteract4;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
+            @NumKeys.started -= instance.OnNumKeys;
+            @NumKeys.performed -= instance.OnNumKeys;
+            @NumKeys.canceled -= instance.OnNumKeys;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -592,6 +663,60 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Spectator
+    private readonly InputActionMap m_Spectator;
+    private List<ISpectatorActions> m_SpectatorActionsCallbackInterfaces = new List<ISpectatorActions>();
+    private readonly InputAction m_Spectator_Mouse;
+    private readonly InputAction m_Spectator_Change;
+    public struct SpectatorActions
+    {
+        private @UserInputAction m_Wrapper;
+        public SpectatorActions(@UserInputAction wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Mouse => m_Wrapper.m_Spectator_Mouse;
+        public InputAction @Change => m_Wrapper.m_Spectator_Change;
+        public InputActionMap Get() { return m_Wrapper.m_Spectator; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SpectatorActions set) { return set.Get(); }
+        public void AddCallbacks(ISpectatorActions instance)
+        {
+            if (instance == null || m_Wrapper.m_SpectatorActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_SpectatorActionsCallbackInterfaces.Add(instance);
+            @Mouse.started += instance.OnMouse;
+            @Mouse.performed += instance.OnMouse;
+            @Mouse.canceled += instance.OnMouse;
+            @Change.started += instance.OnChange;
+            @Change.performed += instance.OnChange;
+            @Change.canceled += instance.OnChange;
+        }
+
+        private void UnregisterCallbacks(ISpectatorActions instance)
+        {
+            @Mouse.started -= instance.OnMouse;
+            @Mouse.performed -= instance.OnMouse;
+            @Mouse.canceled -= instance.OnMouse;
+            @Change.started -= instance.OnChange;
+            @Change.performed -= instance.OnChange;
+            @Change.canceled -= instance.OnChange;
+        }
+
+        public void RemoveCallbacks(ISpectatorActions instance)
+        {
+            if (m_Wrapper.m_SpectatorActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ISpectatorActions instance)
+        {
+            foreach (var item in m_Wrapper.m_SpectatorActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_SpectatorActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public SpectatorActions @Spectator => new SpectatorActions(this);
 
     // UIOpen
     private readonly InputActionMap m_UIOpen;
@@ -685,10 +810,13 @@ public partial class @UserInputAction: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
         void OnDiscard(InputAction.CallbackContext context);
-        void OnInteract1(InputAction.CallbackContext context);
-        void OnInteract2(InputAction.CallbackContext context);
-        void OnInteract3(InputAction.CallbackContext context);
-        void OnInteract4(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnNumKeys(InputAction.CallbackContext context);
+    }
+    public interface ISpectatorActions
+    {
+        void OnMouse(InputAction.CallbackContext context);
+        void OnChange(InputAction.CallbackContext context);
     }
     public interface IUIOpenActions
     {

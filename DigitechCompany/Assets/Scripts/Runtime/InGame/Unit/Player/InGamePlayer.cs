@@ -7,23 +7,27 @@ using DG.Tweening;
 using UnityEngine.Animations.Rigging;
 using System;
 using UnityEngine.InputSystem;
+using UniRx.Triggers;
+using UnityEngine.InputSystem.Composites;
 
-public class InGamePlayer : UnitBase, IService, IPunObservable
+public enum InteractID
 {
-    //const
-    private readonly static int Animator_MoveStateHash = Animator.StringToHash("MoveState"); //0 : idle, 1 : move, 2 : run
-    private readonly static int Animator_MoveXHash = Animator.StringToHash("MoveX");
-    private readonly static int Animator_MoveYHash = Animator.StringToHash("MoveY");
-    private readonly static int Animator_IsGroundHash = Animator.StringToHash("IsGround");
-    private readonly static int Animator_JumpHash = Animator.StringToHash("Jump");
+    None,
+    ID1,
+    ID2,
+    ID3,
+    ID4,
+    End
+}
 
+public partial class InGamePlayer : UnitBase, IService, IPunObservable
+{
     //service
     //service
-    private DataContainer dataContainer;
-    private DataContainer DataContainer => dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
-
-    private ItemManager itemManager;
-    private ItemManager ItemManager => itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
+    private DataContainer _dataContainer;
+    private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
+    private ItemManager _itemManager;
+    private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
 
     //inspector field
     [Space(20)]
@@ -37,43 +41,44 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
     [SerializeField] private LayerMask groundCastMask;
     [Header("Reference")]
     [SerializeField] private Transform camView;
-    [SerializeField] private Camera cam;
+    [SerializeField] private Transform camHolder;
     [SerializeField] private Transform itemHolderCamera;
     [SerializeField] private Transform scanSphere;
-    [SerializeField] private TwoBoneIKConstraint leftHandIK;
-    [SerializeField] private TwoBoneIKConstraint rightHandIK;
-    [SerializeField] private TwoBoneIKConstraint leftHandIKCam;
-    [SerializeField] private TwoBoneIKConstraint rightHandIKCam;
-    [SerializeField] private Transform leftHandIKTarget;
-    [SerializeField] private Transform rightHandIKTarget;
-    [Header("Animator")]
-    [SerializeField] private Animator camAnimator;
-    [SerializeField] private Animator playerModelAnimator;
-    [SerializeField] private Animator armModelAnimator;
 
     //field
     private bool isRun;
     private bool isCrouch;
     private bool isGround;
-    private float runStaminaRecoverWaitTime;
-    private float scanWaitTime;
-    private float camRotateX;
+    private bool isJump;
+    private bool isDie = true;
     private float velocityY;
+    private float camRotateX;
+    private float scanWaitTime;
+    private float runStaminaRecoverWaitTime;
     private float[] interactRequireTimes = new float[(int)InteractID.End];
+    private Camera cam;
+    private Vector2 moveInput;
     private ScanData scanData;
     private Material scanSphereMaterial;
-    // private InputManager userInput;
     private CharacterController cc;
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
     private ReactiveProperty<int> curHandItemViewId = new();
     private UserInputAction userInput;
+    private InGamePlayerAnimator animator;
 
     //property
+    public bool IsRun => isRun;
+    public bool IsCrouch => isCrouch;
+    public bool IsGround => isGround;
+    public bool IsJump => isJump;
+    public bool IsDie => isDie;
+    public Vector2 MoveInput => moveInput;
     public float[] InteractRequireTimes => interactRequireTimes;
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
     public Transform ItemHolderCamera => itemHolderCamera;
+    public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
 
     public void SetPosition(Vector3 pos)
@@ -83,62 +88,38 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         cc.enabled = true;
     }
 
+    public void Revive()
+    {
+        cam.transform.SetParent(camHolder);
+        cam.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+        gameObject.SetActive(true);
+        curStats.ChangeFrom(maxStats);
+        isDie = false;
+    }
+
     public override void OnCreate()
     {
+        gameObject.SetActive(false);
         base.OnCreate();
 
-        // userInput = GetComponent<InputManager>();
-        userInput = new();
-        userInput.Enable();
-        curHandItemViewId.Subscribe(x =>
-        {
-            Debug.Log(x);
-            if (x == 0)
-            {
-                leftHandIKTarget.SetParent(transform);
-                leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                rightHandIKTarget.SetParent(transform);
-                rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                if (photonView.IsMine)
-                {
-                    leftHandIKCam.weight = 0;
-                    rightHandIKCam.weight = 0;
-                }
-                else
-                {
-                    leftHandIK.weight = 0;
-                    rightHandIK.weight = 0;
-                }
-                return;
-            }
+        //cache and initialize member
+        cc = GetComponent<CharacterController>();
+        animator = GetComponent<InGamePlayerAnimator>();
+        animator.Initialize(this);
 
-            var curItem = PhotonView.Find(x).GetComponent<ItemBase>();
-
-            leftHandIKTarget.SetParent(curItem.LeftHandPoint != null ? curItem.LeftHandPoint : transform);
-            leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-            rightHandIKTarget.SetParent(curItem.RightHandPoint != null ? curItem.RightHandPoint : transform);
-            rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-            if (photonView.IsMine)
-            {
-                leftHandIKCam.weight = curItem.LeftHandPoint != null ? 1 : 0;
-                rightHandIKCam.weight = curItem.RightHandPoint != null ? 1 : 0;
-            }
-            else
-            {
-                leftHandIK.weight = curItem.LeftHandPoint != null ? 1 : 0;
-                rightHandIK.weight = curItem.RightHandPoint != null ? 1 : 0;
-            }
-        });
+        //ik setting
 
         if (!photonView.IsMine) return;
 
-        itemContainer = new(4);
-        itemContainer.OnIndexChanged += (pre, cur) =>
+        //set item container
+        inventory = new(4);
+        inventory.OnIndexChanged += (pre, cur) =>
         {
-            itemContainer[pre]?.OnDisable();
-            itemContainer[cur]?.OnActive();
+            inventory[pre]?.OnDisable();
+            inventory[cur]?.OnActive();
         };
 
+        //set test stat
         testBaseStat = new();
         testBaseStat.SetStat(Stats.Key.Hp, x => 100);
         testBaseStat.SetStat(Stats.Key.Strength, x => 10);
@@ -147,18 +128,33 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         testBaseStat.SetStat(Stats.Key.Stamina, x => 5);
         maxStats.ChangeFrom(testBaseStat);
 
-        cc = GetComponent<CharacterController>();
-
-        playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>().For((i, ele) => ele.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
         camView.gameObject.SetActive(true);
 
-        userInput
-            .ObserveEveryValueChanged(i => i.Player.MouseWheel.ReadValue<Vector2>().y)
-            .Where(x => x != 0)
-            .ThrottleFrame(5)
-            .Subscribe(x => itemContainer.Index += x > 0 ? 1 : -1);
-
+        //cache initialize
+        userInput = new();
         scanSphereMaterial = scanSphere.GetComponent<MeshRenderer>().sharedMaterial;
+        cam = Camera.main;
+
+        //enable player input
+        this
+            .ObserveEveryValueChanged(t => t.isDie)
+            .Subscribe(isDie =>
+            {
+                if(isDie) userInput.Player.Disable();
+                else userInput.Player.Enable();
+            });
+
+        //scroll
+        this
+            .UpdateAsObservable()
+            .Select(_ => userInput.Player.MouseWheel.ReadValue<float>())
+            .Where(x => x != 0)
+            .ThrottleFrame(2)
+            .Subscribe(x =>
+            {
+                Debug.Log($"mouse wheel: {x}");
+                inventory.Index += x > 0 ? -1 : 1;
+            });
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -172,7 +168,6 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         DoInteract();
         DoMovement();
         DoRotation();
-        DoAnimator();
     }
 
     private void DoScan()
@@ -196,14 +191,14 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         {
             //calculate
             scanData = new ScanData { gameTime = Time.time, items = new() };
-            foreach (var item in ItemManager.Items)
+            foreach (var kvp in itemManager.Items)
             {
-                if (item.InHand) continue;
+                if (kvp.Value.InHand) continue;
 
-                if (IsInView(item.MeshRenderer))
+                if (IsInView(kvp.Value.MeshRenderer))
                 {
-                    scanData.price += item.SellPrice;
-                    scanData.items.Add(item);
+                    scanData.price += kvp.Value.SellPrice;
+                    scanData.items.Add(kvp.Value);
                 }
             }
 
@@ -247,33 +242,23 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         return true;
     }
 
-    private InputAction GetInteractInputAction(InteractID id)
-    {
-        return id switch
-        {
-            InteractID.ID1 => userInput.Player.Interact1,
-            InteractID.ID2 => userInput.Player.Interact2,
-            InteractID.ID3 => userInput.Player.Interact3,
-            InteractID.ID4 => userInput.Player.Interact4,
-            _ => null,
-        };
-    }
-
     private void DoItem()
     {
         if (!photonView.IsMine) return;
 
-        var item = itemContainer.GetCurrentSlotItem();
+        var item = inventory.GetCurrentSlotItem();
         if (item != null)
         {
             curHandItemViewId.Value = item.photonView.ViewID;
 
-            for (int i = 0; i < (int)InteractID.End; i++)
+            if (userInput.Player.Interact.WasPressedThisFrame())
             {
-                if (GetInteractInputAction((InteractID)i) != null && GetInteractInputAction((InteractID)i).WasPressedThisFrame() && item.IsUsable((InteractID)i))
-                    item.OnUse((InteractID)i);
+                for (int i = 1; i < (int)InteractID.End; i++)
+                {
+                    if (userInput.Player.Interact.ReadValue<float>() == i && item.IsUsable((InteractID)i))
+                        item.OnUse((InteractID)i);
+                }
             }
-
 
             if (userInput.Player.Discard.WasPressedThisFrame())
                 DiscardCurrentItem();
@@ -286,10 +271,10 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
 
     public ItemBase DiscardCurrentItem()
     {
-        var item = itemContainer.GetCurrentSlotItem();
+        var item = inventory.GetCurrentSlotItem();
         if (item == null) return null;
 
-        itemContainer.PopCurrentItem();
+        inventory.PopCurrentItem();
         item.SetLayRotation(transform.eulerAngles.y);
         item.OnDiscard();
         return item;
@@ -305,39 +290,42 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
 
         if (lookInteractable != null && LookInteractable.IsInteractable(this))
         {
+            Debug.Log("Has Interactable");
             var targetInteractId = lookInteractable.GetTargetInteractID(this);
-            var interactAction = GetInteractInputAction(targetInteractId);
-
-            //if pressed target interact id => mark interact is start
-            if (interactAction.WasPressedThisFrame())
-                interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
-
-            //if released target interact id => set require time 0
-            if (interactAction.WasReleasedThisFrame())
-                interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
-
-            //if interact marked
-            if (interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] > 0)
+            if (targetInteractId != InteractID.None)
             {
-                //less than require
-                if (interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] < lookInteractable.GetInteractRequireTime(this))
-                {
-                    interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] += Time.deltaTime;
-                }
-                else //reached
-                {
-                    interactRequireTimes[(int)lookInteractable.GetTargetInteractID(this)] = 0;
+                Debug.Log("Target Interact ID is not None");
+                //if pressed target interact id => mark interact is start
+                if (userInput.Player.Interact.WasPressedThisFrame() && userInput.Player.Interact.ReadValue<float>() == (int)targetInteractId)
+                    interactRequireTimes[(int)targetInteractId] += Time.deltaTime;
 
-                    if (lookInteractable is ItemBase)
+                //if released target interact id => set require time 0
+                if (userInput.Player.Interact.WasReleasedThisFrame())
+                    interactRequireTimes[(int)targetInteractId] = 0;
+
+                //if interact marked
+                if (interactRequireTimes[(int)targetInteractId] > 0)
+                {
+                    //less than require
+                    if (interactRequireTimes[(int)targetInteractId] < lookInteractable.GetInteractRequireTime(this))
                     {
-                        var item = lookInteractable as ItemBase;
-                        itemContainer.InsertItem(item);
-                        item.OnInteract(this);
-                        item.OnActive();
+                        interactRequireTimes[(int)targetInteractId] += Time.deltaTime;
                     }
-                    else
+                    else //reached
                     {
-                        lookInteractable.OnInteract(this);
+                        interactRequireTimes[(int)targetInteractId] = 0;
+
+                        if (lookInteractable is ItemBase)
+                        {
+                            var item = lookInteractable as ItemBase;
+                            inventory.InsertItem(item);
+                            item.OnInteract(this);
+                            item.OnActive();
+                        }
+                        else
+                        {
+                            lookInteractable.OnInteract(this);
+                        }
                     }
                 }
             }
@@ -374,10 +362,10 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         //movement
-        var moveInput = userInput.Player.Move.ReadValue<Vector2>();
+        moveInput = userInput.Player.Move.ReadValue<Vector2>();
         var moveInputMag = Mathf.Clamp01(moveInput.magnitude);
         var relativeDir = transform.TransformDirection(new Vector3(moveInput.x, 0, moveInput.y)).normalized;
-        var weightShave = Mathf.Lerp(1f, 0.5f, itemContainer.WholeWeight / curStats.GetStat(Stats.Key.Weight));
+        var weightShave = Mathf.Lerp(1f, 0.5f, inventory.WholeWeight / curStats.GetStat(Stats.Key.Weight));
         var crouchShave = isCrouch ? 0.5f : 1f;
         var speed = curStats.GetStat(Stats.Key.Speed) * crouchShave * weightShave * moveInputMag;
 
@@ -417,7 +405,14 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         else velocityY -= gravity * Time.deltaTime;
 
         if (userInput.Player.Jump.WasPressedThisFrame() && isGround)
+        {
+            isJump = true;
             velocityY = jumpScale;
+        }
+        else
+        {
+            isJump = false;
+        }
 
         velocity.y = velocityY;
 
@@ -432,42 +427,12 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
         var mouseInput = userInput.Player.Mouse.ReadValue<Vector2>();// * Time.deltaTime;
 
         //camera rotation
-        camRotateX -= mouseInput.y * DataContainer.userData.mouseSensivity.y;
+        camRotateX -= mouseInput.y * dataContainer.userData.mouseSensivity.y;
         camRotateX = Mathf.Clamp(camRotateX, -camRotateXClamp, camRotateXClamp);
         camView.localEulerAngles = new Vector3(camRotateX, 0, 0);
 
         //transfom rotate
-        transform.Rotate(0, mouseInput.x * DataContainer.userData.mouseSensivity.x, 0);
-    }
-
-    private void DoAnimator()
-    {
-        var moveInput = userInput.Player.Move.ReadValue<Vector2>();
-
-        playerModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
-        playerModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
-        playerModelAnimator.SetBool(Animator_IsGroundHash, isGround);
-
-        if (moveInput == Vector2.zero) playerModelAnimator.SetInteger(Animator_MoveStateHash, 0);
-        else playerModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
-
-        if (!photonView.IsMine) return;
-
-        //arm animator
-        armModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
-        armModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
-        armModelAnimator.SetBool(Animator_IsGroundHash, isGround);
-
-        if (moveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
-        else armModelAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
-
-        //camera animator
-        if (moveInput == Vector2.zero) camAnimator.SetInteger(Animator_MoveStateHash, 0);
-        else camAnimator.SetInteger(Animator_MoveStateHash, isRun ? 2 : 1); // move : 1, run : 2
-
-        if (userInput.Player.Jump.WasPressedThisFrame() && isGround)
-            camAnimator.SetTrigger(Animator_JumpHash);
-        camAnimator.SetBool(Animator_IsGroundHash, isGround);
+        transform.Rotate(0, mouseInput.x * dataContainer.userData.mouseSensivity.x, 0);
     }
 
     private void OnDrawGizmosSelected()
@@ -481,12 +446,15 @@ public class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        Debug.Log("Test");
         if (stream.IsWriting)
         {
+            stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
+            gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();
         }
     }
