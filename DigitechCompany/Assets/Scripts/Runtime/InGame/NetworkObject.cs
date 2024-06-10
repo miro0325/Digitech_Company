@@ -3,16 +3,8 @@ using UnityEngine;
 
 public class NetworkObject : MonoBehaviourPun
 {
-    private static NetworkObjectManager networkObjectManager;
-    private static NetworkObjectManager NetworkObjectManager
-    {
-        get
-        {
-            if(ReferenceEquals(networkObjectManager, null))
-                networkObjectManager = ServiceLocator.ForGlobal().Get<NetworkObjectManager>();
-            return networkObjectManager;
-        }
-    }
+    private static NetworkObjectManager _networkObjectManager;
+    private static NetworkObjectManager networkObjectManager => _networkObjectManager ??= ServiceLocator.ForGlobal().Get<NetworkObjectManager>();
 
     /// <summary>
     /// Instantiate prefab from resources folder<br/>
@@ -24,7 +16,7 @@ public class NetworkObject : MonoBehaviourPun
     /// <param name="quat">rotation</param>
     /// <returns></returns>
     public static NetworkObject Instantiate(string prefab, Vector3 pos = default, Quaternion quat = default)
-        => NetworkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, false);
+        => networkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, false);
     
     /// <summary>
     /// Instantiate prefab from resources folder<br/>
@@ -36,14 +28,14 @@ public class NetworkObject : MonoBehaviourPun
     /// <param name="quat">rotation</param>
     /// <returns></returns>
     public static NetworkObject InstantiateBuffered(string prefab, Vector3 pos = default, Quaternion quat = default)
-        => NetworkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, true);
+        => networkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, true);
 
     /// <summary>
     /// Destory object with view id
     /// </summary>
     /// <param name="viewId">view id to destory</param>
     public static void Destory(int viewId)
-        => NetworkObjectManager.DestroyNetworkObjectInternal(viewId);
+        => networkObjectManager.DestroyNetworkObjectInternal(viewId);
 
     /// <summary>
     /// Instantiate prefab from resources folder and sync using view id<br/>
@@ -54,7 +46,7 @@ public class NetworkObject : MonoBehaviourPun
     /// <param name="prefab">resource fild path</param>
     /// <returns></returns>
     public static NetworkObject Sync(int viewId, string prefab = null)
-        => NetworkObjectManager.SyncNetworkObjectInternal(viewId, prefab);
+        => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab);
 
     public virtual void OnCreate() { }
 }

@@ -9,13 +9,13 @@ public abstract class UnitBase : NetworkObject
     protected Stats maxStats = new();
     protected Stats curStats = new();
     protected Stats.Modifier modifier = new();
-    protected ItemContainer itemContainer;
+    protected Inventory inventory;
     
     public Transform ItemHolder => itemHolder;
     public Stats MaxStats => maxStats;
     public Stats CurStats => curStats;
     public Stats.Modifier Modifier => modifier;
-    public ItemContainer ItemContainer => itemContainer;
+    public Inventory Inventory => inventory;
 
     public abstract Stats BaseStats { get; }
 

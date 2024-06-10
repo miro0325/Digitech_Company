@@ -478,9 +478,8 @@ GameObject:
   - component: {fileID: 2738935238104813523}
   - component: {fileID: 3081533927603947071}
   - component: {fileID: 3081533927603947458}
-  - component: {fileID: -3147977743550779262}
-  - component: {fileID: 2026983860}
-  - component: {fileID: 2026983861}
+  - component: {fileID: 1285428840}
+  - component: {fileID: 7200339445220085298}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -555,12 +554,12 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3081533927603947458}
-  - {fileID: -3147977743550779262}
-  - {fileID: 2026983861}
+  - {fileID: 1285428840}
+  - {fileID: 7200339445220085298}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -587,19 +586,31 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   camView: {fileID: 805227098046456827}
-  cam: {fileID: 5628984937875474250}
+  camHolder: {fileID: 5628984937875474231}
   itemHolderCamera: {fileID: 5628984937424643411}
   scanSphere: {fileID: 1452975411}
+--- !u!114 &1285428840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2738935238104813522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57dc21ee5d399f45ae30e9133a6734a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camAnimator: {fileID: 4956217241859585370}
+  playerModelAnimator: {fileID: 6340735601264602243}
+  armModelAnimator: {fileID: 8619893471437653296}
   leftHandIK: {fileID: 380407766}
   rightHandIK: {fileID: 200383501}
   leftHandIKCam: {fileID: 677584477}
   rightHandIKCam: {fileID: 70288749}
   leftHandIKTarget: {fileID: 127994068}
   rightHandIKTarget: {fileID: 532144239}
-  camAnimator: {fileID: 4956217241859585370}
-  playerModelAnimator: {fileID: 6340735601264602243}
-  armModelAnimator: {fileID: 8619893471437653296}
---- !u!114 &-3147977743550779262
+--- !u!114 &7200339445220085298
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -615,93 +626,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 0
---- !u!114 &2026983860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2738935238104813522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 72db26d9fdc01da4e95ba446dc807563,
-    type: 3}
-  m_NotificationBehavior: 1
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 8f5e3673-48e1-489f-b622-c08f0d4b2737
-    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 01b7e2d5-7fd7-4f1f-915c-374b9c3eb8f1
-    m_ActionName: Player/Mouse[/Mouse/delta]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: fe68ddef-6599-48f7-b80f-3089c041dc45
-    m_ActionName: Player/Scan[/Mouse/rightButton]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 8ab69379-a129-4a24-97bd-085c1b4c9a7c
-    m_ActionName: Player/Run[/Keyboard/leftShift]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: ea8f1953-e594-43bb-8d72-caf5ecad7f4b
-    m_ActionName: Player/Jump[/Keyboard/space]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: bd38b7f2-a8e6-4316-a4a8-c010b6120bbc
-    m_ActionName: Player/Crouch[/Keyboard/leftCtrl]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: c3d795b4-ee47-4b7f-8a13-bf3b7a483856
-    m_ActionName: Player/Discard[/Keyboard/g]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 57720e7d-0e79-4d10-a3d5-e170776eea10
-    m_ActionName: Player/Interact
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
---- !u!114 &2026983861
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2738935238104813522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 905ff67e507960f46936339b3043e8c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5248092799163409689
 GameObject:
   m_ObjectHideFlags: 0
@@ -857,12 +781,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5628984937875474231}
-  - component: {fileID: 5628984937875474250}
-  - component: {fileID: 5628984937875474249}
-  - component: {fileID: 5628984937875474248}
   - component: {fileID: 4956217241859585370}
   m_Layer: 6
-  m_Name: Camera
+  m_Name: CameraHolder
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -884,90 +805,6 @@ Transform:
   m_Father: {fileID: 805227098046456827}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &5628984937875474250
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5628984937875474230}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.01
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!81 &5628984937875474249
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5628984937875474230}
-  m_Enabled: 1
---- !u!114 &5628984937875474248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5628984937875474230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
 --- !u!95 &4956217241859585370
 Animator:
   serializedVersion: 5
@@ -1282,6 +1119,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -43.53712
+      objectReference: {fileID: 0}
+    - target: {fileID: -6300004950633166839, guid: 07bbb9dd2c345ec408ffe94d9cf4cf83,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -6182788573997361266, guid: 07bbb9dd2c345ec408ffe94d9cf4cf83,
         type: 3}

@@ -6,43 +6,27 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
     private DataContainer dataContainer;
-    private DataContainer DataContainer
-    {
-        get
-        {
-            if(ReferenceEquals(dataContainer, null))
-                dataContainer = ServiceLocator.ForGlobal().Get<DataContainer>();
-            return dataContainer;
-        }
-    }
-
+    private DataContainer DataContainer => dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager itemManager;
-    private ItemManager ItemManager
-    {
-        get
-        {
-            if(ReferenceEquals(itemManager, null))
-                itemManager = ServiceLocator.For(this).Get<ItemManager>();
-            return itemManager;
-        }
-    }
+    private ItemManager ItemManager => itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
 
     //inspector field
     [SerializeField] protected Transform leftHandPoint;
     [SerializeField] protected Transform rightHandPoint;
 
     //field
-    protected int ownUnit;
     protected float layRotation;
     protected float sellPrice;
     protected string key;
+    protected ReactiveProperty<int> ownUnit = new();
+    protected new Collider collider;
     protected Animator animator;
     protected Rigidbody rb;
     protected PhotonTransformView transformView;
     protected MeshRenderer meshRenderer;
 
     //property
-    public bool InHand => ownUnit != 0;
+    public bool InHand => ownUnit.Value != 0;
     public virtual float SellPrice => sellPrice;
     public float LayRotation => layRotation;
     public string Key => key;
@@ -64,12 +48,12 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual string GetInteractionExplain(UnitBase unit)
     {
-        var player = unit as Player;
+        var player = unit as InGamePlayer;
         if (player)
         {
-            if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
+            if (!player.Inventory.IsInsertable()) // if player item container is not full or two hand
                 return "º’¿Ã ≤À¬¸";
-            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.ItemContainer.WholeWeight + ItemData.weight) // if player strength lack
+            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.Inventory.WholeWeight + ItemData.weight) // if player strength lack
                 return "»˚ ∫Œ¡∑";
             else
                 return "¡›±‚";
@@ -79,12 +63,12 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual bool IsInteractable(UnitBase unit)
     {
-        var player = unit as Player;
+        var player = unit as InGamePlayer;
         if (player)
         {
-            if (!player.ItemContainer.IsInsertable()) // if player item container is not full or two hand
+            if (!player.Inventory.IsInsertable()) // if player item container is not full or two hand
                 return false;
-            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.ItemContainer.WholeWeight + ItemData.weight) // if player strength lack
+            else if (player.MaxStats.GetStat(Stats.Key.Weight) <= player.Inventory.WholeWeight + ItemData.weight) // if player strength lack
                 return false;
             else
                 return true;
@@ -118,10 +102,11 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         //getcomponent
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        collider = GetComponent<Collider>();
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
 
-        this.ObserveEveryValueChanged(x => x.ownUnit)
+        ownUnit
             .Subscribe(viewId => 
             {                
                 if(viewId == 0)
@@ -131,7 +116,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
                 }
 
                 var unit = PhotonView.Find(viewId).GetComponent<UnitBase>();
-                var player = unit as Player;
+                var player = unit as InGamePlayer;
 
                 if(player)
                     //if player view is camera set camera holder other is body holder
@@ -149,31 +134,33 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     [PunRPC]
     protected virtual void DestoryItemRpc()
     {
-        ItemManager.Items.Remove(this);
+        ItemManager.Items.Remove(photonView.ViewID);
         NetworkObject.Destory(photonView.ViewID);
     }
 
     public virtual void OnInteract(UnitBase unit)
     {
-        ownUnit = unit.photonView.ViewID;
+        ownUnit.Value = unit.photonView.ViewID;
         transformView.enabled = false;
         animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
 
         //send rpc
-        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, ownUnit);
+        photonView.RPC(nameof(OnInteractRpc), RpcTarget.Others, ownUnit.Value);
     }
 
     [PunRPC]
     protected virtual void OnInteractRpc(int viewId)
     {
         //to chest position
-        ownUnit = viewId;
+        collider.enabled = false;
+        ownUnit.Value = viewId;
         transformView.enabled = false;
         animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
+        
 
         //chest view weight set
         animator.SetLayerWeight(1, 0);
@@ -224,7 +211,10 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual void OnDiscard()
     {
-        ownUnit = 0;
+        transform.position = transform.parent.position;
+
+        collider.enabled = true;
+        ownUnit.Value = 0;
         transformView.enabled = true;
         animator.enabled = false;
         rb.isKinematic = false;
@@ -236,7 +226,10 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     [PunRPC]
     protected virtual void OnDiscardRpc()
     {
-        ownUnit = 0;
+        transform.position = transform.parent.position;
+
+        collider.enabled = true;
+        ownUnit.Value = 0;
         transformView.enabled = true;
         animator.enabled = false;
         rb.isKinematic = false;
@@ -255,14 +248,14 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         {
             stream.SendNext(key);
             stream.SendNext(layRotation);
-            stream.SendNext(ownUnit);
+            stream.SendNext(ownUnit.Value);
             stream.SendNext(sellPrice);
         }
         else
         {
             key = (string)stream.ReceiveNext();
             layRotation = (float)stream.ReceiveNext();
-            ownUnit = (int)stream.ReceiveNext();
+            ownUnit.Value = (int)stream.ReceiveNext();
             sellPrice = (float)stream.ReceiveNext();
         }
     }

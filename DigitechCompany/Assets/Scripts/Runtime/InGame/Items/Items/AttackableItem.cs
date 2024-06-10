@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class AttackableItem : ItemBase, IInteractable
 {
@@ -18,7 +19,7 @@ public class AttackableItem : ItemBase, IInteractable
 
     public override string GetUseExplain(InteractID id, UnitBase unit)
     {
-        if(id == InteractID.ID2) return "ë•Œë¦¬ê¸°";
+        if(id == InteractID.ID2) return "°ø°Ý";
         return "";
     }
     

@@ -9,13 +9,13 @@ public class ScanUI : MonoBehaviour
     private const int UIPoolMaxCount = 20;
 
     //service
-    private Player player;
-    private Player Player
+    private InGamePlayer player;
+    private InGamePlayer Player
     {
         get
         {
             if (ReferenceEquals(player, null))
-                player = ServiceLocator.For(this).Get<Player>();
+                player = ServiceLocator.For(this).Get<InGamePlayer>();
             return player;
         }
     }
