@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:DigitechCompany/Assets/Scripts/Runtime/InGame/Items/Items/Laptop.cs.meta
 guid: 251087110cb68984583fee285fe36d39
-========
-guid: 5c305950de7ad5a40ab4e2cfbc0c9002
->>>>>>>> develop:DigitechCompany/Assets/Scripts/Runtime/InGame/Items/Items/AttackableItem.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
