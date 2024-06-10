@@ -99,10 +99,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     public void RequestStartGame()
     {
         if (state != GameState.Waiting) return;
-        state = GameState.Loading;
-
-        if (photonView.IsMine) gameStartSign = true;
-        else photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
+        photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
     }
 
     [PunRPC]
@@ -112,18 +109,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     /// <returns></returns>
     private void StartGameRpc()
     {
-        if (state != GameState.Waiting) return;
         state = GameState.Loading;
-
         gameStartSign = true;
     }
 
     public void RequestEndGame()
     {
         if (testBasement.State != TestBasementState.Down) return;
-
-        if (photonView.IsMine) gameEndSign = true;
-        else photonView.RPC(nameof(EndGameRpc), RpcTarget.MasterClient);
+        photonView.RPC(nameof(EndGameRpc), RpcTarget.MasterClient);
     }
 
     [PunRPC]
@@ -133,8 +126,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     /// <returns></returns>
     private void EndGameRpc()
     {
-        if (testBasement.State != TestBasementState.Down) return;
-        
         gameEndSign = true;
     }
 
@@ -146,9 +137,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     {
         while (true)
         {
-            //game start
-            await UniTask.WaitUntil(() => gameStartSign);
+            state = GameState.Waiting;
+
+            Debug.Log(state);
+            Debug.Log(testBasement.State);
+
             gameStartSign = false;
+            await UniTask.WaitUntil(() => gameStartSign);
             
             alivePlayers = inGamePlayerViewIds.Values.ToHashSet();
 
@@ -170,13 +165,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             testBasement.MoveDown();
 
             //game end
+            gameEndSign = false;
             await UniTask.WaitUntil(() => gameEndSign || alivePlayers.Count == 0);
-            gameEndSign = true;
             
             testBasement.MoveUp();
             await UniTask.WaitUntil(() => testBasement.State == TestBasementState.Up);
             itemManager.DestoryItems(true);
-            state = GameState.Waiting;
         }
     }
 
