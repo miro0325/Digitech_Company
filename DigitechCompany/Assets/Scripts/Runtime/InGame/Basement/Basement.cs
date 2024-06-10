@@ -8,6 +8,8 @@ public class Basement : MonoBehaviour, IService
 {
     public bool IsOpenDoor => isOpenDoor;
     public bool IsMovingDoor => isMovingDoor;
+    public bool IsMoving => isMoving;
+    public bool IsArrive => isArrive;
     
     [SerializeField] Transform doorOpenTrans;
     [SerializeField] Transform backDoor;
@@ -23,6 +25,8 @@ public class Basement : MonoBehaviour, IService
 
     [SerializeField] Animator animator;
 
+    private bool isMoving = false;
+    private bool isArrive = true;
     private Sequence sequence;
     // Start is called before the first frame update
     void Start()
@@ -66,11 +70,30 @@ public class Basement : MonoBehaviour, IService
         sequence.Append(backDoor.DOLocalRotate(prevRot, openDelay));
     }
 
-    private void Leave()
+    public void Leave()
     {
+        isMoving = true;
+        isArrive = false;
         RotateTire(true).OnComplete(
             () => { animator.SetTrigger("Leave"); }
         );
+    }
+
+    public void Arrive()
+    {
+        isMoving = true;
+        isArrive = true;
+        RotateTire(true).OnComplete(
+            () => { animator.SetTrigger("Arrive"); }
+        );
+    }
+
+    public void ResetTire()
+    {
+        RotateTire(false);
+        if(isArrive) transform.localPosition = new Vector3(0, 0, 0);
+        else transform.localPosition = new Vector3(0, 80, 300);
+        isMoving = false;
     }
 
     private Tween RotateTire(bool isLeave = false)
@@ -90,5 +113,19 @@ public class Basement : MonoBehaviour, IService
             return tires[3].DOLocalRotate(new Vector3(0, 90, 0), tireRotDelay).SetEase(ease);
         }
         //return sequence;
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.transform.parent == null)
+        {
+            other.transform.SetParent(transform);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (ReferenceEquals(other.transform.parent, transform))
+            other.transform.SetParent(null);
     }
 }

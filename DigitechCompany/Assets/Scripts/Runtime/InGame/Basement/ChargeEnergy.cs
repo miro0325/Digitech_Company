@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class ChargeEnergy : MonoBehaviour, IInteractable
 {
@@ -8,7 +9,8 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     
     public string GetInteractionExplain(UnitBase unit)
     {
-        return "충전";
+        if (isCharging) return "";
+        else return "충전";
     }
 
     public float GetInteractRequireTime(UnitBase unit)
@@ -24,12 +26,32 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     public bool IsInteractable(UnitBase unit)
     {
         if (isCharging) return false;
+        
+        var player = unit as Player;
+        if(player)
+        {
+            if (player.ItemContainer.GetCurrentSlotItem() == null) return false;
+        } else
+        {
+            return false;
+        }
         return true;
     }
 
     public void OnInteract(UnitBase unit)
     {
-        
+        var player = unit as Player; 
+        if(player)
+        {
+            isCharging = true;
+            var originPos = player.ItemHolder.transform.position;
+            player.ItemHolder.transform.DOMove(transform.position,0.5f).OnComplete(() => EndCharge(player,originPos));
+        }
+    }
+
+    private void EndCharge(Player player, Vector3 originPos)
+    {
+        player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => isCharging = false);
     }
 
 }

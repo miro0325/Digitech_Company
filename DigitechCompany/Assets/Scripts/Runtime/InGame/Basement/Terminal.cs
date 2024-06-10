@@ -8,7 +8,7 @@ using DG.Tweening;
 
 namespace Basements
 {
-    public class Terminal : MonoBehaviour
+    public class Terminal : MonoBehaviour, IInteractable
     {
         [Header("Cam Move Setting"),Space(5)]
         
@@ -30,6 +30,8 @@ namespace Basements
         [SerializeField] private List<Command> commands = new List<Command>();
         private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
         
+        private Player curPlayer;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -56,29 +58,39 @@ namespace Basements
         // Update is called once per frame
         void Update()
         {
-            //InputKey();
+            InputKey();
         }
 
         private void InputKey()
         {
-            if(Input.GetKeyDown(KeyCode.LeftShift) && !isMoving)
+            if (Input.GetKeyDown(KeyCode.Escape) && !isMoving)
             {
-                isConnectTerminal = !isConnectTerminal;
-                if(isConnectTerminal)
-                    ConnectTerminal();
-                else
-                    DisconnectTerminal();
+                isConnectTerminal = false;
+                DisconnectTerminal();
             }
         }
 
         private void ConnectTerminal()
         {
-            prevCamPos = cam.transform.position;
-            prevCamRot = cam.transform.eulerAngles;
+            if (!curPlayer) return;
+            curPlayer.ControlTerminal(true);
+            prevCamPos = curPlayer.CamView.transform.position;
+            prevCamRot = curPlayer.CamView.transform.eulerAngles;
             isMoving = true;
-            cam.transform.DOMove(watchCamLocation.position, moveDelay);
-            cam.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
+            curPlayer.CamView.transform.DOMove(watchCamLocation.position, moveDelay);
+            curPlayer.CamView.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
                 () => { consoleInput.ActivateInputField(); isMoving = false; }
+            );
+        }
+        
+        private void DisconnectTerminal()
+        {
+            if (!curPlayer) return;
+            isMoving = true;
+            consoleInput.DeactivateInputField();
+            curPlayer.CamView.transform.DOMove(prevCamPos, moveDelay);
+            curPlayer.CamView.transform.DORotate(prevCamRot, moveDelay).OnComplete(
+                () => { isMoving = false; curPlayer.ControlTerminal(false); curPlayer = null; isConnectTerminal = false; }
             );
         }
 
@@ -151,21 +163,14 @@ namespace Basements
                     args[i-1] = split[i].Trim();
                 }
                 return args;
-            } else
+            } 
+            else
             {
                 return null;
             }
         }
 
-        private void DisconnectTerminal()
-        {
-            isMoving = true;
-            consoleInput.DeactivateInputField();
-            cam.transform.DOMove(prevCamPos, moveDelay);
-            cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => {  isMoving = false; }
-            );
-        }
+        
 
         private void LimitWordCount()
         {
@@ -175,6 +180,39 @@ namespace Basements
                 consoleInput.text = consoleInput.text.Substring(0,wordCountLimit); 
             }
             
+        }
+
+        public InteractID GetTargetInteractID(UnitBase unit)
+        {
+            return InteractID.ID1;
+        }
+
+        public float GetInteractRequireTime(UnitBase unit)
+        {
+            return 0;
+        }
+
+        public bool IsInteractable(UnitBase unit)
+        {
+            if (isConnectTerminal) return false;
+            else return true;
+        }
+
+        public string GetInteractionExplain(UnitBase unit)
+        {
+            if (isConnectTerminal) return "";
+            else return "터미널 입력";
+        }
+
+        public void OnInteract(UnitBase unit)
+        {
+            var player = unit as Player;
+            if(player)
+            {
+                isConnectTerminal = true;
+                curPlayer = player;
+                ConnectTerminal();
+            }
         }
     }
 }

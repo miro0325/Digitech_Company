@@ -70,6 +70,7 @@ public class Player : UnitBase, IService, IPunObservable
     private bool isRun;
     private bool isCrouch;
     private bool isGround;
+    private bool isControlTerminal = false;
     private float runStaminaRecoverWaitTime;
     private float scanWaitTime;
     private float camRotateX;
@@ -88,6 +89,7 @@ public class Player : UnitBase, IService, IPunObservable
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
     public Transform ItemHolderCamera => itemHolderCamera;
+    public Transform CamView => camView;
     public override Stats BaseStats => testBaseStat;
 
     public void SetPosition(Vector3 pos)
@@ -179,12 +181,20 @@ public class Player : UnitBase, IService, IPunObservable
 
     private void Update()
     {
-        DoScan();
-        DoItem();
-        DoInteract();
-        DoMovement();
-        DoRotation();
+        if(!isControlTerminal)
+        {
+            DoScan();
+            DoItem();
+            DoInteract();
+            DoMovement();
+            DoRotation();
+        }
         DoAnimator();
+    }
+
+    public void ControlTerminal(bool value)
+    {
+        isControlTerminal = value;
     }
 
     private void DoScan()
