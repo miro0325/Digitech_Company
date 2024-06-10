@@ -23,6 +23,7 @@ MonoBehaviour:
         m_Bits: 4294967295
       PassNames:
       - Outline
+      - ForwardLit
     overrideMaterial: {fileID: 0}
     overrideMaterialPassIndex: 0
     overrideDepthState: 0

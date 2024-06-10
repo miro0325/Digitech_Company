@@ -37,7 +37,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a95067173c22bbc41b979ec4b50d7a31, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BrushTex:
@@ -69,7 +69,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 1d9c03fc46e554143af99321f3dd4002, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -107,12 +107,12 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _Blend: 0
+    - _Blend: 2.22
     - _BumpScale: 1
     - _Cel: 3
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Cull: 2
+    - _Cull: 0.53
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -125,39 +125,40 @@ Material:
     - _EdgeSpecular: 1
     - _EdgeSpecularOffset: 1
     - _EnvironmentReflections: 1
+    - _ExtraSpecular: 0
     - _FresnelIntensity: 0.8
-    - _FresnelSmooth: 0.983
-    - _FresnelThreshold: 1
+    - _FresnelSmooth: 0
+    - _FresnelThreshold: 0.308
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _MedBrushStrength: 1
     - _MedSmooth: 0
-    - _MedThreshold: 0
-    - _MetalReflectProbeIntensity: 1
-    - _Metallic: 0
+    - _MedThreshold: 0.556
+    - _MetalReflectProbeIntensity: 1.2
+    - _Metallic: 0.091
     - _NormalStrength: 2
     - _OcclusionStrength: 1
     - _Outline_Bold: 0.1
-    - _Parallax: 0.005
+    - _Parallax: 0.017
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ReflectBrushStrength: 1
     - _ReflectProbeIntensity: 1
     - _ReflectProbeRotation: 1
-    - _ReflectSmooth: 1
-    - _ReflectThreshold: 1
+    - _ReflectSmooth: 0
+    - _ReflectThreshold: 0.4
     - _RimThreshold: 1
     - _ShadowBrushStrength: 1
-    - _ShadowSmooth: 1
-    - _ShadowThreshold: 1
+    - _ShadowSmooth: 0
+    - _ShadowThreshold: 0.465
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpecularIntensity: 0.98
-    - _SpecularSmooth: 0.961
-    - _SpecularThreshold: 1
+    - _SpecularIntensity: 0.85
+    - _SpecularSmooth: 0
+    - _SpecularThreshold: 0.83
     - _SrcBlend: 1
     - _Surface: 0
     - _UseBrushTex: 0
@@ -168,15 +169,15 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.9056604, g: 0.66389275, b: 0.48273405, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Light1Color: {r: 0, g: 0, b: 0, a: 0}
     - _Light1Dir: {r: 0, g: 0, b: 0, a: 0}
-    - _MedColor: {r: 0.39382136, g: 1, b: 0, a: 1}
+    - _MedColor: {r: 0.8867924, g: 0.8867924, b: 0.8867924, a: 1}
     - _Outline_Color: {r: 0, g: 0, b: 0, a: 1}
-    - _ReflectColor: {r: 0, g: 1, b: 0.88574815, a: 1}
-    - _ShadowColor: {r: 0, g: 0.8221295, b: 1, a: 1}
+    - _ReflectColor: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
+    - _ShadowColor: {r: 0.67893374, g: 0.68695945, b: 0.6886792, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularLightOffset: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

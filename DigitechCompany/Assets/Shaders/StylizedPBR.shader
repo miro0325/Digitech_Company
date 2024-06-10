@@ -105,6 +105,9 @@ Shader "Custom/StylizedPBR"
         _ShadowBrushStrength("Shadow Brush Strength",Range(0,1)) = 0
         _ReflectBrushStrength("Reflect Brush Strength",Range(0,1)) = 0
         
+        _Outline_Color("Outline Color",Color) = (0,0,0,1)
+        _Outline_Bold ("Outline Bold", float) = 0.1
+
         _ReceiveShadows("Receive Shadows",float) = 0
     }
 
@@ -115,6 +118,50 @@ Shader "Custom/StylizedPBR"
         // material work with both Universal Render Pipeline and Builtin Unity Pipeline
         Tags{"RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "UniversalMaterialType" = "Lit" "IgnoreProjector" = "True" "ShaderModel"="4.5"}
         LOD 300
+
+        Pass
+        {
+            Cull front
+            Tags {"LightMode"="Outline"}
+            HLSLPROGRAM
+            #pragma vertex vert noshadow
+            #pragma fragment frag noshadow
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+
+            struct v2f
+            {
+                float4 vertex : SV_POSITION;
+                float4 color : COLOR;
+            };
+
+            
+            float _Outline_Bold;
+            float4 _Outline_Color;
+
+            v2f vert (appdata v)
+            {
+                v2f o;
+                o.vertex = TransformObjectToHClip(v.vertex);
+                float3 normal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV,v.normal));
+                float2 offset = mul((float2x2)UNITY_MATRIX_P, normal.xy);
+                o.vertex.xy += offset * o.vertex.z * _Outline_Bold;
+                o.color = _Outline_Color;
+                return o;
+            }
+
+            half4 frag (v2f i) : SV_Target
+            {
+                return i.color;
+            }
+            ENDHLSL
+        }
 
         // ------------------------------------------------------------------
         //  Forward pass. Shades all light in a single pass. GI + emission + Fog
