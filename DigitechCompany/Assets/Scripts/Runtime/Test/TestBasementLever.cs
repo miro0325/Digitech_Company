@@ -3,33 +3,17 @@ using UnityEngine;
 public class TestBasementLever : MonoBehaviour, IInteractable
 {
     //service
-    private GameManager gameManager;
-    private GameManager GameManager
-    {
-        get
-        {
-            if(ReferenceEquals(gameManager, null))
-                gameManager = ServiceLocator.For(this).Get<GameManager>();
-            return gameManager;
-        }
-    }
+    private GameManager _gameManager;
+    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     
-    private TestBasement testBasement;
-    private TestBasement TestBasement
-    {
-        get
-        {
-            if(ReferenceEquals(testBasement, null))
-                testBasement = ServiceLocator.For(this).Get<TestBasement>();
-            return testBasement;
-        }
-    }
+    private TestBasement _testBasement;
+    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        if(GameManager.State == GameState.Loading) return "·Îµù Áß";
+        if(gameManager.State == GameState.Loading) return "·Îµù Áß";
         
-        switch (TestBasement.State)
+        switch (testBasement.State)
         {
             case TestBasementState.TakingOff: return "ÀÌ·ú Áß";
             case TestBasementState.Up: return "Âø·úÇÏ±â";
@@ -51,9 +35,9 @@ public class TestBasementLever : MonoBehaviour, IInteractable
 
     public bool IsInteractable(UnitBase unit)
     {
-        if(GameManager.State == GameState.Loading) return false;
+        if(gameManager.State == GameState.Loading) return false;
         
-        switch (TestBasement.State)
+        switch (testBasement.State)
         {
             //moving
             case TestBasementState.TakingOff:
@@ -68,14 +52,14 @@ public class TestBasementLever : MonoBehaviour, IInteractable
 
     public void OnInteract(UnitBase unit)
     {
-        if(GameManager.State == GameState.Loading) return;
+        if(gameManager.State == GameState.Loading) return;
         
-        switch (TestBasement.State)
+        switch (testBasement.State)
         {
             case TestBasementState.TakingOff: break;
-            case TestBasementState.Up: GameManager.RequestStartGame(); break;
+            case TestBasementState.Up: gameManager.RequestStartGame(); break;
             case TestBasementState.Landing: break;
-            case TestBasementState.Down: GameManager.RequestEndGame(); break;
+            case TestBasementState.Down: gameManager.RequestEndGame(); break;
         }
     }
 }

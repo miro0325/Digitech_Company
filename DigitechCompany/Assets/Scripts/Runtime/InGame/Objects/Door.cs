@@ -112,8 +112,8 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
                 if (CheckKeyItem(unit))
                 {
                     doorState = DoorState.Close;
-                    var key = unit.ItemContainer.GetCurrentSlotItem();
-                    var player = unit as Player;
+                    var key = unit.Inventory.GetCurrentSlotItem();
+                    var player = unit as InGamePlayer;
                     player.DiscardCurrentItem();
                     key.DestroyItem();
                 }
@@ -152,9 +152,9 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 
     private bool CheckKeyItem(UnitBase unit)
     {
-        if (unit is Player)
+        if (unit is InGamePlayer)
         {
-            var curItem = unit.ItemContainer.GetCurrentSlotItem();
+            var curItem = unit.Inventory.GetCurrentSlotItem();
             if (curItem != null && curItem.Key.Equals("Key"))
             {
                 return true;

@@ -17,10 +17,10 @@ public class TestBasement : MonoBehaviourPun, IService
     [SerializeField] private Vector3 downPos;
 
     private TestBasementState state;
-    private HashSet<ItemBase> items = new();
+    private Dictionary<int, ItemBase> items = new();
 
     public TestBasementState State => state;
-    public HashSet<ItemBase> Items => items;
+    public Dictionary<int, ItemBase> Items => items;
 
     private void Awake()
     {
@@ -58,7 +58,7 @@ public class TestBasement : MonoBehaviourPun, IService
             other.transform.SetParent(transform);
             
             if(other.TryGetComponent<ItemBase>(out var comp))
-                items.Add(comp);
+                items.Add(comp.photonView.ViewID, comp);
         }
     }
 

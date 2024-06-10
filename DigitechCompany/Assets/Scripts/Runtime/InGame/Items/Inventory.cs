@@ -1,0 +1,100 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UnityEngine;
+
+public class Inventory
+{
+    private int index;
+    private ItemBase[] slots;
+
+    public int Index
+    {
+        get => index;
+        set
+        {
+            if(value == index) return;
+            if(GetCurrentSlotItem() != null && GetCurrentSlotItem().ItemData.isTwoHand) return;
+
+            var pre = index;
+            if(value < 0) value = slots.Length - 1;
+            if(value > slots.Length - 1) value = 0;
+            index = value;
+            OnIndexChanged?.Invoke(pre, index);
+        }
+    }
+
+    public float WholeWeight
+    {
+        get
+        {
+            float weight = 0;
+            for(int i = 0; i < slots.Length; i++)
+                if(slots[i]) weight += slots[i].ItemData.weight;
+            return weight;
+        }
+    }
+
+    public int Size { get; private set; }
+
+    //old cur
+    public event Action<int, int> OnIndexChanged;
+
+    public ItemBase this[int index]
+    {
+        get => slots[index];
+        set => slots[index] = value;
+    }
+
+    public Inventory(int size)
+    {
+        slots = new ItemBase[size];
+        Size = size;
+    }
+
+    public ItemBase GetCurrentSlotItem()
+    {
+        return slots[Index];
+    }
+
+    public bool IsInsertable()
+    {
+        if(slots[index] == null) return true;
+        else
+        {
+            if(slots[index].ItemData.isTwoHand) return false;
+            return TryGetEmptySlotIndex(out _);
+        }
+    }
+
+    public void InsertItem(ItemBase item)
+    {
+        if(!IsInsertable()) return;
+
+        if(slots[index] == null)
+        {
+            slots[index] = item;
+        }
+        else
+        {
+            if(TryGetEmptySlotIndex(out int index))
+            {
+                slots[index] = item;
+                Index = index;
+            }
+        }
+    }
+
+    public void PopCurrentItem()
+    {
+        if(slots[index] == null) return;
+        slots[index] = null;
+    }
+
+    public bool TryGetEmptySlotIndex(out int index)
+    {
+        for(index = 0; index < slots.Length; index++)
+            if(slots[index] == null) return true;
+        return false;
+    }
+}
