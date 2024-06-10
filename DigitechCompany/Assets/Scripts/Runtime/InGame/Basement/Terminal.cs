@@ -12,7 +12,6 @@ namespace Basements
     {
         [Header("Cam Move Setting"),Space(5)]
         
-        [SerializeField] private Camera cam;
         [SerializeField] private Transform watchCamLocation;
         [SerializeField] private float moveDelay;
         private bool isMoving = false;
@@ -30,16 +29,20 @@ namespace Basements
         [SerializeField] private List<Command> commands = new List<Command>();
         private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
         
-        private Player curPlayer;
+        private InGamePlayer curPlayer;
+        private UserInputAction userInput;
 
-        // Start is called before the first frame update
-        void Start()
+        private Transform cam;
+
+        private void Start()
         {
             Initialize();
         }
 
         private void Initialize()
         {
+            cam = Camera.main.transform;
+            userInput = new();
             foreach(var command in commands)
             {
                 command.Init();
@@ -55,8 +58,7 @@ namespace Basements
             consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
             InputKey();
         }
@@ -72,25 +74,25 @@ namespace Basements
 
         private void ConnectTerminal()
         {
-            if (!curPlayer) return;
-            curPlayer.ControlTerminal(true);
-            prevCamPos = curPlayer.CamView.transform.position;
-            prevCamRot = curPlayer.CamView.transform.eulerAngles;
+            if (!curPlayer || !curPlayer.photonView.IsMine) return;
+            userInput.Disable();
+            prevCamPos = cam.transform.position;
+            prevCamRot = cam.transform.eulerAngles;
             isMoving = true;
-            curPlayer.CamView.transform.DOMove(watchCamLocation.position, moveDelay);
-            curPlayer.CamView.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
+            cam.transform.DOMove(watchCamLocation.position, moveDelay);
+            cam.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
                 () => { consoleInput.ActivateInputField(); isMoving = false; }
             );
         }
         
         private void DisconnectTerminal()
         {
-            if (!curPlayer) return;
+            if (!curPlayer || !curPlayer.photonView.IsMine) return;
             isMoving = true;
             consoleInput.DeactivateInputField();
-            curPlayer.CamView.transform.DOMove(prevCamPos, moveDelay);
-            curPlayer.CamView.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => { isMoving = false; curPlayer.ControlTerminal(false); curPlayer = null; isConnectTerminal = false; }
+            cam.transform.DOMove(prevCamPos, moveDelay);
+            cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
+                () => { isMoving = false; curPlayer = null; isConnectTerminal = false; userInput.Player.Enable(); }
             );
         }
 
@@ -106,7 +108,7 @@ namespace Basements
             {
                 if(!string.IsNullOrEmpty(msg.Replace(" ",string.Empty)) || msg.Replace(" ", string.Empty).Length != 0)
                     SendNotExistCommand(msg);
-                Debug.Log(msg.Replace(" ", string.Empty).Length);
+                //Debug.Log(msg.Replace(" ", string.Empty).Length);
             }
             consoleInput.text = "";
             consoleInput.ActivateInputField();
@@ -206,7 +208,7 @@ namespace Basements
 
         public void OnInteract(UnitBase unit)
         {
-            var player = unit as Player;
+            var player = unit as InGamePlayer;
             if(player)
             {
                 isConnectTerminal = true;

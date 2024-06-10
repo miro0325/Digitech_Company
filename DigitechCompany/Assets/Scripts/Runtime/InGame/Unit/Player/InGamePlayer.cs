@@ -88,10 +88,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         cc.enabled = true;
     }
 
-    public void Revive()
+    public void SetCamera()
     {
         cam.transform.SetParent(camHolder);
         cam.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
+    }
+
+    public void Revive()
+    {
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
         isDie = false;

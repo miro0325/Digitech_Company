@@ -27,10 +27,10 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     {
         if (isCharging) return false;
         
-        var player = unit as Player;
+        var player = unit as InGamePlayer;
         if(player)
         {
-            if (player.ItemContainer.GetCurrentSlotItem() == null) return false;
+            if (player.Inventory.GetCurrentSlotItem() == null) return false;
         } else
         {
             return false;
@@ -40,7 +40,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
 
     public void OnInteract(UnitBase unit)
     {
-        var player = unit as Player; 
+        var player = unit as InGamePlayer; 
         if(player)
         {
             isCharging = true;
@@ -49,7 +49,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
         }
     }
 
-    private void EndCharge(Player player, Vector3 originPos)
+    private void EndCharge(InGamePlayer player, Vector3 originPos)
     {
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => isCharging = false);
     }
