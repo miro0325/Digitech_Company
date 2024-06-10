@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         if (testBasement.State != TestBasementState.Down) return;
 
         if (photonView.IsMine) gameEndSign = true;
-        else photonView.RPC(nameof(StartGameRpc), RpcTarget.MasterClient);
+        else photonView.RPC(nameof(EndGameRpc), RpcTarget.MasterClient);
     }
 
     [PunRPC]
@@ -176,6 +176,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             testBasement.MoveUp();
             await UniTask.WaitUntil(() => testBasement.State == TestBasementState.Up);
             itemManager.DestoryItems(true);
+            state = GameState.Waiting;
         }
     }
 
