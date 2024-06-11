@@ -43,7 +43,9 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
         var player = unit as InGamePlayer; 
         if(player)
         {
+            if (player.Inventory.GetCurrentSlotItem() == null) return;
             isCharging = true;
+            player.ControlTerminal(true);
             var originPos = player.ItemHolder.transform.position;
             player.ItemHolder.transform.DOMove(transform.position,0.5f).OnComplete(() => EndCharge(player,originPos));
         }
@@ -51,6 +53,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
 
     private void EndCharge(InGamePlayer player, Vector3 originPos)
     {
+        player.ControlTerminal(false);
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => isCharging = false);
     }
 
