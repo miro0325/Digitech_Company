@@ -252,7 +252,7 @@ PrefabInstance:
     - target: {fileID: 7921545433663057366, guid: ed5376ad12789d5419a9440161b23e47,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed5376ad12789d5419a9440161b23e47, type: 3}
@@ -602,7 +602,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.19215688, g: 0.3019608, b: 0.47058827, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1115,7 +1115,7 @@ PrefabInstance:
     - target: {fileID: 1356001367119801953, guid: f6b6fb52c60b1e241a1967f1035d5931,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1844976815600235739, guid: f6b6fb52c60b1e241a1967f1035d5931,
         type: 3}

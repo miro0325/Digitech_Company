@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class SpectatorView : MonoBehaviour, IService
 {

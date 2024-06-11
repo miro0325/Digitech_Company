@@ -27,12 +27,17 @@ public class AssetPreviewToPng : EditorWindow
             prev?.SetActive(false);
             s.SetActive(true);
 
-            var screenShoot = new Texture2D(size.x, size.y, TextureFormat.RGB24, false);
+            var screenShot = new Texture2D(size.x, size.y, TextureFormat.ARGB32, false);
             camera.Render();
             RenderTexture.active = rt;
-            screenShoot.ReadPixels(new Rect(0, 0, size.x, size.y), 0, 0);
-            screenShoot.Apply();
-            SaveTextureToPNGFile(screenShoot, directory, s.name);
+            screenShot.ReadPixels(new Rect(0, 0, size.x, size.y), 0, 0);
+            var pixels = screenShot.GetPixels();
+            for(int i = 0; i < pixels.Length; i++)
+                if(pixels[i] == camera.backgroundColor)
+                    pixels[i] = new Color(1, 1, 1, 0);
+            screenShot.SetPixels(pixels);
+            screenShot.Apply();
+            SaveTextureToPNGFile(screenShot, directory, s.name);
             prev = s;
         }
 
