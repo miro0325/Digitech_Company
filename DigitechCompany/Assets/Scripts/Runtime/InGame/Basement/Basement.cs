@@ -33,7 +33,6 @@ public class Basement : MonoBehaviour, IService
     {
         ServiceLocator.For(this).Register(this);
         sequence = DOTween.Sequence();
-        InteractDoor();
     }
 
     // Update is called once per frame

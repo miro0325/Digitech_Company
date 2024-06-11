@@ -81,6 +81,16 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
 
+
+    #region Temp 
+    private bool isConnectedTerminal = false;
+
+    public void ControlTerminal(bool value)
+    {
+        isConnectedTerminal = value;
+    }
+    #endregion
+
     public void SetPosition(Vector3 pos)
     {
         cc.enabled = false;
@@ -96,6 +106,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
+        SetCamera();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
         isDie = false;
@@ -167,6 +178,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void Update()
     {
+        /* temp */ if (isConnectedTerminal) return;
         DoScan();
         DoItem();
         DoInteract();

@@ -100,7 +100,7 @@ Material:
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
-    - _DetailNormalMapScale: 1
+    - _DetailNormalMapScale: 0.607
     - _DstBlend: 0
     - _EdgeDiffuse: 1
     - _EdgeDistanceAttenuation: 0

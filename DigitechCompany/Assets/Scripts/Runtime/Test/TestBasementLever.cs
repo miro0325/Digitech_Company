@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class TestBasementLever : MonoBehaviour, IInteractable
 {
@@ -8,6 +9,8 @@ public class TestBasementLever : MonoBehaviour, IInteractable
     
     private TestBasement _testBasement;
     private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+
+    [SerializeField] private Transform gearStick;
 
     public string GetInteractionExplain(UnitBase unit)
     {
@@ -61,5 +64,16 @@ public class TestBasementLever : MonoBehaviour, IInteractable
             case TestBasementState.Landing: break;
             case TestBasementState.Down: gameManager.RequestEndGame(); break;
         }
+
+        #region Temp
+        if (testBasement.State == TestBasementState.Up)
+        {
+            gearStick.DOLocalRotate(new Vector3(25,0,0), 0.25f);
+        }
+        else if(testBasement.State == TestBasementState.Down)
+        {
+            gearStick.DOLocalRotate(Vector3.zero, 0.25f);
+        }
+        #endregion
     }
 }

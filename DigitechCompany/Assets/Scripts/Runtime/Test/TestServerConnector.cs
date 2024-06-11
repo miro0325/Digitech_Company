@@ -23,6 +23,6 @@ public class TestServerConnector : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel("test-gamescene2");
+        PhotonNetwork.LoadLevel("test-gamescene");
     }
 }
