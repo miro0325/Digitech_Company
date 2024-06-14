@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &582309127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 582309128}
+  m_Layer: 7
+  m_Name: RightHandIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &582309128
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 582309127}
+  m_LocalRotation: {x: -0.23519503, y: 0.6081097, z: 0.19521473, w: 0.7326508}
+  m_LocalPosition: {x: -0.1367, y: 0.0196, z: -0.0364}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3209353215035880254}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -35.595, y: 79.386, z: 0}
 --- !u!1 &2864915064015088004
 GameObject:
   m_ObjectHideFlags: 0
@@ -35,6 +66,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2204247681490085398}
+  - {fileID: 582309128}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -74,8 +106,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holdPos: {x: 0.083, y: -0.009, z: 0.383}
+  holdRot: {x: 340.901, y: 8.226003, z: 191.368}
+  camHoldPos: {x: 0.39, y: -0.02, z: 0.604}
+  camHoldRot: {x: 294.66098, y: 30.109062, z: 9.4699955}
   leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
+  rightHandPoint: {fileID: 582309128}
 --- !u!65 &509302545011878877
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -115,7 +151,7 @@ Animator:
   m_GameObject: {fileID: 2864915064015088004}
   m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 2ac8cced23b872146870b72fb2755bc2, type: 2}
+  m_Controller: {fileID: 9100000, guid: 35e9a8d7677a9a346bab10950ee267bd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -169,7 +205,7 @@ Transform:
   m_GameObject: {fileID: 4693542583219635768}
   m_LocalRotation: {x: 4.8252663e-15, y: -1, z: -0.000000021855694, w: 0.00000020861623}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3209353215035880254}

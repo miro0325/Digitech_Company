@@ -9,7 +9,7 @@ AnimatorOverrideController:
   m_Name: Protein
   m_Controller: {fileID: 9100000, guid: 39fa2c4eaa752a44880555550b1f0204, type: 2}
   m_Clips:
-  - m_OriginalClip: {fileID: 7400000, guid: 818c4796706f92c4a961d229deaaff4e, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 74eaa951504b43043b7e586aa92c5048, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: 233de695c1ed6ec4aa21fbeba936238d, type: 2}
-  - m_OriginalClip: {fileID: 7400000, guid: 664d981acc335eb4697b688df776d72a, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 7fe09b989a20ddc4b913f8eaa9cf166a, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: 890c28ddd8f22b34f86cd21c297c141f, type: 2}

@@ -18,12 +18,8 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
     [SerializeField] private Animator playerModelAnimator;
     [SerializeField] private Animator armModelAnimator;
     [Header("IK")]
-    [SerializeField] private TwoBoneIKConstraint leftHandIK;
-    [SerializeField] private TwoBoneIKConstraint rightHandIK;
-    [SerializeField] private TwoBoneIKConstraint leftHandIKCam;
-    [SerializeField] private TwoBoneIKConstraint rightHandIKCam;
-    [SerializeField] private Transform leftHandIKTarget;
-    [SerializeField] private Transform rightHandIKTarget;
+    [SerializeField] private InGamePlayerIKHandler bodyHandIK;
+    [SerializeField] private InGamePlayerIKHandler camHandIK;
 
     private InGamePlayer player;
     private bool isGround;
@@ -39,39 +35,15 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
             {
                 if (x == 0)
                 {
-                    leftHandIKTarget.SetParent(transform);
-                    leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                    rightHandIKTarget.SetParent(transform);
-                    rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                    if (photonView.IsMine)
-                    {
-                        leftHandIKCam.weight = 0;
-                        rightHandIKCam.weight = 0;
-                    }
-                    else
-                    {
-                        leftHandIK.weight = 0;
-                        rightHandIK.weight = 0;
-                    }
+                    if (photonView.IsMine) camHandIK.SetHandIKTarget(null, null);
+                    else bodyHandIK.SetHandIKTarget(null, null);
                     return;
                 }
 
                 var curItem = PhotonView.Find(x).GetComponent<ItemBase>();
 
-                leftHandIKTarget.SetParent(curItem.LeftHandPoint != null ? curItem.LeftHandPoint : transform);
-                leftHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                rightHandIKTarget.SetParent(curItem.RightHandPoint != null ? curItem.RightHandPoint : transform);
-                rightHandIKTarget.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
-                if (photonView.IsMine)
-                {
-                    leftHandIKCam.weight = curItem.LeftHandPoint != null ? 1 : 0;
-                    rightHandIKCam.weight = curItem.RightHandPoint != null ? 1 : 0;
-                }
-                else
-                {
-                    leftHandIK.weight = curItem.LeftHandPoint != null ? 1 : 0;
-                    rightHandIK.weight = curItem.RightHandPoint != null ? 1 : 0;
-                }
+                if (photonView.IsMine) camHandIK.SetHandIKTarget(curItem.LeftHandPoint, curItem.RightHandPoint);
+                else bodyHandIK.SetHandIKTarget(curItem.LeftHandPoint, curItem.RightHandPoint);
             });
 
         if (!photonView.IsMine) return;

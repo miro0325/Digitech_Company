@@ -36,7 +36,7 @@ public class AttackableItem : ItemBase, IInteractable
         animator.SetTrigger(Animator_IdleHash);
     }
 
-    public override void OnUse(InteractID id)
+    public override void OnUsePressed(InteractID id)
     {
         if(id != InteractID.ID2) return;
         delayTime = 0.75f;

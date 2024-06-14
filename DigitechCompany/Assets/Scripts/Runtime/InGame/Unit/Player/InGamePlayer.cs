@@ -123,7 +123,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         animator.Initialize(this);
 
         //ik setting
-
         if (!photonView.IsMine) return;
 
         //set item container
@@ -269,11 +268,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
             if (userInput.Player.Interact.WasPressedThisFrame())
             {
-                for (int i = 1; i < (int)InteractID.End; i++)
-                {
-                    if (userInput.Player.Interact.ReadValue<float>() == i && item.IsUsable((InteractID)i))
-                        item.OnUse((InteractID)i);
-                }
+                var interactId = (InteractID)(int)userInput.Player.Interact.ReadValue<float>();
+                if(item.IsUsable(interactId))
+                    item.OnUsePressed(interactId);
+            }
+
+            if (userInput.Player.Interact.WasReleasedThisFrame())
+            {
+                item.OnUseReleased();
             }
 
             if (userInput.Player.Discard.WasPressedThisFrame())

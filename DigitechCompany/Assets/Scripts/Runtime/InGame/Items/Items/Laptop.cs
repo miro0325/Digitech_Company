@@ -30,10 +30,10 @@ public class Laptop : ItemBase, IPunObservable
         return false;
     }
 
-    public override void OnUse(InteractID id)
+    public override void OnUsePressed(InteractID id)
     {
         if (isPlaying) return;
-        base.OnUse(id);
+        base.OnUsePressed(id);
         isOpen = !isOpen;
         isPlaying = true;
         var anim = (isOpen ? openAnim : closeAnim);
@@ -41,7 +41,7 @@ public class Laptop : ItemBase, IPunObservable
     }
 
     [PunRPC]
-    protected override void OnUseRpc(int id)
+    protected override void OnUsePressedRpc(int id)
     {
         isOpen = !isOpen;
         isPlaying = true;

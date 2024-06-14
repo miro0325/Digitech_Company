@@ -80,6 +80,8 @@ MonoBehaviour:
   - EndGameRpc
   - NotifyPlayerJoinRpc
   - RequestSyncRpc
+  - OnUsePressedRpc
+  - OnUseReleasedRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
