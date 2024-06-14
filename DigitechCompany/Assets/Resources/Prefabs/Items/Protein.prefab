@@ -64,7 +64,7 @@ Transform:
   m_GameObject: {fileID: 5071659167641445493}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6600004, y: 0.65999997, z: 0.66000015}
+  m_LocalScale: {x: 0.66000056, y: 0.65999997, z: 0.6600004}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 718620092}
@@ -160,7 +160,7 @@ MonoBehaviour:
   holdPos: {x: 0.062, y: -0.04, z: 0.361}
   holdRot: {x: 346.78098, y: 179.61533, z: 13.433113}
   camHoldPos: {x: 0.311, y: -0.02, z: 0.505}
-  camHoldRot: {x: 352.854, y: 196.15381, z: 3.022803}
+  camHoldRot: {x: 352.48108, y: 204.86908, z: 1.9083835}
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 718620092}
 --- !u!65 &4464119471771101961
