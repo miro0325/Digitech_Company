@@ -67,8 +67,8 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
             }
         }
 
-        var shovel = NetworkObject.Instantiate("Prefabs/Items/Mop", new Vector3(0, -8, 0)) as ItemBase;
-        shovel.Initialize("Mop");
+        var shovel = NetworkObject.Instantiate("Prefabs/Items/Mask", new Vector3(0, -8, 0)) as ItemBase;
+        shovel.Initialize("Mask");
         items.Add(shovel.photonView.ViewID, shovel);
 
         var networkItemData = new NetworkItemData[items.Count];

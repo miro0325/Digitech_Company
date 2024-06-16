@@ -28,7 +28,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3209353215035880254}
+  m_Father: {fileID: 4960594313197563217}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -35.595, y: 79.386, z: 0}
 --- !u!1 &2864915064015088004
@@ -39,9 +39,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3209353215035880254}
+  - component: {fileID: 4960594313197563217}
   - component: {fileID: 6957136983906310593}
-  - component: {fileID: 6957136983906310594}
+  - component: {fileID: 986658764}
   - component: {fileID: 509302545011878877}
   - component: {fileID: 8761190563286211451}
   - component: {fileID: 625903227}
@@ -52,8 +52,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3209353215035880254
-Transform:
+--- !u!224 &4960594313197563217
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -69,6 +69,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6957136983906310593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,12 +93,12 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 6957136983906310594}
+  - {fileID: 986658764}
   - {fileID: 625903227}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &6957136983906310594
+--- !u!114 &986658764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,7 +107,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2864915064015088004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
+  m_Script: {fileID: 11500000, guid: ee5b22b474ed6784486a2b2113c3ac1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   holdPos: {x: 0.083, y: -0.009, z: 0.383}
@@ -186,7 +191,7 @@ Transform:
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 3209353215035880254}
+  m_Father: {fileID: 4960594313197563217}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!33 &2541291040970154218

@@ -80,7 +80,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public Transform ItemHolderCamera => itemHolderCamera;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
-
+    
 
     #region Temp 
     private bool isConnectedTerminal = false;
