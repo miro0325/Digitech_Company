@@ -129,7 +129,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         inventory = new(4);
         inventory.OnIndexChanged += (pre, cur) =>
         {
-            inventory[pre]?.OnDisable();
+            inventory[pre]?.OnInactive();
             inventory[cur]?.OnActive();
         };
 
@@ -457,9 +457,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position + groundCastOffset, groundCastRadius);
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(cam.transform.position, cam.transform.position + cam.transform.forward * interactionDistance);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

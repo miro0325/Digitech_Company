@@ -23,14 +23,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206278126}
-  m_LocalRotation: {x: 0.00000007450579, y: 0.6361922, z: -0.7715306, w: -0.000000022351736}
-  m_LocalPosition: {x: 0.285, y: 0.052, z: -0.041}
+  m_LocalRotation: {x: -0.023253314, y: 0.6634697, z: -0.74761415, w: 0.018449223}
+  m_LocalPosition: {x: 0.474, y: 0.046, z: -0.028}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1562513690961932807}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 100.983, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 82.385, y: 26.558, z: -153.832}
 --- !u!1 &2103392090
 GameObject:
   m_ObjectHideFlags: 0
@@ -54,14 +54,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2103392090}
-  m_LocalRotation: {x: 0.76604444, y: 0, z: 0, w: 0.64278764}
-  m_LocalPosition: {x: -0.213, y: 0.04, z: 0.041}
+  m_LocalRotation: {x: 0.8205717, y: -0.000000022351731, z: -0.00000008131607, w: 0.5715436}
+  m_LocalPosition: {x: -0.133, y: 0.035, z: 0.057}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1562513690961932807}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 100, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 110.284, y: 0, z: 0}
 --- !u!1 &1095704351971947516
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +248,7 @@ Animator:
   m_GameObject: {fileID: 2226178173274958013}
   m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: db09011ef4825ad4cb8c7715c0bb24fd, type: 2}
+  m_Controller: {fileID: 9100000, guid: ebe25b983d2a3b846b8049c59875f488, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -274,7 +274,7 @@ MonoBehaviour:
   holdPos: {x: 0.106, y: 0.077, z: 0.302}
   holdRot: {x: 62.314632, y: 99.05498, z: 290.74146}
   camHoldPos: {x: -0.047, y: -0.089, z: 0.414}
-  camHoldRot: {x: 68.213425, y: 105.77164, z: 289.67938}
+  camHoldRot: {x: 68.21302, y: 105.77199, z: 289.679}
   leftHandPoint: {fileID: 1206278127}
   rightHandPoint: {fileID: 2103392091}
 --- !u!114 &1152228089

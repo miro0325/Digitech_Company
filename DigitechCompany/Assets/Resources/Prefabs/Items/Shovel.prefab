@@ -106,14 +106,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2960460522283444554}
-  m_LocalRotation: {x: 0.04283836, y: 0.14021873, z: -0.98912036, w: -0.012021316}
-  m_LocalPosition: {x: 0.32701448, y: 0.0395661, z: 0.036233168}
+  m_LocalRotation: {x: -0.51934916, y: -0.47987136, z: -0.47987136, w: 0.51934916}
+  m_LocalPosition: {x: 0.447, y: -0.054, z: -0.007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6668602876129647263}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -85.475006}
 --- !u!1 &6323179596718751781
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,6 +240,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 251087110cb68984583fee285fe36d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holdPos: {x: -0.192, y: 0.129, z: 0.223}
+  holdRot: {x: 53.510555, y: 254.65198, z: 270}
+  camHoldPos: {x: -0.081, y: -0.151, z: 0.446}
+  camHoldRot: {x: 41.748936, y: 261.49802, z: 256.86798}
   leftHandPoint: {fileID: 7186773845848759113}
   rightHandPoint: {fileID: 5922099111990150510}
 --- !u!114 &784093169
@@ -281,11 +285,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6837367370792780110}
-  m_LocalRotation: {x: -0.019005416, y: 0.1525598, z: 0.96305454, w: 0.22111166}
-  m_LocalPosition: {x: -0.103976466, y: 0.089873165, z: -0.05103444}
+  m_LocalRotation: {x: -0.1197759, y: 0.6387873, z: 0.7531835, w: -0.1015839}
+  m_LocalPosition: {x: -0.034, y: -0.066, z: 0.018}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6668602876129647263}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -110.296, y: 116.581, z: 61.922}

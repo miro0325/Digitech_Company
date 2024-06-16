@@ -24,7 +24,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     protected string key;
     protected ReactiveProperty<int> ownUnitViewId = new();
     protected new Collider collider;
-    protected Animator animator;
     protected Rigidbody rb;
     protected PhotonTransformView transformView;
     protected MeshRenderer meshRenderer;
@@ -106,7 +105,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     public override void OnCreate()
     {
         //getcomponent
-        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         collider = GetComponent<Collider>();
         transformView = GetComponent<PhotonTransformView>();
@@ -150,7 +148,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     {
         ownUnitViewId.Value = unit.photonView.ViewID;
         transformView.enabled = false;
-        animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
 
@@ -165,20 +162,14 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         collider.enabled = false;
         ownUnitViewId.Value = viewId;
         transformView.enabled = false;
-        animator.enabled = true;
         rb.isKinematic = true;
         rb.detectCollisions = false;
-        
-
-        //chest view weight set
-        animator.SetLayerWeight(1, 0);
     }
 
     public virtual void OnActive()
     {
-        transform.SetLocalPositionAndRotation(holdPos, Quaternion.Euler(holdRot));
+        transform.SetLocalPositionAndRotation(camHoldPos, Quaternion.Euler(camHoldRot));
         gameObject.SetActive(true);
-        animator.SetLayerWeight(1, 1);
 
         //invoke rpc
         photonView.RPC(nameof(OnActiveRpc), RpcTarget.Others);
@@ -188,22 +179,21 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     protected virtual void OnActiveRpc()
     {
         Debug.Log("active true");
-        transform.SetLocalPositionAndRotation(camHoldPos, Quaternion.Euler(camHoldRot));
+        transform.SetLocalPositionAndRotation(holdPos, Quaternion.Euler(holdRot));
         gameObject.SetActive(true);
-        animator.SetLayerWeight(1, 0);
     }
 
-    public virtual void OnDisable()
+    public virtual void OnInactive()
     {
         Debug.Log("active false");
         gameObject.SetActive(false);
 
         //invoke rpc
-        photonView.RPC(nameof(OnDisableRpc), RpcTarget.Others);
+        photonView.RPC(nameof(OnInactiveRpc), RpcTarget.Others);
     }
 
     [PunRPC]
-    protected virtual void OnDisableRpc()
+    protected virtual void OnInactiveRpc()
     {
         gameObject.SetActive(false);
     }
@@ -237,7 +227,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         collider.enabled = true;
         ownUnitViewId.Value = 0;
         transformView.enabled = true;
-        animator.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
 
@@ -252,7 +241,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
         collider.enabled = true;
         ownUnitViewId.Value = 0;
         transformView.enabled = true;
-        animator.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
     }

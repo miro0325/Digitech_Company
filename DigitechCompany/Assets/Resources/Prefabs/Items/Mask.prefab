@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 6957136983906310594}
   - component: {fileID: 509302545011878877}
   - component: {fileID: 8761190563286211451}
-  - component: {fileID: -3623021762427984762}
   - component: {fileID: 625903227}
   m_Layer: 7
   m_Name: Mask
@@ -108,8 +107,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   holdPos: {x: 0.083, y: -0.009, z: 0.383}
   holdRot: {x: 340.901, y: 8.226003, z: 191.368}
-  camHoldPos: {x: 0.39, y: -0.02, z: 0.604}
-  camHoldRot: {x: 294.66098, y: 30.109062, z: 9.4699955}
+  camHoldPos: {x: 0.274, y: 0.074, z: 0.447}
+  camHoldRot: {x: 295.42267, y: 49.210846, z: 164.11258}
   leftHandPoint: {fileID: 0}
   rightHandPoint: {fileID: 582309128}
 --- !u!65 &509302545011878877
@@ -141,27 +140,6 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 112
   m_CollisionDetection: 1
---- !u!95 &-3623021762427984762
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2864915064015088004}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35e9a8d7677a9a346bab10950ee267bd, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &625903227
 MonoBehaviour:
   m_ObjectHideFlags: 0

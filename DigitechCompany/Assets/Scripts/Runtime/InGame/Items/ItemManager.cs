@@ -59,13 +59,17 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 {
                     var itemKeys = ResourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
-                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity).GetComponent<ItemBase>();
+                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity) as ItemBase;
                     item.SetLayRotation(Random.Range(0, 360));
                     item.Initialize(randomItemKey);
                     items.Add(item.photonView.ViewID, item);
                 }
             }
         }
+
+        var shovel = NetworkObject.Instantiate("Prefabs/Items/Mop", new Vector3(0, -8, 0)) as ItemBase;
+        shovel.Initialize("Mop");
+        items.Add(shovel.photonView.ViewID, shovel);
 
         var networkItemData = new NetworkItemData[items.Count];
         var count = 0;

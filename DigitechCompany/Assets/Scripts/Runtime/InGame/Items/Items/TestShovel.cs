@@ -8,8 +8,15 @@ public class TestShovel : ItemBase, IInteractable
 
     //field
     private float delayTime;
+    private Animator animator;
 
     //function
+    public override void OnCreate()
+    {
+        base.OnCreate();
+        animator = GetComponent<Animator>();
+    }
+    
     public override bool IsUsable(InteractID id)
     {
         if(id == InteractID.ID2) return delayTime <= 0;
@@ -18,7 +25,7 @@ public class TestShovel : ItemBase, IInteractable
 
     public override string GetUseExplain(InteractID id, UnitBase unit)
     {
-        if(id == InteractID.ID2) return "때리기";
+        if(id == InteractID.ID2) return "?��리기";
         return "";
     }
     

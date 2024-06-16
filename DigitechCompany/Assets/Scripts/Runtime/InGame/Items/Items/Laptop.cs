@@ -9,11 +9,16 @@ public class Laptop : ItemBase, IPunObservable
     private readonly int closeAnim = Animator.StringToHash("LaptopClose");
     private readonly int openAnim = Animator.StringToHash("LaptopOpen");
 
+    private Animator animator;
+    
     private bool isOpen = false;
     public bool isPlaying = false;
 
-    protected override void Update()
+    //function
+    public override void OnCreate()
     {
+        base.OnCreate();
+        animator = GetComponent<Animator>();
     }
 
     public override void OnInteract(UnitBase unit)

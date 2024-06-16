@@ -1,16 +1,33 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
+using UniRx;
 
 public class AttackableItem : ItemBase, IInteractable
 {
     //static
-    private static int Animator_IdleHash = Animator.StringToHash("Idle");
-    private static int Animator_AttackHash = Animator.StringToHash("Attack");
+    private static int Animator_AttackHash = Animator.StringToHash("attack");
+    private static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
 
     //field
+    private ReactiveProperty<bool> isUsePressed = new();
     private float delayTime;
+    private Animator animator;
 
     //function
+    public override void OnCreate()
+    {
+        base.OnCreate();
+        animator = GetComponent<Animator>();
+        isUsePressed
+            .Subscribe(b =>
+            {
+                if(b)
+                    animator.SetTrigger(Animator_AttackHash);
+                animator.SetBool(Animator_AttackPressedHash, b);
+            });
+    }
+
     public override bool IsUsable(InteractID id)
     {
         if(id == InteractID.ID2) return delayTime <= 0;
@@ -26,20 +43,50 @@ public class AttackableItem : ItemBase, IInteractable
     protected override void Update()
     {
         base.Update();
-        if(delayTime > 0)
+        if(!isUsePressed.Value && delayTime > 0)
             delayTime -= Time.deltaTime;
-    }
 
-    public override void OnInteract(UnitBase unit)
-    {
-        base.OnInteract(unit);
-        animator.SetTrigger(Animator_IdleHash);
+        //set camera view if ownUnit is pv controller
+        if(!ReferenceEquals(OwnUnit, null))
+            animator.SetLayerWeight(1, OwnUnit.photonView.IsMine ? 1 : 0);
     }
 
     public override void OnUsePressed(InteractID id)
     {
         if(id != InteractID.ID2) return;
-        delayTime = 0.75f;
-        animator.SetTrigger(Animator_AttackHash);
+        delayTime = 100f;
+        animator.enabled = true;
+        isUsePressed.Value = true;
+    }
+
+    public override void OnUseReleased()
+    {
+        isUsePressed.Value = false;
+    }
+
+    public override void OnInactive()
+    {
+        base.OnInactive();
+        animator.enabled = false;
+        isUsePressed.Value = false;
+    }
+
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        base.OnPhotonSerializeView(stream, info);
+        if(stream.IsWriting)
+        {
+            stream.SendNext(isUsePressed.Value);
+        }
+        else
+        {
+            isUsePressed.Value = (bool)stream.ReceiveNext();
+        }
+    }
+
+    public void OnAttackAnimationEnd()
+    {
+        delayTime = 0.1f;
+        animator.enabled = false;
     }
 }
