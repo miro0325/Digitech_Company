@@ -222,7 +222,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual void OnDiscard()
     {
-        transform.position = transform.parent.position;
+        transform.localPosition = transform.parent.forward * 0.2f;
 
         collider.enabled = true;
         ownUnitViewId.Value = 0;
@@ -236,8 +236,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     [PunRPC]
     protected virtual void OnDiscardRpc()
     {
-        transform.position = transform.parent.position;
-
         collider.enabled = true;
         ownUnitViewId.Value = 0;
         transformView.enabled = true;

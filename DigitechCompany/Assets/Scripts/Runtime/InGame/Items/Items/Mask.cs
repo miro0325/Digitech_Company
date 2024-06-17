@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 
-public class Mask : ItemBase
+public partial class Mask : ItemBase
 {
     private Vector3 targetPosition;
     private Quaternion targetRotation;
@@ -43,5 +43,6 @@ public class Mask : ItemBase
             transform.localPosition = Vector3.Lerp(transform.localPosition, targetPosition, Time.deltaTime * 5);
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * 5);
         }
+        Debug.Log(transform.position);
     }
 }
