@@ -222,8 +222,6 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
 
     public virtual void OnDiscard()
     {
-        transform.localPosition = transform.parent.forward * 0.2f;
-
         collider.enabled = true;
         ownUnitViewId.Value = 0;
         transformView.enabled = true;

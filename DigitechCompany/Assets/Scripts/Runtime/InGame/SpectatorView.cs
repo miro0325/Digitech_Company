@@ -22,14 +22,14 @@ public class SpectatorView : MonoBehaviour, IService
     private int targetIndex;
     private float camXRotate;
     private float camDistance;
-    private UserInputAction userInput;
     private List<InGamePlayer> aliveInGamePlayers = new();
+    private InGameInputAction inGameInput;
     private Camera cam;
 
     private void Start()
     {
         cam = Camera.main;
-        userInput = new();
+        inGameInput = new();
         gameManager
             .ObserveEveryValueChanged(gm => gm.AlivePlayers.Count)
             .Subscribe(_ =>
@@ -52,8 +52,8 @@ public class SpectatorView : MonoBehaviour, IService
                 //initialize
                 if(isDie)
                 {
-                    userInput.Spectator.Enable();
-                    
+                    inGameInput.Spectator.Enable();
+                                            
                     cam.transform.SetParent(camHolder);
                     cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
                     camDistance = camDistanceClamp;
@@ -63,20 +63,22 @@ public class SpectatorView : MonoBehaviour, IService
 
     private void Update()
     {
+        Debug.Log(inGameInput.asset == player.testasset);        
+
         if(targetIndex == -1) return;
         if(aliveInGamePlayers.Count == 0) return;
 
         //set spectator
-        if(userInput.Spectator.Change.WasPressedThisFrame())
+        if(inGameInput.Spectator.Change.WasPressedThisFrame())
         {
-            targetIndex += (int)userInput.Spectator.Change.ReadValue<float>();
+            targetIndex += (int)inGameInput.Spectator.Change.ReadValue<float>();
 
             if(targetIndex < 0) targetIndex = aliveInGamePlayers.Count - 1;
             if(targetIndex > aliveInGamePlayers.Count - 1) targetIndex = 0;
         }
 
         //rotation
-        var mouseInput = userInput.Spectator.Mouse.ReadValue<Vector2>();
+        var mouseInput = inGameInput.Spectator.Mouse.ReadValue<Vector2>();
 
         transform.Rotate(0, mouseInput.x * dataContainer.userData.mouseSensivity.x, 0, Space.Self);
         camXRotate -= mouseInput.y * dataContainer.userData.mouseSensivity.y;

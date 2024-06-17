@@ -23,11 +23,11 @@ public class InteractableDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private Image requireTime;
 
-    private UserInputAction userInput;
+    private InGameInputAction inGameInput;
 
     private void Start()
     {
-        userInput = new();
+        inGameInput = new();
     }
 
     private void Update()
@@ -49,7 +49,7 @@ public class InteractableDisplay : MonoBehaviour
                 var targetInteractId = Player.LookInteractable.GetTargetInteractID(Player);
                 var keyString = InputControlPath.ToHumanReadableString
                 (
-                    userInput.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
+                    inGameInput.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
                     InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames
                 );
                 text.text = $"{Player.LookInteractable.GetInteractionExplain(Player)} ({keyString})";

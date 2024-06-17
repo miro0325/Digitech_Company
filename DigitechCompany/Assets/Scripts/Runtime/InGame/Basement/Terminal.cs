@@ -30,7 +30,7 @@ namespace Basements
         private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
         
         private InGamePlayer curPlayer;
-        private UserInputAction userInput;
+        private InGameInputAction inGameInput;
 
         private Transform cam;
 
@@ -42,7 +42,7 @@ namespace Basements
         private void Initialize()
         {
             cam = Camera.main.transform;
-            userInput = new();
+            inGameInput = new();
             foreach(var command in commands)
             {
                 command.Init();
@@ -75,7 +75,7 @@ namespace Basements
         private void ConnectTerminal()
         {
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
-            userInput.Player.Disable();
+            inGameInput.Player.Disable();
 
             curPlayer.ControlTerminal(true);
 
@@ -95,7 +95,7 @@ namespace Basements
             consoleInput.DeactivateInputField();
             cam.transform.DOMove(prevCamPos, moveDelay);
             cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => { isMoving = false; isConnectTerminal = false; userInput.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
+                () => { isMoving = false; isConnectTerminal = false; inGameInput.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
             );
         }
 
