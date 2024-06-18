@@ -5,8 +5,15 @@ using DG.Tweening;
 
 public class ChargeEnergy : MonoBehaviour, IInteractable
 {
+    [SerializeField] private float chargingTime = 1;
     private bool isCharging = false;
-    
+    private WaitForSeconds wait;
+
+    private void Awake()
+    {
+        wait = new WaitForSeconds(chargingTime);
+    }
+
     public string GetInteractionExplain(UnitBase unit)
     {
         if (isCharging) return "";
@@ -41,20 +48,23 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     public void OnInteract(UnitBase unit)
     {
         var player = unit as InGamePlayer; 
-        if(player)
+        if(player && !isCharging)
         {
-            if (player.Inventory.GetCurrentSlotItem() == null) return;
-            isCharging = true;
-            player.ControlTerminal(true);
-            var originPos = player.ItemHolder.transform.position;
-            player.ItemHolder.transform.DOMove(transform.position,0.5f).OnComplete(() => EndCharge(player,originPos));
+           if (player.Inventory.GetCurrentSlotItem() == null) return;
+           StartCoroutine(ChargingItem(player));
         }
     }
 
-    private void EndCharge(InGamePlayer player, Vector3 originPos)
+    IEnumerator ChargingItem(InGamePlayer player)
     {
-        player.ControlTerminal(false);
-        player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => isCharging = false);
+        isCharging = true;
+        player.ControlTerminal(true);
+        var originPos = player.ItemHolder.transform.position;
+        yield return player.ItemHolder.transform.DOMove(transform.position, 0.5f).WaitForCompletion();
+        yield return wait;
+        player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => {
+            isCharging = false;
+            player.ControlTerminal(false);
+        });
     }
-
 }
