@@ -450,7 +450,7 @@ Shader "Custom/StylizedPBR"
             half3 LightingStylizedPhysicallyBased(BRDFData brdfData,half3 radiance, half3 lightColor, half3 lightDirectionWS, half lightAttenuation, half3 normalWS, half3 viewDirectionWS,bool isExtraLight) 
             {
                 half3 color = (lightAttenuation * (radiance * DirectStylizedBRDF(brdfData,normalWS,normalize(lightDirectionWS + _SpecularLightOffset.xyz),viewDirectionWS,isExtraLight)));
-
+                //color = ceil(color);
                 return color;
             }
 

@@ -161,7 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63c84604bca1434c9df57589d46e73a, type: 3}
   m_Name: Pixelate
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   IsEnable:
     m_OverrideState: 1
     m_Value: 1
