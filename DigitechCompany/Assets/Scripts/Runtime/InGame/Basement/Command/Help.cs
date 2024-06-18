@@ -14,11 +14,16 @@ namespace TerminalCommand
             return GetExplainText(cmd, args);
         }
 
+        public override void Init()
+        {
+
+        }
+
         protected override string GetExplainText(string cmd, string[] args)
         {
             string txt = explain;
             MatchCollection matches = regax.Matches(explain);
-            Debug.Log(matches.Count);
+            Debug.Log(matches.Count);   
             foreach (Match match in matches)
             {
                 if (match.Value == "cmd")

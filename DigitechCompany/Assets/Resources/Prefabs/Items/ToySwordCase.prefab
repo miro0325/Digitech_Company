@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &412089462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 412089463}
+  m_Layer: 7
+  m_Name: RightHandIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &412089463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412089462}
+  m_LocalRotation: {x: -0.00000013411041, y: -0.22705625, z: -0.000000003870808, w: 0.9738816}
+  m_LocalPosition: {x: -0.039, y: 0.013, z: -0.04}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4217568140252646305}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: -26.248, z: 0}
 --- !u!1 &3463223559939944084
 GameObject:
   m_ObjectHideFlags: 0
@@ -26,9 +57,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3463223559939944084}
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -0.0615, y: -0, z: -0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4217568140252646305}
   m_RootOrder: 0
@@ -97,7 +128,7 @@ GameObject:
   - component: {fileID: 2913999442165871615}
   - component: {fileID: 8777855443907190939}
   - component: {fileID: 6772462356070885612}
-  - component: {fileID: 4323375817333714902}
+  - component: {fileID: 1928494607}
   m_Layer: 7
   m_Name: ToySwordCase
   m_TagString: Untagged
@@ -118,6 +149,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 610763073513267126}
+  - {fileID: 412089463}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -137,10 +169,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 4323375817333714902}
+  - {fileID: 5490673715390399644}
+  - {fileID: 1928494607}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -156,9 +189,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
+  holdPos: {x: 0.24, y: -0.184, z: 0.273}
+  holdRot: {x: 27.591131, y: 338.28885, z: 273.24924}
+  camHoldPos: {x: 0.281, y: -0.081, z: 0.3}
+  camHoldRot: {x: 21.781652, y: 355.7286, z: 266.92044}
   leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
+  rightHandPoint: {fileID: 412089463}
 --- !u!65 &2913999442165871615
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -170,8 +206,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.2, y: 0.25, z: 0.15}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.65092444, y: 0.091991425, z: 0.15}
+  m_Center: {x: -0.05331275, y: -0.00063822995, z: 0.0000000039444714}
 --- !u!54 &8777855443907190939
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -187,7 +223,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 2
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!95 &6772462356070885612
 Animator:
   serializedVersion: 5
@@ -196,9 +232,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3588277415013765403}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 22100000, guid: 61da16f484d38394eabc3247af6c377a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -209,7 +245,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4323375817333714902
+--- !u!114 &1928494607
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -222,6 +258,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1

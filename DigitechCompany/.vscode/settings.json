@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "DigitechCompany.sln"
+    "dotnet.defaultSolution": "DigitechCompany.sln",
+    "files.encoding": "euckr"
 }

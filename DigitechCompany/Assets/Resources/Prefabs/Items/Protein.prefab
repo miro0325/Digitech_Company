@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &718620091
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 718620092}
+  m_Layer: 7
+  m_Name: RightHandIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &718620092
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718620091}
+  m_LocalRotation: {x: -0.6439874, y: 0.7644925, z: -0.02205203, w: 0.01857588}
+  m_LocalPosition: {x: -0.232, y: 0.074, z: 0.084}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5560247382742892239}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0.561, y: 176.743, z: -80.236}
 --- !u!1 &5071659167641445493
 GameObject:
   m_ObjectHideFlags: 0
@@ -15,8 +46,8 @@ GameObject:
   - component: {fileID: 5697470236292625105}
   - component: {fileID: 4464119471771101961}
   - component: {fileID: -7852324475417631020}
-  - component: {fileID: 6241874285249480920}
   - component: {fileID: 6597456480677327289}
+  - component: {fileID: 1948134024}
   m_Layer: 7
   m_Name: Protein
   m_TagString: Untagged
@@ -33,9 +64,10 @@ Transform:
   m_GameObject: {fileID: 5071659167641445493}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_LocalScale: {x: 0.66000056, y: 0.65999997, z: 0.6600004}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 718620092}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -105,10 +137,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 6241874285249480920}
+  - {fileID: 5697470236292625105}
+  - {fileID: 1948134024}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -124,9 +157,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
+  holdPos: {x: 0.062, y: -0.04, z: 0.361}
+  holdRot: {x: 346.78098, y: 179.61533, z: 13.433113}
+  camHoldPos: {x: 0.311, y: -0.02, z: 0.505}
+  camHoldRot: {x: 352.48108, y: 204.86908, z: 1.9083835}
   leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
+  rightHandPoint: {fileID: 718620092}
 --- !u!65 &4464119471771101961
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -148,9 +184,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5071659167641445493}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 22100000, guid: e19a81eb12634974fbc6fd7d6bf67f69, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -161,22 +197,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6241874285249480920
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5071659167641445493}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!54 &6597456480677327289
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -192,4 +212,20 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 2
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
+--- !u!114 &1948134024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5071659167641445493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 0
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

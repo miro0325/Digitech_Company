@@ -8,11 +8,10 @@ using DG.Tweening;
 
 namespace Basements
 {
-    public class Terminal : MonoBehaviour
+    public class Terminal : MonoBehaviour, IInteractable
     {
         [Header("Cam Move Setting"),Space(5)]
         
-        [SerializeField] private Camera cam;
         [SerializeField] private Transform watchCamLocation;
         [SerializeField] private float moveDelay;
         private bool isMoving = false;
@@ -30,16 +29,23 @@ namespace Basements
         [SerializeField] private List<Command> commands = new List<Command>();
         private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
         
-        // Start is called before the first frame update
-        void Start()
+        private InGamePlayer curPlayer;
+        private InGameInputAction inGameInput;
+
+        private Transform cam;
+
+        private void Start()
         {
             Initialize();
         }
 
         private void Initialize()
         {
+            cam = Camera.main.transform;
+            inGameInput = new();
             foreach(var command in commands)
             {
+                command.Init();
                 if(!command.IsMultiple)
                     commandDic.Add(command.Cmd, command);
                 foreach(var aliases in command.Aliases)
@@ -52,32 +58,44 @@ namespace Basements
             consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
             InputKey();
         }
 
         private void InputKey()
         {
-            if(Input.GetKeyDown(KeyCode.LeftShift) && !isMoving)
+            if (Input.GetKeyDown(KeyCode.Escape) && !isMoving)
             {
-                isConnectTerminal = !isConnectTerminal;
-                if(isConnectTerminal)
-                    ConnectTerminal();
-                else
-                    DisconnectTerminal();
+                isConnectTerminal = false;
+                DisconnectTerminal();
             }
         }
 
         private void ConnectTerminal()
         {
+            if (!curPlayer || !curPlayer.photonView.IsMine) return;
+            inGameInput.Player.Disable();
+
+            curPlayer.ControlTerminal(true);
+
             prevCamPos = cam.transform.position;
             prevCamRot = cam.transform.eulerAngles;
             isMoving = true;
             cam.transform.DOMove(watchCamLocation.position, moveDelay);
             cam.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
                 () => { consoleInput.ActivateInputField(); isMoving = false; }
+            );
+        }
+        
+        private void DisconnectTerminal()
+        {
+            if (!curPlayer || !curPlayer.photonView.IsMine) return;
+            isMoving = true;
+            consoleInput.DeactivateInputField();
+            cam.transform.DOMove(prevCamPos, moveDelay);
+            cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
+                () => { isMoving = false; isConnectTerminal = false; inGameInput.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
             );
         }
 
@@ -93,7 +111,7 @@ namespace Basements
             {
                 if(!string.IsNullOrEmpty(msg.Replace(" ",string.Empty)) || msg.Replace(" ", string.Empty).Length != 0)
                     SendNotExistCommand(msg);
-                Debug.Log(msg.Replace(" ", string.Empty).Length);
+                //Debug.Log(msg.Replace(" ", string.Empty).Length);
             }
             consoleInput.text = "";
             consoleInput.ActivateInputField();
@@ -150,21 +168,14 @@ namespace Basements
                     args[i-1] = split[i].Trim();
                 }
                 return args;
-            } else
+            } 
+            else
             {
                 return null;
             }
         }
 
-        private void DisconnectTerminal()
-        {
-            isMoving = true;
-            consoleInput.DeactivateInputField();
-            cam.transform.DOMove(prevCamPos, moveDelay);
-            cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => {  isMoving = false; }
-            );
-        }
+        
 
         private void LimitWordCount()
         {
@@ -174,6 +185,39 @@ namespace Basements
                 consoleInput.text = consoleInput.text.Substring(0,wordCountLimit); 
             }
             
+        }
+
+        public InteractID GetTargetInteractID(UnitBase unit)
+        {
+            return InteractID.ID1;
+        }
+
+        public float GetInteractRequireTime(UnitBase unit)
+        {
+            return 0;
+        }
+
+        public bool IsInteractable(UnitBase unit)
+        {
+            if (isConnectTerminal) return false;
+            else return true;
+        }
+
+        public string GetInteractionExplain(UnitBase unit)
+        {
+            if (isConnectTerminal) return "";
+            else return "터미널 입력";
+        }
+
+        public void OnInteract(UnitBase unit)
+        {
+            var player = unit as InGamePlayer;
+            if(player)
+            {
+                isConnectTerminal = true;
+                curPlayer = player;
+                ConnectTerminal();
+            }
         }
     }
 }

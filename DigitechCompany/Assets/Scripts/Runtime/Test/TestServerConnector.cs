@@ -7,7 +7,7 @@ public class TestServerConnector : MonoBehaviourPunCallbacks
 {
     private async void Start()
     {
-        await Services.Get<DataContainer>().Load();
+        await ServiceLocator.ForGlobal().Get<DataContainer>().Load();
         PhotonNetwork.ConnectUsingSettings();
     }
 

@@ -1,18 +1,41 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.AI.Navigation;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ItemManager : MonoBehaviour
+[System.Serializable]
+public class NetworkItemData
 {
+    public int viewId;
+    public string key;
+    public Vector3 position;
+    public float layRotation;
+}
+
+public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
+{
+    //service
     private ResourceLoader resourceLoader;
+    private ResourceLoader ResourceLoader => resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
+    private TestBasement testBasement;
+    private TestBasement TestBasement => testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
-    private List<ItemBase> items = new();
+    //field
+    private string itemDataJson;
+    private Dictionary<int, ItemBase> items = new();
 
-    public IReadOnlyList<ItemBase> Items => items;
+    //property
+    public string ItemDataJson => itemDataJson;
+    public Dictionary<int, ItemBase> Items => items;
 
+    //function
+    /// <summary>
+    /// This function must be executed only when you are a host.
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <param name="spawnAreas"></param>
+    /// <returns>Items data</returns>
     public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
         int wholeItemAmount = 35 * difficulty;
@@ -24,31 +47,87 @@ public class ItemManager : MonoBehaviour
 
             for (int i = 0; i < spawnItemAmount; i++)
             {
-                var randomPos = 
+                var randomPos =
                     new Vector3
                     (
-                        Random.Range(area.min.x, area.max.x), 
-                        Random.Range(area.min.y, area.max.y), 
+                        Random.Range(area.min.x, area.max.x),
+                        Random.Range(area.center.y - 1, area.center.y + 2),
                         Random.Range(area.min.z, area.max.z)
                     );
 
-                if(NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+                    var itemKeys = ResourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
-                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}").GetComponent<ItemBase>();
-                    item.transform.position = hit.position + Vector3.up;
-                    item.LayRotation = Random.Range(0, 360);
+                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity) as ItemBase;
+                    item.SetLayRotation(Random.Range(0, 360));
                     item.Initialize(randomItemKey);
-                    items.Add(item);
+                    items.Add(item.photonView.ViewID, item);
                 }
             }
         }
+
+        var shovel = NetworkObject.Instantiate("Prefabs/Items/Mask", new Vector3(0, -8, 0)) as ItemBase;
+        shovel.Initialize("Mask");
+        items.Add(shovel.photonView.ViewID, shovel);
+
+        var networkItemData = new NetworkItemData[items.Count];
+        var count = 0;
+        foreach(var kvp in items)
+            networkItemData[count++] = new()
+            {
+                viewId = kvp.Key,
+                key = kvp.Value.Key,
+                position = kvp.Value.transform.position,
+                layRotation = kvp.Value.LayRotation
+            };
+
+        var json = networkItemData.ToJson();
+        itemDataJson = json;
+    }
+
+    /// <summary>
+    /// This function must be executed only when you are a client.
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <param name="spawnAreas"></param>
+    /// <returns>Items data</returns>
+    public void SyncItem(string networkItemDataJson)
+    {
+        var datas = JsonSerializer.JsonToArray<NetworkItemData>(networkItemDataJson);
+        for (int i = 0; i < datas.Length; i++)
+        {
+            var data = datas[i];
+            var item = NetworkObject.Sync(data.viewId, $"Prefabs/Items/{data.key}") as ItemBase;
+            item.Initialize(data.key);
+            item.transform.position = data.position;
+            item.SetLayRotation(data.layRotation);
+            items.Add(item.photonView.ViewID, item);
+        }
+    }
+
+    /// <summary>
+    /// This function must be executed only when you are a client.
+    /// </summary>
+    /// <param name="withoutBasement">Whether to clear the items in the foundation</param>
+    public void DestoryItems(bool withoutBasement)
+    {
+        Dictionary<int ,ItemBase> excepts = new();
+        if(withoutBasement) excepts = TestBasement.Items;
+        
+        foreach(var kvp in items.ToArray())
+        {
+            if(!excepts.ContainsKey(kvp.Key))
+                NetworkObject.Destory(kvp.Value.photonView.ViewID);
+        }
+
+        items.Clear();
+        if(withoutBasement)
+            items = excepts;
     }
 
     private void Awake()
     {
-        Services.Register(this);
-        resourceLoader = Services.Get<ResourceLoader>();
+        ServiceLocator.For(this).Register(this);
     }
 }

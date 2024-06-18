@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &512088431
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 512088432}
+  m_Layer: 7
+  m_Name: RightHandIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &512088432
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 512088431}
+  m_LocalRotation: {x: 0, y: -0.72099876, z: 0, w: 0.6929364}
+  m_LocalPosition: {x: 0.106, y: 0.019, z: 0.024}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1844976815600235739}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: -92.274, z: 0}
 --- !u!1 &1356001367119801953
 GameObject:
   m_ObjectHideFlags: 0
@@ -14,7 +45,7 @@ GameObject:
   - component: {fileID: 5016739347664444124}
   - component: {fileID: 2878428577882584179}
   - component: {fileID: -2840125497791610278}
-  - component: {fileID: 6248309510140582192}
+  - component: {fileID: 1812868014}
   m_Layer: 7
   m_Name: Key
   m_TagString: Untagged
@@ -35,6 +66,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6882773890659982218}
+  - {fileID: 512088432}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -54,10 +86,11 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 6248309510140582192}
+  - {fileID: 4186870988266087289}
+  - {fileID: 1812868014}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -73,9 +106,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c2e0c91ec6988428e657690945db2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guid: 
+  holdPos: {x: 0.218, y: 0, z: 0.29}
+  holdRot: {x: 84.34404, y: 90, z: 20.183}
+  camHoldPos: {x: 0.257, y: 0.069, z: 0.382}
+  camHoldRot: {x: 80.990036, y: 188.07703, z: 98.65401}
   leftHandPoint: {fileID: 0}
-  rightHandPoint: {fileID: 0}
+  rightHandPoint: {fileID: 512088432}
 --- !u!54 &5016739347664444124
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -91,7 +127,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 2
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &2878428577882584179
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -113,9 +149,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1356001367119801953}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 22100000, guid: 869301c6cc73fc64c8b3b409574beece, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -126,7 +162,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6248309510140582192
+--- !u!114 &1812868014
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!1 &1722841710922360517

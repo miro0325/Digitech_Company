@@ -8,22 +8,21 @@ using UnityEngine.Rendering.Universal;
 public class Pixelate : VolumeComponent, IPostProcessComponent
 {
     
-    //Shader Á¤º¸ ÀÛ¼º
+    //Shader ï¿½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½
     private const string SHADER_NAME = "Custom/PixelateShader";
-    // ½¦ÀÌ´õ ÆÄ¶ó¹ÌÅÍ
+    // ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½Ä¶ï¿½ï¿½ï¿½ï¿?
     private const string RESOLUTION = "_Pixels";
     private const string PIXEL_WIDTH = "_PixelWidth";
     private const string PIXEL_HEIGHT = "_PixelHeight";
 
     private Material _material;
     /// <summary>
-    /// È°¼ºÈ­ ¿©ºÎ
+    /// È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public BoolParameter IsEnable = new BoolParameter(false);
     public ClampedIntParameter resolution = new ClampedIntParameter(512,0,4096);
     public ClampedFloatParameter pixelWidth = new ClampedFloatParameter(16,0,512);
     public ClampedFloatParameter pixelHeight = new ClampedFloatParameter(16,0,512);
-    
 
     public bool IsActive()
     {

@@ -1,47 +1,79 @@
-using System;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class NetworkObjectManager : MonoBehaviourPun
+public class NetworkObjectManager : MonoBehaviourPun, IService
 {
-    internal readonly Dictionary<string, NetworkObject> networkObjects = new();
-
-    internal NetworkObject InstantiateNetworkObjectInternal(string path, Vector3 pos, Quaternion rot)
+    private void Awake()
     {
-        var obj = Instantiate(Resources.Load<NetworkObject>(path), pos, rot);
-        var pv = obj.GetComponent<PhotonView>();
+        ServiceLocator.ForGlobal().Register(this);
+    }
 
-        if (PhotonNetwork.AllocateViewID(pv)) //allocate view id
+    internal NetworkObject InstantiateNetworkObjectInternal(string prefab, Vector3 pos, Quaternion quat, bool isBufferd)
+    {
+        var @object = Instantiate(Resources.Load<NetworkObject>(prefab), pos, quat);
+        var pv = @object.GetComponent<PhotonView>();
+
+        if (PhotonNetwork.AllocateViewID(pv))
         {
-            var guid = Guid.NewGuid().ToString();
-            networkObjects.Add(guid, obj);
-            obj.guid = guid;
+            PhotonNetwork.RegisterPhotonView(photonView);
 
-            obj.OnCreate();
+            @object.OnCreate();
 
-            //send rpc to another
-            photonView.RPC(nameof(InstantiateNetworkObjectRPC), RpcTarget.Others, path, guid, pv.ViewID, pos, rot);
-            return obj;
+            photonView.RPC(nameof(InstantiateNetworkObjectRpc), isBufferd ? RpcTarget.OthersBuffered : RpcTarget.Others, prefab, pv.ViewID, pos, quat);
+
+            return @object;
         }
         else
         {
             Debug.LogError("Failed to allocate a ViewId.");
-            Destroy(obj);
+
+            Destroy(@object);
             return null;
         }
     }
 
     [PunRPC]
-    private void InstantiateNetworkObjectRPC(string path, string guid, int viewId, Vector3 pos, Quaternion rot)
+    private void InstantiateNetworkObjectRpc(string prefab, int viewId, Vector3 pos, Quaternion quat)
     {
-        var obj = Instantiate(Resources.Load<NetworkObject>(path), pos, rot);
-        var pv = obj.GetComponent<PhotonView>();
+        var @object = Instantiate(Resources.Load<NetworkObject>(prefab), pos, quat);
+        var pv = @object.GetComponent<PhotonView>();
+
         pv.ViewID = viewId;
 
-        networkObjects.Add(guid, obj);
-        obj.guid = guid;
+        PhotonNetwork.RegisterPhotonView(photonView);
 
-        obj.OnCreate();
+        @object.OnCreate();
+    }
+
+    internal void DestroyNetworkObjectInternal(int viewId)
+    {
+        photonView.RPC(nameof(DestoryNetworkObjectRpc), RpcTarget.All, viewId);
+    }
+
+    [PunRPC]
+    private void DestoryNetworkObjectRpc(int viewId)
+    {
+        var pv = PhotonView.Find(viewId);
+        if (pv && pv.IsMine) PhotonNetwork.Destroy(pv);
+    }
+
+    internal NetworkObject SyncNetworkObjectInternal(int viewId, string prefab)
+    {
+        var pv = PhotonView.Find(viewId);
+        if (pv != null) //already object exist
+        {
+            return pv.GetComponent<NetworkObject>();
+        }
+        else //instantiate new one
+        {
+            var @object = Instantiate(Resources.Load<NetworkObject>(prefab));
+            var getPv = @object.GetComponent<PhotonView>();
+            getPv.ViewID = viewId;
+
+            PhotonNetwork.RegisterPhotonView(photonView);
+
+            @object.OnCreate();
+            return @object;
+        }
     }
 }
