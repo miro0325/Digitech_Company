@@ -50,8 +50,6 @@ Shader "Custom/PixelateShader"
                 v2f o;
                 o.vertex = TransformObjectToHClip(v.vertex.xyz);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                
-                
                 return o;
             }
 
