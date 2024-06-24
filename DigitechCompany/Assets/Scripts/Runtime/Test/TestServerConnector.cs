@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class TestServerConnector : MonoBehaviourPunCallbacks
 {
-    private async void Start()
+    private void Start()
     {
-        await ServiceLocator.ForGlobal().Get<DataContainer>().Load();
+        PhotonNetwork.SerializationRate = 60;
         PhotonNetwork.ConnectUsingSettings();
     }
 

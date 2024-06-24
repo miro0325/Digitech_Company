@@ -23,7 +23,6 @@ public enum InteractID
 public partial class InGamePlayer : UnitBase, IService, IPunObservable
 {
     //service
-    //service
     private DataContainer _dataContainer;
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager _itemManager;
@@ -56,6 +55,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private float scanWaitTime;
     private float runStaminaRecoverWaitTime;
     private float[] interactRequireTimes = new float[(int)InteractID.End];
+    private Vector3 position;
     private Camera cam;
     private Vector2 moveInput;
     private ScanData scanData;
@@ -81,7 +81,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public Transform ItemHolderCamera => itemHolderCamera;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
-    
+
     #region Temp 
     private bool isConnectedTerminal = false;
 
@@ -154,7 +154,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             .ObserveEveryValueChanged(t => t.isDie)
             .Subscribe(isDie =>
             {
-                if(isDie) inGameInput.Player.Disable();
+                if (isDie) inGameInput.Player.Disable();
                 else inGameInput.Player.Enable();
             });
 
@@ -177,7 +177,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void Update()
     {
-        /* temp */ if (isConnectedTerminal) return;
+        /* temp */
+        if (isConnectedTerminal) return;
         DoScan();
         DoItem();
         DoInteract();
@@ -269,7 +270,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             if (inGameInput.Player.Interact.WasPressedThisFrame())
             {
                 var interactId = (InteractID)(int)inGameInput.Player.Interact.ReadValue<float>();
-                if(item.IsUsable(interactId))
+                if (item.IsUsable(interactId))
                     item.OnUsePressed(interactId);
             }
 
@@ -299,7 +300,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private void DoInteract()
     {
         if (!photonView.IsMine) return;
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactionDistance, ~LayerMask.GetMask("Player")))
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactionDistance, ~LayerMask.GetMask("Ignore Raycast", "Player")))
             hit.collider.TryGetComponent(out lookInteractable);
         else
             lookInteractable = null;
@@ -355,6 +356,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoMovement()
     {
+        position = transform.position;
+        transform.position = Vector3.Lerp(transform.position, position, 8 * Time.deltaTime);
         isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
 
         if (!photonView.IsMine) return;
@@ -451,22 +454,26 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         transform.Rotate(0, mouseInput.x * dataContainer.userData.mouseSensivity.x, 0);
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position + groundCastOffset, groundCastRadius);
+
+        // Gizmos.color = Color.green;
+        // Gizmos.DrawLine(cam.transform.position, cam.transform.position + cam.transform.forward * interactionDistance);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        Debug.Log("Test");
         if (stream.IsWriting)
         {
+            stream.SendNext(transform.position);
             stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
+            position = (Vector3)stream.ReceiveNext();
             gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();
         }

@@ -5,10 +5,10 @@ using UnityEngine;
 public class ItemBase : NetworkObject, IPunObservable, IInteractable
 {
     //service
-    private DataContainer dataContainer;
-    private DataContainer DataContainer => dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
-    private ItemManager itemManager;
-    private ItemManager ItemManager => itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
+    private DataContainer _dataContainer;
+    private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
+    private ItemManager _itemManager;
+    private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
 
     //inspector field
     [SerializeField] protected Vector3 holdPos;
@@ -37,7 +37,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     public string Key => key;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
-    public ItemData ItemData => DataContainer.itemDatas[key];
+    public ItemData ItemData => dataContainer.loadData.itemDatas[key];
     public MeshRenderer MeshRenderer => meshRenderer;
 
     //method
@@ -140,7 +140,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable
     [PunRPC]
     protected virtual void DestoryItemRpc()
     {
-        ItemManager.Items.Remove(photonView.ViewID);
+        itemManager.Items.Remove(photonView.ViewID);
         NetworkObject.Destory(photonView.ViewID);
     }
 

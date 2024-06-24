@@ -63,8 +63,6 @@ public class SpectatorView : MonoBehaviour, IService
 
     private void Update()
     {
-        Debug.Log(inGameInput.asset == player.testasset);        
-
         if(targetIndex == -1) return;
         if(aliveInGamePlayers.Count == 0) return;
 

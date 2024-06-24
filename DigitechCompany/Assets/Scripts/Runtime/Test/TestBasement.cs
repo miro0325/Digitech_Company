@@ -11,11 +11,12 @@ public enum TestBasementState
     Landing,
 }
 
-public class TestBasement : MonoBehaviourPun, IService
+public class TestBasement : MonoBehaviourPun, IService, IPunObservable
 {
     [SerializeField] private Vector3 upPos;
     [SerializeField] private Vector3 downPos;
 
+    private Vector3 position;
     private TestBasementState state;
     private Dictionary<int, ItemBase> items = new();
 
@@ -66,5 +67,23 @@ public class TestBasement : MonoBehaviourPun, IService
     {
         if(ReferenceEquals(other.transform.parent, transform))
             other.transform.SetParent(null);
+    }
+
+    private void Update()
+    {
+        position = transform.position;
+        transform.position = Vector3.Lerp(transform.position, position, 8 * Time.deltaTime);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if(stream.IsWriting)
+        {
+            stream.SendNext(position);
+        }
+        else
+        {
+            position = (Vector3)stream.ReceiveNext();
+        }
     }
 }
