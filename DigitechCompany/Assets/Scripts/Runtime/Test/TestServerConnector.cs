@@ -7,7 +7,7 @@ public class TestServerConnector : MonoBehaviourPunCallbacks
 {
     private void Start()
     {
-        PhotonNetwork.SerializationRate = 60;
+        // PhotonNetwork.SerializationRate = 60;
         PhotonNetwork.ConnectUsingSettings();
     }
 

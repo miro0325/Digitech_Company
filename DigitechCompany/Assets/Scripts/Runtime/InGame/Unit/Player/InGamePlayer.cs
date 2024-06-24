@@ -27,6 +27,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
+    private TestBasement _testBasement;
+    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
     //inspector field
     [Space(20)]
@@ -50,14 +52,15 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private bool isGround;
     private bool isJump;
     private bool isDie = true;
+    private bool isInBasement;
     private float velocityY;
     private float camRotateX;
     private float scanWaitTime;
     private float runStaminaRecoverWaitTime;
     private float[] interactRequireTimes = new float[(int)InteractID.End];
-    private Vector3 position;
     private Camera cam;
     private Vector2 moveInput;
+    private Vector3 velocity;
     private ScanData scanData;
     private Material scanSphereMaterial;
     private CharacterController cc;
@@ -93,9 +96,9 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void SetPosition(Vector3 pos)
     {
-        cc.enabled = false;
+        if(photonView.IsMine) cc.enabled = false;
         transform.position = pos;
-        cc.enabled = true;
+        if(photonView.IsMine) cc.enabled = true;
     }
 
     public void SetCamera()
@@ -124,6 +127,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         //ik setting
         if (!photonView.IsMine) return;
+
+        cc.enabled = true;
 
         //set item container
         inventory = new(4);
@@ -175,6 +180,21 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         ServiceLocator.For(this).Register(this);
     }
 
+    private void Start()
+    {
+        this
+            .ObserveEveryValueChanged(t => t.isInBasement)
+            .Subscribe(x =>
+            {
+                if (isInBasement) transform.SetParent(testBasement.transform);
+                else transform.SetParent(null);
+            });
+
+        transform
+            .ObserveEveryValueChanged(t => transform.parent)
+            .Subscribe(parent => isInBasement = ReferenceEquals(parent, testBasement.transform));
+    }
+
     private void Update()
     {
         /* temp */
@@ -184,6 +204,11 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         DoInteract();
         DoMovement();
         DoRotation();
+    }
+
+    private void FixedUpdate()
+    {
+        cc.Move(velocity * Time.fixedDeltaTime);
     }
 
     private void DoScan()
@@ -356,8 +381,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoMovement()
     {
-        position = transform.position;
-        transform.position = Vector3.Lerp(transform.position, position, 8 * Time.deltaTime);
         isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
 
         if (!photonView.IsMine) return;
@@ -417,7 +440,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             if (curStats.GetStat(Stats.Key.Stamina) <= 0) isRun = false;
             if (!inGameInput.Player.Run.IsPressed()) isRun = false;
         }
-        var velocity = speed * moveInputMag * relativeDir;
+        velocity = speed * moveInputMag * relativeDir;
 
         //gravity
         if (cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
@@ -434,9 +457,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         velocity.y = velocityY;
-
-        //move
-        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoRotation()
@@ -467,13 +487,13 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(transform.position);
+            stream.SendNext(isInBasement);
             stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
-            position = (Vector3)stream.ReceiveNext();
+            isInBasement = (bool)stream.ReceiveNext();
             gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();
         }

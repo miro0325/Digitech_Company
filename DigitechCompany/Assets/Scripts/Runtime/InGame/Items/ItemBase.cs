@@ -2,7 +2,7 @@ using Photon.Pun;
 using UniRx;
 using UnityEngine;
 
-public class ItemBase : NetworkObject, IPunObservable, IInteractable
+public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 {
     //service
     private DataContainer _dataContainer;
