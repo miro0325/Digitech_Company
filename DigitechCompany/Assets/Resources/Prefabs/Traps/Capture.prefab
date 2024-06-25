@@ -176,6 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5328430986733731454}
   - component: {fileID: 4808071357202097350}
+  - component: {fileID: 5654509839191674847}
   m_Layer: 0
   m_Name: Capture
   m_TagString: Untagged
@@ -220,6 +221,29 @@ MonoBehaviour:
   rightPart: {fileID: 4483595417429864066}
   triggerParent: {fileID: 5654509838301930898}
   particle: {fileID: 5392124936477376719}
+--- !u!114 &5654509839191674847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4808071357202097348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 1
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 4808071357202097350}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &5654509837552051696
 GameObject:
   m_ObjectHideFlags: 0
@@ -640,6 +664,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BigTrap_Effect
+      objectReference: {fileID: 0}
+    - target: {fileID: 5392124936761236099, guid: 377a7e094ce2b3a4f8a974ae2b1fc2c7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 377a7e094ce2b3a4f8a974ae2b1fc2c7, type: 3}

@@ -7,55 +7,42 @@ using UnityEngine.UI;
 public class InteractableDisplay : MonoBehaviour
 {
     //service
-    private InGamePlayer player;
-    private InGamePlayer Player
-    {
-        get
-        {
-            if (ReferenceEquals(player, null))
-                player = ServiceLocator.For(this).Get<InGamePlayer>();
-            return player;
-        }
-    }
+    private InGamePlayer _player;
+    private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
+    private UserInput input => UserInput.input;
 
     //inspector field
     [SerializeField] private GameObject display;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private Image requireTime;
 
-    private InGameInputAction inGameInput;
-
-    private void Start()
-    {
-        inGameInput = new();
-    }
 
     private void Update()
     {
-        if (ReferenceEquals(Player, null)) return;
+        if (ReferenceEquals(player, null)) return;
 
-        display.SetActive(Player.LookInteractable != null);
+        display.SetActive(player.LookInteractable != null);
 
         requireTime.fillAmount =
-            Player.LookInteractable != null && Player.LookInteractable.GetInteractRequireTime(Player) > 0 ?
-            Player.InteractRequireTimes[(int)Player.LookInteractable.GetTargetInteractID(Player)] / Player.LookInteractable.GetInteractRequireTime(Player) :
+            player.LookInteractable != null && player.LookInteractable.GetInteractRequireTime(player) > 0 ?
+            player.InteractRequireTimes[(int)player.LookInteractable.GetTargetInteractID(player)] / player.LookInteractable.GetInteractRequireTime(player) :
             0;
 
-        if (Player.LookInteractable != null)
+        if (player.LookInteractable != null)
         {
 
-            if (Player.LookInteractable.IsInteractable(Player))
+            if (player.LookInteractable.IsInteractable(player))
             {
-                var targetInteractId = Player.LookInteractable.GetTargetInteractID(Player);
+                var targetInteractId = player.LookInteractable.GetTargetInteractID(player);
                 var keyString = InputControlPath.ToHumanReadableString
                 (
-                    inGameInput.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
+                    input.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
                     InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames
                 );
-                text.text = $"{Player.LookInteractable.GetInteractionExplain(Player)} ({keyString})";
+                text.text = $"{player.LookInteractable.GetInteractionExplain(player)} ({keyString})";
             }
             else //only display explain
-                text.text = Player.LookInteractable.GetInteractionExplain(Player);
+                text.text = player.LookInteractable.GetInteractionExplain(player);
         }
     }
 }

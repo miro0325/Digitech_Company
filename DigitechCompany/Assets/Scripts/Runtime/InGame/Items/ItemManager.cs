@@ -98,7 +98,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         for (int i = 0; i < datas.Length; i++)
         {
             var data = datas[i];
-            var item = NetworkObject.Sync(data.viewId, $"Prefabs/Items/{data.key}") as ItemBase;
+            var item = NetworkObject.Sync( $"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);

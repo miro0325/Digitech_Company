@@ -5,7 +5,7 @@ using Photon.Pun;
 using UniRx;
 using UnityEngine;
 
-public class CaptureTrap : MonoBehaviourPun, IPunObservable
+public class CaptureTrap : NetworkObject, IPunObservable
 {
     private enum State { Open, Capture, Close }
 
@@ -16,6 +16,7 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
     [SerializeField] private GameObject particle;
 
     private float reopenTime;
+    private float capturePlayerDamageTime;
     private State state;
     private ReactiveProperty<int> capturedPlayerViewId = new();
 
@@ -37,6 +38,7 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
             .ObserveEveryValueChanged(t => t.state)
             .Subscribe(state =>
             {
+                Debug.LogError(state);
                 if (state == State.Open)
                 {
                     leftPart.DORotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.OutQuad);
@@ -64,6 +66,7 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
                     if (hit.collider.TryGetComponent<InGamePlayer>(out var comp))
                     {
                         capturedPlayerViewId.Value = comp.photonView.ViewID;
+                        capturePlayerDamageTime = 1;
                         state = State.Capture;
                         Debug.Log("Captured!");
                     }
@@ -76,34 +79,48 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
                 if (reopenTime > 0)
                 {
                     reopenTime -= Time.deltaTime;
-                    Debug.Log(reopenTime);
                 }
-                else state = State.Open;
+                else
+                {
+                    state = State.Open;
+                }
+                break;
+        }
+
+        if(!photonView.IsMine) return;
+
+        switch (state)
+        {
+            case State.Open:
+                break;
+            case State.Capture:
+                if(capturePlayerDamageTime > 0)
+                {
+                    capturePlayerDamageTime -= Time.deltaTime;
+                }
+                else
+                {
+                    CapturedPlayer.Damage(1);
+                    capturePlayerDamageTime = 1;
+                }
+                break;
+            case State.Close:
                 break;
         }
     }
 
     public void TryExit()
     {
-        if (Random.Range(0f, 100f) > 50f)
-        {
-            capturedPlayerViewId.Value = 0;
-            state = State.Close;
-            reopenTime = 7.5f;
-        }
-        // photonView.RPC(nameof(TryExitRpc), RpcTarget.MasterClient);
+        if (Random.Range(0f, 100f) > 50f) photonView.RPC(nameof(ExitRpc), RpcTarget.All);
     }
 
-    // [PunRPC]
-    // private void TryExitRpc()
-    // {
-    //     if (Random.Range(0f, 100f) > 50f)
-    //     {
-    //         capturedPlayerViewId = null;
-    //         state = State.Close;
-    //         reopenTime = 7.5f;
-    //     }
-    // }
+    [PunRPC]
+    private void ExitRpc()
+    {
+        capturedPlayerViewId.Value = 0;
+        state = State.Close;
+        reopenTime = 7.5f;
+    }
 
     private void OnDrawGizmos()
     {

@@ -83,6 +83,9 @@ MonoBehaviour:
   - OnUsePressedRpc
   - OnUseReleasedRpc
   - OnInactiveRpc
+  - DamageRpc
+  - TryExitRpc
+  - ExitRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

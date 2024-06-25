@@ -12,6 +12,7 @@ public class SpectatorView : MonoBehaviour, IService
     private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     private InGamePlayer _player;
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
+    private UserInput input => UserInput.input;
 
     [SerializeField] private Transform camHolder;
     [SerializeField] private float camXRotateClampAbs;
@@ -23,13 +24,11 @@ public class SpectatorView : MonoBehaviour, IService
     private float camXRotate;
     private float camDistance;
     private List<InGamePlayer> aliveInGamePlayers = new();
-    private InGameInputAction inGameInput;
     private Camera cam;
 
     private void Start()
     {
         cam = Camera.main;
-        inGameInput = new();
         gameManager
             .ObserveEveryValueChanged(gm => gm.AlivePlayers.Count)
             .Subscribe(_ =>
@@ -52,7 +51,7 @@ public class SpectatorView : MonoBehaviour, IService
                 //initialize
                 if(isDie)
                 {
-                    inGameInput.Spectator.Enable();
+                    input.Spectator.Enable();
                                             
                     cam.transform.SetParent(camHolder);
                     cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
@@ -67,16 +66,16 @@ public class SpectatorView : MonoBehaviour, IService
         if(aliveInGamePlayers.Count == 0) return;
 
         //set spectator
-        if(inGameInput.Spectator.Change.WasPressedThisFrame())
+        if(input.Spectator.Change.WasPressedThisFrame())
         {
-            targetIndex += (int)inGameInput.Spectator.Change.ReadValue<float>();
+            targetIndex += (int)input.Spectator.Change.ReadValue<float>();
 
             if(targetIndex < 0) targetIndex = aliveInGamePlayers.Count - 1;
             if(targetIndex > aliveInGamePlayers.Count - 1) targetIndex = 0;
         }
 
         //rotation
-        var mouseInput = inGameInput.Spectator.Mouse.ReadValue<Vector2>();
+        var mouseInput = input.Spectator.Mouse.ReadValue<Vector2>();
 
         transform.Rotate(0, mouseInput.x * dataContainer.userData.mouseSensivity.x, 0, Space.Self);
         camXRotate -= mouseInput.y * dataContainer.userData.mouseSensivity.y;

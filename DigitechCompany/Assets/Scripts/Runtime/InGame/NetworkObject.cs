@@ -17,7 +17,7 @@ public class NetworkObject : MonoBehaviourPun
     /// <returns></returns>
     public static NetworkObject Instantiate(string prefab, Vector3 pos = default, Quaternion quat = default)
         => networkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, false);
-    
+
     /// <summary>
     /// Instantiate prefab from resources folder<br/>
     /// Send RPC to everyone <br/>
@@ -45,8 +45,8 @@ public class NetworkObject : MonoBehaviourPun
     /// <param name="viewId">view id to sync</param>
     /// <param name="prefab">resource fild path</param>
     /// <returns></returns>
-    public static NetworkObject Sync(int viewId, string prefab = null)
-        => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab);
+    public static NetworkObject Sync(string prefab, int viewId, Vector3 pos = default, Quaternion quat = default)
+        => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab, pos, quat);
 
     public virtual void OnCreate() { }
 }

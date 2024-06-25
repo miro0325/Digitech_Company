@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 public enum SyncTarget
 {
     Item,
+    TestCapture,
 
     End
 }
@@ -96,6 +97,33 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SyncRpc), player, (int)SyncTarget.Item, itemManager.ItemDataJson);
     }
 
+    [PunRPC]
+    private void SyncRpc(int syncTarget, string data)
+    {
+        switch ((SyncTarget)syncTarget)
+        {
+            case SyncTarget.Item:
+                itemManager.SyncItem(data);
+                break;
+            case SyncTarget.TestCapture:
+                NetworkObject.Sync("Prefabs/Traps/Capture", int.Parse(data), new Vector3(1.137f,0.42f,7.352f));
+                break;
+            default:
+                break;
+        }
+        photonView.RPC(nameof(NotifySyncComplete), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, syncTarget);
+    }
+
+    [PunRPC]
+    /// <summary>
+    /// Must run in Master Client
+    /// </summary>
+    /// <returns></returns>
+    private void NotifySyncComplete(Player player, int syncTarget)
+    {
+        syncDatas[player][syncTarget] = true;
+    }
+
     public void RequestStartGame()
     {
         if (state != GameState.Waiting) return;
@@ -149,9 +177,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
             itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
             syncDatas[PhotonNetwork.LocalPlayer][(int)SyncTarget.Item] = true;
+            var captureViewId = NetworkObject.Instantiate("Prefabs/Traps/Capture", new Vector3(1.137f,0.42f,7.352f)).photonView.ViewID;
+            syncDatas[PhotonNetwork.LocalPlayer][(int)SyncTarget.TestCapture] = true;
 
             //send rpc
             photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
+            photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.TestCapture, captureViewId.ToString());
 
             await UniTask.WaitUntil(() =>
             {
@@ -172,30 +203,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => testBasement.State == TestBasementState.Up);
             itemManager.DestoryItems(true);
         }
-    }
-
-    [PunRPC]
-    private void SyncRpc(int syncTarget, string data)
-    {
-        switch ((SyncTarget)syncTarget)
-        {
-            case SyncTarget.Item:
-                itemManager.SyncItem(data);
-                photonView.RPC(nameof(NotifySyncComplete), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, syncTarget);
-                break;
-            default:
-                break;
-        }
-    }
-
-    [PunRPC]
-    /// <summary>
-    /// Must run in Master Client
-    /// </summary>
-    /// <returns></returns>
-    private void NotifySyncComplete(Player player, int syncTarget)
-    {
-        syncDatas[player][syncTarget] = true;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

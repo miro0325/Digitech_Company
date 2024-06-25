@@ -10,6 +10,8 @@ namespace Basements
 {
     public class Terminal : MonoBehaviour, IInteractable
     {
+        private UserInput input => UserInput.input;
+        
         [Header("Cam Move Setting"),Space(5)]
         
         [SerializeField] private Transform watchCamLocation;
@@ -30,9 +32,9 @@ namespace Basements
         private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
         
         private InGamePlayer curPlayer;
-        private InGameInputAction inGameInput;
 
         private Transform cam;
+
 
         private void Start()
         {
@@ -42,7 +44,6 @@ namespace Basements
         private void Initialize()
         {
             cam = Camera.main.transform;
-            inGameInput = new();
             foreach(var command in commands)
             {
                 command.Init();
@@ -75,7 +76,7 @@ namespace Basements
         private void ConnectTerminal()
         {
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
-            inGameInput.Player.Disable();
+            input.Player.Disable();
 
             curPlayer.ControlTerminal(true);
 
@@ -95,7 +96,7 @@ namespace Basements
             consoleInput.DeactivateInputField();
             cam.transform.DOMove(prevCamPos, moveDelay);
             cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => { isMoving = false; isConnectTerminal = false; inGameInput.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
+                () => { isMoving = false; isConnectTerminal = false; input.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
             );
         }
 

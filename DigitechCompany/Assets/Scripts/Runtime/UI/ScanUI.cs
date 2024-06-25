@@ -9,16 +9,8 @@ public class ScanUI : MonoBehaviour
     private const int UIPoolMaxCount = 20;
 
     //service
-    private InGamePlayer player;
-    private InGamePlayer Player
-    {
-        get
-        {
-            if (ReferenceEquals(player, null))
-                player = ServiceLocator.For(this).Get<InGamePlayer>();
-            return player;
-        }
-    }
+    private InGamePlayer _player;
+    private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
 
     //inspector
     [SerializeField] private ScanInfomationUI scanInfomationUIPrefab;
@@ -29,7 +21,7 @@ public class ScanUI : MonoBehaviour
 
     private void Update()
     {
-        if (ReferenceEquals(Player, null)) return;
+        if (ReferenceEquals(player, null)) return;
         if (isInitialized) return;
 
         isInitialized = true;
@@ -42,7 +34,7 @@ public class ScanUI : MonoBehaviour
             uiPool.Enqueue(inst);
         }
 
-        Player
+        player
             .ObserveEveryValueChanged(p => p.ScanData)
             .Skip(1)
             .Subscribe(scandata =>

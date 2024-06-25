@@ -57,7 +57,7 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
         if (pv && pv.IsMine) PhotonNetwork.Destroy(pv);
     }
 
-    internal NetworkObject SyncNetworkObjectInternal(int viewId, string prefab)
+    internal NetworkObject SyncNetworkObjectInternal(int viewId, string prefab, Vector3 pos, Quaternion quat)
     {
         var pv = PhotonView.Find(viewId);
         if (pv != null) //already object exist
@@ -66,7 +66,7 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
         }
         else //instantiate new one
         {
-            var @object = Instantiate(Resources.Load<NetworkObject>(prefab));
+            var @object = Instantiate(Resources.Load<NetworkObject>(prefab), pos, quat);
             var getPv = @object.GetComponent<PhotonView>();
             getPv.ViewID = viewId;
 
