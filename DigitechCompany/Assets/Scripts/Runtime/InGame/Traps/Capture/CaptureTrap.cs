@@ -13,6 +13,7 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
     [SerializeField] private Transform leftPart;
     [SerializeField] private Transform rightPart;
     [SerializeField] private GameObject triggerParent;
+    [SerializeField] private GameObject particle;
 
     private float reopenTime;
     private State state;
@@ -38,16 +39,17 @@ public class CaptureTrap : MonoBehaviourPun, IPunObservable
             {
                 if (state == State.Open)
                 {
-                    leftPart.DORotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InBack);
-                    rightPart.DORotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InBack);
+                    leftPart.DORotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.OutQuad);
+                    rightPart.DORotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.OutQuad);
                 }
                 else
                 {
-                    leftPart.DORotate(new Vector3(65, 0, 0), 0.25f).SetEase(Ease.InBack);
-                    rightPart.DORotate(new Vector3(-65, 0, 0), 0.25f).SetEase(Ease.InBack);
+                    leftPart.DORotate(new Vector3(65, 0, 0), 0.1f).SetEase(Ease.InBack);
+                    rightPart.DORotate(new Vector3(-65, 0, 0), 0.1f).SetEase(Ease.InBack);
                 }
 
                 triggerParent.SetActive(state == State.Capture);
+                particle.SetActive(state == State.Capture);
             });
     }
 
