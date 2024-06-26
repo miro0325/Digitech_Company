@@ -29,6 +29,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
     private TestBasement _testBasement;
     private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private GameManager _gameManager;
+    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     private UserInput input => UserInput.input;
 
     //inspector field
@@ -84,15 +86,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
 
-    #region Temp 
-    private bool isConnectedTerminal = false;
-
-    public void ControlTerminal(bool value)
-    {
-        isConnectedTerminal = value;
-    }
-    #endregion
-
     public void Damage(float damage)
     {
         photonView.RPC(nameof(DamageRpc), photonView.Owner, damage);
@@ -118,6 +111,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public void Revive()
     {
         SetCamera();
+        input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
         isDie = false;
@@ -138,7 +132,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         curStats.OnStatChanged += (key, prev, cur) =>
         {
-            if(key == Stats.Key.Hp)
+            if (key == Stats.Key.Hp)
                 Debug.LogError(curStats.GetStat(key));
         };
 
@@ -166,15 +160,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         //cache initialize
         scanSphereMaterial = scanSphere.GetComponent<MeshRenderer>().sharedMaterial;
         cam = Camera.main;
-
-        //enable player input
-        this
-            .ObserveEveryValueChanged(t => t.isDie)
-            .Subscribe(isDie =>
-            {
-                if (isDie) input.Player.Disable();
-                else input.Player.Enable();
-            });
 
         //scroll
         this
@@ -210,8 +195,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void Update()
     {
-        /* temp */
-        if (isConnectedTerminal) return;
+        DoLife();
         DoScan();
         DoItem();
         DoInteract();
@@ -222,6 +206,23 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private void FixedUpdate()
     {
         cc.Move(velocity * Time.fixedDeltaTime);
+    }
+
+    private void DoLife()
+    {
+        if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
+        {
+            isDie = true;
+            input.Player.Disable();
+            gameManager.AlivePlayers.Remove(photonView.ViewID);
+            this.Invoke(() => photonView.RPC(nameof(DisableRpc), RpcTarget.All), 1.5f);
+        }
+    }
+
+    [PunRPC]
+    private void DisableRpc()
+    {
+        gameObject.SetActive(false);
     }
 
     private void DoScan()

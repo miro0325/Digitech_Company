@@ -35,43 +35,46 @@ public class SpectatorView : MonoBehaviour, IService
             {
                 aliveInGamePlayers.Clear();
 
-                foreach(var p in gameManager.AlivePlayers)
+                foreach (var p in gameManager.AlivePlayers)
                     aliveInGamePlayers.Add(PhotonView.Find(p).GetComponent<InGamePlayer>());
-                
-                if(targetIndex >= aliveInGamePlayers.Count)
+
+                if (targetIndex >= aliveInGamePlayers.Count)
                     targetIndex = aliveInGamePlayers.Count - 1;
             });
 
         player
-            .ObserveEveryValueChanged(p => p.IsDie)
-            .Subscribe(isDie =>
+            .ObserveEveryValueChanged(p => p.gameObject.activeSelf)
+            .Subscribe(isActive =>
             {
-                targetIndex = isDie ? 0 : -1;
-
                 //initialize
-                if(isDie)
+                if (!isActive)
                 {
+                    targetIndex = 0;
                     input.Spectator.Enable();
-                                            
                     cam.transform.SetParent(camHolder);
                     cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
                     camDistance = camDistanceClamp;
+                }
+                else
+                {
+                    targetIndex = -1;
+                    input.Spectator.Disable();
                 }
             });
     }
 
     private void Update()
     {
-        if(targetIndex == -1) return;
-        if(aliveInGamePlayers.Count == 0) return;
+        if (targetIndex == -1) return;
+        if (aliveInGamePlayers.Count == 0) return;
 
         //set spectator
-        if(input.Spectator.Change.WasPressedThisFrame())
+        if (input.Spectator.Change.WasPressedThisFrame())
         {
             targetIndex += (int)input.Spectator.Change.ReadValue<float>();
 
-            if(targetIndex < 0) targetIndex = aliveInGamePlayers.Count - 1;
-            if(targetIndex > aliveInGamePlayers.Count - 1) targetIndex = 0;
+            if (targetIndex < 0) targetIndex = aliveInGamePlayers.Count - 1;
+            if (targetIndex > aliveInGamePlayers.Count - 1) targetIndex = 0;
         }
 
         //rotation
@@ -85,7 +88,7 @@ public class SpectatorView : MonoBehaviour, IService
         transform.position = aliveInGamePlayers[targetIndex].transform.position + Vector3.up * 1.5f;
 
         //cam collision
-        if(Physics.Linecast(transform.position, cam.transform.position - cam.transform.forward * camCollisionRadius, out var hit, ~ignoreCamCollisionLayer)) camDistance = hit.distance;
+        if (Physics.Linecast(transform.position, cam.transform.position - cam.transform.forward * camCollisionRadius, out var hit, ~ignoreCamCollisionLayer)) camDistance = hit.distance;
         else camDistance = camDistanceClamp;
         camDistance = Mathf.Clamp(camDistance, 0, camDistanceClamp);
         cam.transform.localPosition = Vector3.back * camDistance;

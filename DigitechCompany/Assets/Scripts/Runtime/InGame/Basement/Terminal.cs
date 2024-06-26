@@ -78,8 +78,6 @@ namespace Basements
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
             input.Player.Disable();
 
-            curPlayer.ControlTerminal(true);
-
             prevCamPos = cam.transform.position;
             prevCamRot = cam.transform.eulerAngles;
             isMoving = true;
@@ -96,7 +94,7 @@ namespace Basements
             consoleInput.DeactivateInputField();
             cam.transform.DOMove(prevCamPos, moveDelay);
             cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
-                () => { isMoving = false; isConnectTerminal = false; input.Player.Enable(); curPlayer.ControlTerminal(false); curPlayer = null; }
+                () => { isMoving = false; isConnectTerminal = false; input.Player.Enable(); curPlayer = null; }
             );
         }
 

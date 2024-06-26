@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class ChargeEnergy : MonoBehaviour, IInteractable
 {
+    private UserInput input => UserInput.input;
+
     [SerializeField] private float chargingTime = 1;
     private bool isCharging = false;
     private WaitForSeconds wait;
@@ -58,13 +60,14 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     IEnumerator ChargingItem(InGamePlayer player)
     {
         isCharging = true;
-        player.ControlTerminal(true);
+        
+        input.Player.Disable();
         var originPos = player.ItemHolder.transform.position;
         yield return player.ItemHolder.transform.DOMove(transform.position, 0.5f).WaitForCompletion();
         yield return wait;
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => {
             isCharging = false;
-            player.ControlTerminal(false);
+            input.Player.Enable();
         });
     }
 }

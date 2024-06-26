@@ -227,9 +227,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext((int)state);
+
             stream.SendNext(alivePlayers.Count);
-            foreach (var player in alivePlayers)
+            foreach(var player in alivePlayers)
                 stream.SendNext(player);
+
             stream.SendNext(inGamePlayerViewIds.Count);
             foreach (var viewid in inGamePlayerViewIds)
             {
@@ -240,10 +242,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         else
         {
             state = (GameState)(int)stream.ReceiveNext();
+
             var count = (int)stream.ReceiveNext();
             alivePlayers.Clear();
             for (int i = 0; i < count; i++)
                 alivePlayers.Add((int)stream.ReceiveNext());
+
             count = (int)stream.ReceiveNext();
             inGamePlayerViewIds.Clear();
             for (int i = 0; i < count; i++)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,7 @@ public class ProfileUI : MonoBehaviour
     {
         if (ReferenceEquals(player, null)) return;
 
-        hp.color = new Color(1, 0, 0, 1 - (player.CurStats.GetStat(Stats.Key.Hp) / player.MaxStats.GetStat(Stats.Key.Hp)));
+        hp.color = new Color(1, 0, 0, DOVirtual.EasedValue(0, 0.75f, 1 - (player.CurStats.GetStat(Stats.Key.Hp) / player.MaxStats.GetStat(Stats.Key.Hp)), Ease.InQuad));
         stamina.fillAmount = Mathf.Lerp(0, 0.4f, player.CurStats.GetStat(Stats.Key.Stamina) / player.MaxStats.GetStat(Stats.Key.Stamina));
     }
 }

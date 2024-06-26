@@ -30,7 +30,7 @@ public class CaptureTrap : NetworkObject, IPunObservable
         capturedPlayerViewId
             .Subscribe(id =>
             {
-                if(id == 0) CapturedPlayer = null;
+                if (id == 0) CapturedPlayer = null;
                 else CapturedPlayer = PhotonView.Find(id).GetComponent<InGamePlayer>();
             });
 
@@ -68,12 +68,27 @@ public class CaptureTrap : NetworkObject, IPunObservable
                         capturedPlayerViewId.Value = comp.photonView.ViewID;
                         capturePlayerDamageTime = 1;
                         state = State.Capture;
+
+                        if(photonView.IsMine) CapturedPlayer.Damage(20);
                         Debug.Log("Captured!");
                     }
                 }
                 break;
             case State.Capture:
                 CapturedPlayer.SetPosition(transform.position);
+
+                if (photonView.IsMine)
+                {
+                    if (capturePlayerDamageTime > 0)
+                    {
+                        capturePlayerDamageTime -= Time.deltaTime;
+                    }
+                    else
+                    {
+                        CapturedPlayer.Damage(1);
+                        capturePlayerDamageTime = 1;
+                    }
+                }
                 break;
             case State.Close:
                 if (reopenTime > 0)
@@ -84,27 +99,6 @@ public class CaptureTrap : NetworkObject, IPunObservable
                 {
                     state = State.Open;
                 }
-                break;
-        }
-
-        if(!photonView.IsMine) return;
-
-        switch (state)
-        {
-            case State.Open:
-                break;
-            case State.Capture:
-                if(capturePlayerDamageTime > 0)
-                {
-                    capturePlayerDamageTime -= Time.deltaTime;
-                }
-                else
-                {
-                    CapturedPlayer.Damage(1);
-                    capturePlayerDamageTime = 1;
-                }
-                break;
-            case State.Close:
                 break;
         }
     }
@@ -130,7 +124,7 @@ public class CaptureTrap : NetworkObject, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if(stream.IsWriting)
+        if (stream.IsWriting)
         {
             stream.SendNext((int)state);
             stream.SendNext(capturedPlayerViewId.Value);
