@@ -95,7 +95,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Damage(float damage)
     {
-        photonView.RPC(nameof(DamageRpc), RpcTarget.MasterClient, damage);
+        photonView.RPC(nameof(DamageRpc), photonView.Owner, damage);
     }
 
     [PunRPC]
@@ -135,6 +135,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         //ik setting
         if (!photonView.IsMine) return;
+
+        curStats.OnStatChanged += (key, prev, cur) =>
+        {
+            if(key == Stats.Key.Hp)
+                Debug.LogError(curStats.GetStat(key));
+        };
 
         cc.enabled = true;
 

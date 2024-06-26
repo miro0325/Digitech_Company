@@ -24,6 +24,16 @@ public enum GameState
 
 public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
+    [Serializable]
+    public class TestTrapData
+    {
+        public string prefab;
+        public Vector3 position;
+        public Vector3 rotation;
+
+        [HideInInspector] public int viewid;
+    }
+
     //service
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
@@ -35,14 +45,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //inspector
     [SerializeField] private MeshRenderer[] rooms;
     [SerializeField] private TestBasement testBasement;
+    [SerializeField] private TestTrapData[] trapDatas;
 
     //field
     private bool gameEndSign;
     private bool gameStartSign;
     private Dictionary<Player, bool[]> syncDatas = new();
-    /* sync */ private GameState state;
-    /* sync */ Dictionary<Player, int> inGamePlayerViewIds = new();
-    /* sync */ private HashSet<int> alivePlayers = new();
+    /* sync */
+    private GameState state;
+    /* sync */
+    Dictionary<Player, int> inGamePlayerViewIds = new();
+    /* sync */
+    private HashSet<int> alivePlayers = new();
 
     //property
     public GameState State => state;
@@ -51,7 +65,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);
-        
+
         var viewId = NetworkObject.InstantiateBuffered("Prefabs/Player", testBasement.transform.position + Vector3.up * 2, Quaternion.identity).photonView.ViewID;
         photonView.RPC(nameof(NotifyPlayerJoinRpc), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, viewId);
     }
@@ -71,7 +85,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     [PunRPC]
     private void GameInstantiateRpc(int gameState)
     {
-        if(photonView.IsMine) GameRoutine().Forget();
+        if (photonView.IsMine) GameRoutine().Forget();
 
         state = (GameState)gameState;
 
@@ -106,7 +120,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 itemManager.SyncItem(data);
                 break;
             case SyncTarget.TestCapture:
-                NetworkObject.Sync("Prefabs/Traps/Capture", int.Parse(data), new Vector3(1.137f,0.42f,7.352f));
+                trapDatas = JsonSerializer.JsonToArray<TestTrapData>(data);
+                for (int i = 0; i < trapDatas.Length; i++)
+                    NetworkObject.Sync(trapDatas[i].prefab, trapDatas[i].viewid, trapDatas[i].position, Quaternion.Euler(trapDatas[i].rotation));
                 break;
             default:
                 break;
@@ -172,17 +188,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
             gameStartSign = false;
             await UniTask.WaitUntil(() => gameStartSign);
-            
+
             alivePlayers = inGamePlayerViewIds.Values.ToHashSet();
 
             itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
             syncDatas[PhotonNetwork.LocalPlayer][(int)SyncTarget.Item] = true;
-            var captureViewId = NetworkObject.Instantiate("Prefabs/Traps/Capture", new Vector3(1.137f,0.42f,7.352f)).photonView.ViewID;
+            for (int i = 0; i < trapDatas.Length; i++)
+                trapDatas[i].viewid = NetworkObject.Instantiate(trapDatas[i].prefab, trapDatas[i].position, Quaternion.Euler(trapDatas[i].rotation)).photonView.ViewID;
             syncDatas[PhotonNetwork.LocalPlayer][(int)SyncTarget.TestCapture] = true;
 
             //send rpc
             photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
-            photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.TestCapture, captureViewId.ToString());
+            photonView.RPC(nameof(SyncRpc), RpcTarget.Others, (int)SyncTarget.TestCapture, trapDatas.ToJson());
 
             await UniTask.WaitUntil(() =>
             {
@@ -198,7 +215,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             //game end
             gameEndSign = false;
             await UniTask.WaitUntil(() => gameEndSign || alivePlayers.Count == 0);
-            
+
             testBasement.MoveUp();
             await UniTask.WaitUntil(() => testBasement.State == TestBasementState.Up);
             itemManager.DestoryItems(true);
@@ -211,10 +228,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             stream.SendNext((int)state);
             stream.SendNext(alivePlayers.Count);
-            foreach(var player in alivePlayers)
+            foreach (var player in alivePlayers)
                 stream.SendNext(player);
             stream.SendNext(inGamePlayerViewIds.Count);
-            foreach(var viewid in inGamePlayerViewIds)
+            foreach (var viewid in inGamePlayerViewIds)
             {
                 stream.SendNext(viewid.Key);
                 stream.SendNext(viewid.Value);
@@ -225,11 +242,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             state = (GameState)(int)stream.ReceiveNext();
             var count = (int)stream.ReceiveNext();
             alivePlayers.Clear();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 alivePlayers.Add((int)stream.ReceiveNext());
             count = (int)stream.ReceiveNext();
             inGamePlayerViewIds.Clear();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 inGamePlayerViewIds.Add((Player)stream.ReceiveNext(), (int)stream.ReceiveNext());
         }
     }

@@ -42,4 +42,9 @@ public static class JsonSerializer
     {
         return ArrayToJson(array);
     }
+
+    public static TClass ToClass<TClass>(this string json) where TClass : class
+    {
+        return JsonToClass<TClass>(json);
+    }
 }

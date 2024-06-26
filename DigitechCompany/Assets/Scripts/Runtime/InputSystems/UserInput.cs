@@ -15,14 +15,10 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-public partial class UserInput: IInputActionCollection2, IDisposable
+public partial class @UserInput: IInputActionCollection2, IDisposable
 {
     public InputActionAsset asset { get; }
-
-    /// <summary>
-    /// Do not use constructor. Use UserInput.input instead.
-    /// </summary>
-    public UserInput()
+    public @UserInput()
     {
         asset = InputActionAsset.FromJson(@"{
     ""name"": ""UserInput"",
@@ -565,8 +561,8 @@ public partial class UserInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_NumKeys;
     public struct PlayerActions
     {
-        private UserInput m_Wrapper;
-        public PlayerActions(UserInput wrapper) { m_Wrapper = wrapper; }
+        private @UserInput m_Wrapper;
+        public PlayerActions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Mouse => m_Wrapper.m_Player_Mouse;
         public InputAction @MouseWheel => m_Wrapper.m_Player_MouseWheel;
@@ -675,8 +671,8 @@ public partial class UserInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Spectator_Change;
     public struct SpectatorActions
     {
-        private UserInput m_Wrapper;
-        public SpectatorActions(UserInput wrapper) { m_Wrapper = wrapper; }
+        private @UserInput m_Wrapper;
+        public SpectatorActions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Mouse => m_Wrapper.m_Spectator_Mouse;
         public InputAction @Change => m_Wrapper.m_Spectator_Change;
         public InputActionMap Get() { return m_Wrapper.m_Spectator; }
@@ -727,8 +723,8 @@ public partial class UserInput: IInputActionCollection2, IDisposable
     private List<IUIOpenActions> m_UIOpenActionsCallbackInterfaces = new List<IUIOpenActions>();
     public struct UIOpenActions
     {
-        private UserInput m_Wrapper;
-        public UIOpenActions(UserInput wrapper) { m_Wrapper = wrapper; }
+        private @UserInput m_Wrapper;
+        public UIOpenActions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputActionMap Get() { return m_Wrapper.m_UIOpen; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
