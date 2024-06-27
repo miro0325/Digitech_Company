@@ -18,6 +18,7 @@ public class Laptop : ItemBase, IPunObservable
     public override void OnCreate()
     {
         base.OnCreate();
+        
         animator = GetComponent<Animator>();
     }
 

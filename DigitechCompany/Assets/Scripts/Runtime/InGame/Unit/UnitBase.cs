@@ -21,6 +21,8 @@ public abstract class UnitBase : NetworkObject
 
     public override void OnCreate()
     {
+        base.OnCreate();
+
         if(!photonView.IsMine) return;
         
         modifier.OnValueChange += key => modifier.Calculate(key, maxStats, BaseStats);

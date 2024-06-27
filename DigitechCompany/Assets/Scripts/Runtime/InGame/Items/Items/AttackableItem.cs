@@ -18,6 +18,7 @@ public class AttackableItem : ItemBase, IInteractable
     public override void OnCreate()
     {
         base.OnCreate();
+        
         animator = GetComponent<Animator>();
         isUsePressed
             .Subscribe(b =>

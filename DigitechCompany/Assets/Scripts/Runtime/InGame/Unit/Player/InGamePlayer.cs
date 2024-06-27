@@ -119,8 +119,9 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public override void OnCreate()
     {
-        gameObject.SetActive(false);
         base.OnCreate();
+        
+        gameObject.SetActive(false);
 
         //cache and initialize member
         cc = GetComponent<CharacterController>();

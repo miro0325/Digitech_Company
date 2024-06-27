@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
+using UniRx;
 using UnityEngine;
 
 public class NetworkObject : MonoBehaviourPun
@@ -48,5 +52,49 @@ public class NetworkObject : MonoBehaviourPun
     public static NetworkObject Sync(string prefab, int viewId, Vector3 pos = default, Quaternion quat = default)
         => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab, pos, quat);
 
-    public virtual void OnCreate() { }
+    private List<Func<object>> send = new();
+    private List<Action<object>> receive = new();
+
+    /// <summary>
+    /// Make sure to use base.OnCreate() once
+    /// </summary>
+    public virtual void OnCreate()
+    {
+        if (photonView.IsMine)
+        {
+            OnSendData(send);
+
+            for (int i = 0; i < send.Count; i++)
+            {
+                int idx = i;
+                send[i]
+                    .ObserveEveryValueChanged(x => x())
+                    .Skip(1)
+                    .Subscribe(x => photonView.RPC(nameof(SynchronizeRpc), RpcTarget.Others, idx, ByteConverter.ToByte(x)));
+            }
+        }
+        else
+        {
+            OnReceiveData(receive);
+
+            for (int i = 0; i < send.Count; i++)
+                photonView.RPC(nameof(SynchronizeRpc), photonView.Owner, PhotonNetwork.LocalPlayer);
+        }
+    }
+
+    [PunRPC]
+    protected void RequestSynchronizeRpc(Player player)
+    {
+        for (int i = 0; i < send.Count; i++)
+            photonView.RPC(nameof(SynchronizeRpc), player, i, ByteConverter.ToByte(send[i]()));
+    }
+
+    [PunRPC]
+    protected void SynchronizeRpc(int setterIdx, byte[] data)
+    {
+        receive[setterIdx]?.Invoke(ByteConverter.ToObject(data));
+    }
+
+    protected virtual void OnSendData(List<Func<object>> send) { }
+    protected virtual void OnReceiveData(List<Action<object>> receive) { }
 }
