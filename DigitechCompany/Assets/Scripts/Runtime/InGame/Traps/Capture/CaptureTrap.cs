@@ -5,7 +5,7 @@ using Photon.Pun;
 using UniRx;
 using UnityEngine;
 
-public class CaptureTrap : NetworkObject, IPunObservable
+public class CaptureTrap : NetworkObject
 {
     private enum State { Open, Capture, Close }
 
@@ -121,6 +121,20 @@ public class CaptureTrap : NetworkObject, IPunObservable
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, captureRadius);
     }
+
+    // protected override void OnSendData(List<System.Func<object>> send)
+    // {
+    //     base.OnSendData(send);
+    //     send.Add(() => (int)state);
+    //     send.Add(() => capturedPlayerViewId.Value);
+    // }
+
+    // protected override void OnReceiveData(List<System.Action<object>> receive)
+    // {
+    //     base.OnReceiveData(receive);
+    //     receive.Add(obj => state = (State)(int)obj);
+    //     receive.Add(obj => capturedPlayerViewId.Value = (int)obj);
+    // }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

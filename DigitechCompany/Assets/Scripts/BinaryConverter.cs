@@ -20,6 +20,10 @@ public static class ByteConverter
         {
             Debug.LogError(exception.ToString());
         }
+
+        using(var stream = new MemoryStream(buffer))
+        {
+        }
         return null;
     }
 

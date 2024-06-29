@@ -12,6 +12,7 @@ public class ClaymoreTrap : NetworkObject
     [SerializeField] private float explosionDamage;
     [SerializeField] private GameObject effect;
 
+    private bool isExplosion;
     private LineRenderer lr;
 
     private void Start()
@@ -34,28 +35,7 @@ public class ClaymoreTrap : NetworkObject
                 lr.SetPosition(1, ray.transform.position + ray.forward * hit.distance);
                 if (hit.collider.TryGetComponent<InGamePlayer>(out _))
                 {
-                    yield return new WaitForSeconds(0.5f);
-
-                    if (photonView.IsMine)
-                    {
-                        var explosionHits = 
-                            Physics.SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
-                            .Where(col => col.collider is not CharacterController);
-                            
-                        foreach (var explosion in explosionHits)
-                        {
-                            var distanceRatio = explosion.distance / explosionRange;
-                            var damageFactor = distanceRatio < 0.5f ? 1 : distanceRatio * 2;
-                            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor);
-                        }
-                    }
-                    GetComponent<MeshRenderer>().enabled = false;
-                    lr.enabled = false;
-                    effect.SetActive(true);
-                    Debug.Log("Explosion");
-
-                    yield return new WaitForSeconds(3f);
-                    Destroy(gameObject);
+                    photonView.RPC(nameof(SendExplosionToAllRpc), RpcTarget.All);
                     yield break;
                 }
             }
@@ -66,6 +46,39 @@ public class ClaymoreTrap : NetworkObject
 
             yield return wait;
         }
+    }
+
+    private IEnumerator ExplosionRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        var explosionHits =
+                Physics.SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
+                .Where(col => col.collider is CharacterController);
+
+        foreach (var explosion in explosionHits)
+        {
+            var distanceRatio = explosion.distance / explosionRange;
+            var damageFactor = distanceRatio < 0.5f ? 1 : distanceRatio * 2;
+            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor);
+        }
+        GetComponent<MeshRenderer>().enabled = false;
+        lr.enabled = false;
+        effect.SetActive(true);
+        Debug.Log("Explosion");
+
+        yield return new WaitForSeconds(3f);
+        Destroy(gameObject);
+        yield break;
+    }
+
+    [PunRPC]
+    private void SendExplosionToAllRpc()
+    {
+        if (isExplosion) return;
+
+        isExplosion = true;
+        StartCoroutine(ExplosionRoutine());
     }
 
     private void OnDrawGizmos()

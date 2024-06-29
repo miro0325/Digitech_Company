@@ -425,7 +425,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 33047570}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1977,6 +1977,12 @@ MonoBehaviour:
     position: {x: -7.97, y: 0.407, z: -1.58}
     rotation: {x: -90, y: 0, z: 90}
     viewid: 0
+  - prefab: Prefabs/Traps/Claymore
+    position: {x: -9.18, y: 0.407, z: 2.64}
+    rotation: {x: 270, y: 269.99994, z: 0}
+    viewid: 0
+  playerDatas:
+    values: []
 --- !u!114 &293386056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7299,15 +7305,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1196537129}
-  m_LocalRotation: {x: -0, y: 0.70710677, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -7.97, y: 0.407, z: -1.58}
+  m_LocalRotation: {x: -0.49999976, y: -0.5000003, z: -0.50000024, w: 0.49999973}
+  m_LocalPosition: {x: -9.18, y: 0.407, z: 2.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 33047571}
   m_Father: {fileID: 0}
   m_RootOrder: 20
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
 --- !u!64 &1198108396
 MeshCollider:
   m_ObjectHideFlags: 0

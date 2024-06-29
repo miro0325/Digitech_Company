@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Photon.Pun;
+using System;
 
-public class Laptop : ItemBase, IPunObservable
+public class Laptop : ItemBase
 {
     private readonly int closeAnim = Animator.StringToHash("LaptopClose");
     private readonly int openAnim = Animator.StringToHash("LaptopOpen");
@@ -58,14 +59,19 @@ public class Laptop : ItemBase, IPunObservable
     public void EndAnimation()
     {
         isPlaying = false;
-        //photonView.RPC(nameof(EndAnimationRPC), RpcTarget.Others);
     }
 
-    //[PunRPC]
-    //private void EndAnimationRPC()
-    //{
-    //    isPlaying = false;
-    //}
+    // protected override void OnSendData(List<Func<object>> send)
+    // {
+    //     base.OnSendData(send);
+    //     send.Add(() => isPlaying);
+    // }
+
+    // protected override void OnReceiveData(List<Action<object>> receive)
+    // {
+    //     base.OnReceiveData(receive);
+    //     receive.Add(obj => isPlaying = (bool)obj);
+    // }
 
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

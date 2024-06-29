@@ -88,11 +88,11 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Damage(float damage)
     {
-        photonView.RPC(nameof(DamageRpc), photonView.Owner, damage);
+        photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }
 
     [PunRPC]
-    private void DamageRpc(float damage)
+    private void SendDamageToOwnerRpc(float damage)
     {
         curStats.SetStat(Stats.Key.Hp, x => x - damage);
     }
@@ -110,10 +110,11 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        SetCamera();
         input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
+        gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
+        SetCamera();
         isDie = false;
     }
 
@@ -211,11 +212,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoLife()
     {
+        if(!photonView.IsMine) return;
+
         if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
         {
+            Debug.LogError("Die");
             isDie = true;
             input.Player.Disable();
-            gameManager.AlivePlayers.Remove(photonView.ViewID);
+            gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false);
             this.Invoke(() => photonView.RPC(nameof(DisableRpc), RpcTarget.All), 1.5f);
         }
     }

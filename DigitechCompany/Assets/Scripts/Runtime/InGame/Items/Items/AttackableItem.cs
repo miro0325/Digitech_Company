@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 using UniRx;
+using System.Collections.Generic;
+using System;
 
 public class AttackableItem : ItemBase, IInteractable
 {
@@ -71,6 +73,18 @@ public class AttackableItem : ItemBase, IInteractable
         animator.enabled = false;
         isUsePressed.Value = false;
     }
+
+    // protected override void OnSendData(List<Func<object>> send)
+    // {
+    //     base.OnSendData(send);
+    //     send.Add(() => isUsePressed.Value);
+    // }
+
+    // protected override void OnReceiveData(List<Action<object>> receive)
+    // {
+    //     base.OnReceiveData(receive);
+    //     receive.Add(obj => isUsePressed.Value = (bool)obj);
+    // }
 
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

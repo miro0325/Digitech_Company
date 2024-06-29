@@ -250,25 +250,24 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(0, layRotation, 0), Time.deltaTime * 1080);
     }
 
-    protected override void OnSendData(List<System.Func<object>> send)
-    {
-        send.Add(() => key);
-        send.Add(() => layRotation);
-        send.Add(() => ownUnitViewId.Value);
-        send.Add(() => sellPrice);
-    }
+    // protected override void OnSendData(List<System.Func<object>> send)
+    // {
+    //     send.Add(() => key);
+    //     send.Add(() => layRotation);
+    //     send.Add(() => ownUnitViewId.Value);
+    //     send.Add(() => sellPrice);
+    // }
 
-    protected override void OnReceiveData(List<System.Action<object>> receive)
-    {
-        receive.Add(obj => key = (string)obj);
-        receive.Add(obj => layRotation = (float)obj);
-        receive.Add(obj => ownUnitViewId.Value = (int)obj);
-        receive.Add(obj => sellPrice = (float)obj);
-    }
+    // protected override void OnReceiveData(List<System.Action<object>> receive)
+    // {
+    //     receive.Add(obj => key = (string)obj);
+    //     receive.Add(obj => layRotation = (float)obj);
+    //     receive.Add(obj => ownUnitViewId.Value = (int)obj);
+    //     receive.Add(obj => sellPrice = (float)obj);
+    // }
 
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        return;
         if (stream.IsWriting)
         {
             stream.SendNext(key);

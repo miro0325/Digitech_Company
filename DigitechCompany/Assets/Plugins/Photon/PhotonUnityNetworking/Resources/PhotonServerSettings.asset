@@ -89,6 +89,22 @@ MonoBehaviour:
   - DisableRpc
   - RequestSynchronizeRpc
   - SynchronizeRpc
+  - SendApplyGameDataToClientRpc
+  - SendEndGameRpc
+  - SendGameStateToClientRpc
+  - SendPlayerDieSignToAllRpc
+  - SendPlayerJoinToMasterRpc
+  - SendRequestGameDataToMasterRpc
+  - SendStartGameRpc
+  - SendSyncCompleteToMasterRpc
+  - SendGameDataApplyToClientRpc
+  - SendGameDataRequestToMasterRpc
+  - SendPlayerDieToAllRpc
+  - SendPlayerStateToAllRpc
+  - SendDamageToOwnerRpc
+  - SendExplosionToAllRpc
+  - SendGameDataSyncToClientRpc
+  - SendPlayerJoinToAllRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

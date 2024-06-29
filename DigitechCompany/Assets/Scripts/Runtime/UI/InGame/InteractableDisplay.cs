@@ -34,11 +34,7 @@ public class InteractableDisplay : MonoBehaviour
             if (player.LookInteractable.IsInteractable(player))
             {
                 var targetInteractId = player.LookInteractable.GetTargetInteractID(player);
-                var keyString = InputControlPath.ToHumanReadableString
-                (
-                    input.Player.Interact.bindings[(int)targetInteractId - 1].effectivePath, 
-                    InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames
-                );
+                var keyString = InputString.GetString(input.Player.Interact, (int)targetInteractId - 1);
                 text.text = $"{player.LookInteractable.GetInteractionExplain(player)} ({keyString})";
             }
             else //only display explain
