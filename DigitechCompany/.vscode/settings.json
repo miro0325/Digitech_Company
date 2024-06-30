@@ -57,5 +57,6 @@
         "Temp/": true
     },
     "dotnet.defaultSolution": "DigitechCompany.sln",
-    "files.encoding": "euckr"
+    "files.encoding": "euckr",
+    "git.ignoreLimitWarning": true
 }

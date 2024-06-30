@@ -27,8 +27,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
-    private TestBasement _testBasement;
-    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private Basement _basement;
+    private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
     private GameManager _gameManager;
     private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     private UserInput input => UserInput.input;
@@ -97,11 +97,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         curStats.SetStat(Stats.Key.Hp, x => x - damage);
     }
 
-    public void SetPosition(Vector3 pos)
-    {
-        transform.position = pos;
-    }
-
     public void SetCamera()
     {
         cam.transform.SetParent(camHolder);
@@ -121,7 +116,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public override void OnCreate()
     {
         base.OnCreate();
-        
+
         gameObject.SetActive(false);
 
         //cache and initialize member
@@ -186,13 +181,13 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             .ObserveEveryValueChanged(t => t.isInBasement)
             .Subscribe(x =>
             {
-                if (isInBasement) transform.SetParent(testBasement.transform);
+                if (isInBasement) transform.SetParent(basement.transform);
                 else transform.SetParent(null);
             });
 
         transform
             .ObserveEveryValueChanged(t => transform.parent)
-            .Subscribe(parent => isInBasement = ReferenceEquals(parent, testBasement.transform));
+            .Subscribe(parent => isInBasement = ReferenceEquals(parent, basement.transform));
     }
 
     private void Update()
@@ -212,15 +207,19 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoLife()
     {
-        if(!photonView.IsMine) return;
+        if (!photonView.IsMine) return;
 
         if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
         {
             Debug.LogError("Die");
             isDie = true;
             input.Player.Disable();
-            gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false);
-            this.Invoke(() => photonView.RPC(nameof(DisableRpc), RpcTarget.All), 1.5f);
+            this.Invoke(() =>
+            {
+                photonView.RPC(nameof(DisableRpc), RpcTarget.All);
+                gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false);
+            }
+            , 1.5f);
         }
     }
 

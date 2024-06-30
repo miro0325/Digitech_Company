@@ -105,6 +105,8 @@ MonoBehaviour:
   - SendExplosionToAllRpc
   - SendGameDataSyncToClientRpc
   - SendPlayerJoinToAllRpc
+  - SendGameDataLoadToClientRpc
+  - SendLoadCompleteToMasterRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

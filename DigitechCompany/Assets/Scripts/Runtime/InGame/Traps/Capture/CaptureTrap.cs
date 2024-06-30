@@ -75,7 +75,7 @@ public class CaptureTrap : NetworkObject
                 }
                 break;
             case State.Capture:
-                CapturedPlayer.SetPosition(transform.position);
+                CapturedPlayer.transform.position = transform.position;
 
                 if (photonView.IsMine)
                 {
