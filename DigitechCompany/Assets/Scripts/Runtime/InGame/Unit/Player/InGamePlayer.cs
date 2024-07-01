@@ -9,6 +9,7 @@ using System;
 using UnityEngine.InputSystem;
 using UniRx.Triggers;
 using UnityEngine.InputSystem.Composites;
+using Cysharp.Threading.Tasks;
 
 public enum InteractID
 {
@@ -105,6 +106,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
+        photonView.RPC(nameof(ReviveRpc), photonView.Owner);   
+    }
+
+    [PunRPC]
+    private void ReviveRpc()
+    {
         input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
@@ -170,8 +177,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
                 inventory.Index += x > 0 ? -1 : 1;
             });
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         ServiceLocator.For(this).Register(this);
     }
 
@@ -242,40 +247,39 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             if (input.Player.Scan.WasPressedThisFrame())
             {
                 scanWaitTime = 1.33f;
-                StartCoroutine(ScanRoutine());
+                ScanRoutine().Forget();
             }
         }
+    }
 
-        IEnumerator ScanRoutine()
+    private async UniTask ScanRoutine()
+    {
+        //calculate
+        scanData = new ScanData { gameTime = Time.time, items = new() };
+        foreach (var kvp in itemManager.Items)
         {
-            //calculate
-            scanData = new ScanData { gameTime = Time.time, items = new() };
-            foreach (var kvp in itemManager.Items)
+            if (kvp.Value.InHand) continue;
+
+            if (IsInView(kvp.Value.MeshRenderer))
             {
-                if (kvp.Value.InHand) continue;
-
-                if (IsInView(kvp.Value.MeshRenderer))
-                {
-                    scanData.price += kvp.Value.SellPrice;
-                    scanData.items.Add(kvp.Value);
-                }
+                scanData.price += kvp.Value.SellPrice;
+                scanData.items.Add(kvp.Value);
             }
-
-            //animation
-            scanSphere.gameObject.SetActive(true);
-            scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
-            yield return new WaitForSeconds(0.5f);
-
-            var startColor = scanSphereMaterial.color;
-            var targetColor = startColor;
-            targetColor.a = 0;
-            scanSphereMaterial.DOColor(targetColor, 0.5f);
-            yield return new WaitForSeconds(0.5f);
-
-            scanSphere.gameObject.SetActive(false);
-            scanSphereMaterial.color = startColor;
-            scanSphere.localScale = Vector3.one * 0.1f;
         }
+
+        //animation
+        scanSphere.gameObject.SetActive(true);
+        scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
+        await UniTask.WaitForSeconds(0.5f);
+
+        var startColor = scanSphereMaterial.color;
+        var targetColor = new Color(startColor.r, startColor.g, startColor.b, 0);
+        scanSphereMaterial.DOColor(targetColor, 0.5f);
+        await UniTask.WaitForSeconds(0.5f);
+
+        scanSphere.gameObject.SetActive(false);
+        scanSphereMaterial.color = startColor;
+        scanSphere.localScale = Vector3.one * 0.1f;
     }
 
     private bool IsInView(Renderer toCheck)

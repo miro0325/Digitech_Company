@@ -113,7 +113,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     public void DestoryItems(bool withoutBasement)
     {
         Dictionary<int ,ItemBase> excepts = new();
-        if(withoutBasement) excepts = basement.Items;
+        if(withoutBasement) excepts = basement.WholeItems;
         
         foreach(var kvp in items.ToArray())
         {

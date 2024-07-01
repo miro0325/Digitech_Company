@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void Start()
     {
-        player.transform.SetPositionAndRotation(basement.transform.position + Vector3.up * 2, Quaternion.identity);
+        player.transform.SetPositionAndRotation(basement.transform.position + Vector3.up, Quaternion.identity);
         photonView.RPC(nameof(SendPlayerJoinToAllRpc), RpcTarget.All, PhotonNetwork.LocalPlayer, inGamePlayerViewId);
     }
 
@@ -242,6 +242,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         while (true)
         {
             state = GameState.StartWait;
+            foreach(var data in playerDatas)
+            {
+                var player = PhotonView.Find(data.Value.inGamePlayerViewId).GetComponent<InGamePlayer>();
+                if(!data.Value.isAlive)
+                {
+                    player.transform.SetPositionAndRotation(basement.transform.position + Vector3.up, Quaternion.Euler(0, 0, 0));
+                    player.Revive();
+                }
+            }
 
             gameStartSign = false;
             await UniTask.WaitUntil(() => gameStartSign);
@@ -272,7 +281,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             state = GameState.DisplayResult;
             itemManager.DestoryItems(true);
 
-            await UniTask.WaitForSeconds(5f);
+            await UniTask.WaitForSeconds(3f);
         }
     }
 

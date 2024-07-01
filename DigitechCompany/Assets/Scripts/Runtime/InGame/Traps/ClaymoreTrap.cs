@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 
@@ -19,13 +20,13 @@ public class ClaymoreTrap : NetworkObject
     {
         lr = GetComponent<LineRenderer>();
 
-        StartCoroutine(TrapRoutine());
+        TrapRoutine().Forget();
     }
 
-    private IEnumerator TrapRoutine()
+    private async UniTask TrapRoutine()
     {
-        var wait = new WaitForSeconds(0.2f);
-        while (true)
+        var repeat = true;
+        while (repeat)
         {
             lr.SetPosition(0, ray.position);
             Debug.DrawRay(ray.position, ray.forward, Color.cyan);
@@ -36,7 +37,7 @@ public class ClaymoreTrap : NetworkObject
                 if (hit.collider.TryGetComponent<InGamePlayer>(out _))
                 {
                     photonView.RPC(nameof(SendExplosionToAllRpc), RpcTarget.All);
-                    yield break;
+                    repeat = false;
                 }
             }
             else
@@ -44,13 +45,13 @@ public class ClaymoreTrap : NetworkObject
                 lr.SetPosition(1, ray.transform.position + ray.forward * detectDistance);
             }
 
-            yield return wait;
+            await UniTask.WaitForSeconds(0.2f);
         }
     }
 
-    private IEnumerator ExplosionRoutine()
+    private async UniTask ExplosionRoutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        await UniTask.WaitForSeconds(0.5f);
 
         var explosionHits =
                 Physics.SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
@@ -67,9 +68,8 @@ public class ClaymoreTrap : NetworkObject
         effect.SetActive(true);
         Debug.Log("Explosion");
 
-        yield return new WaitForSeconds(3f);
+        await UniTask.WaitForSeconds(3f);
         Destroy(gameObject);
-        yield break;
     }
 
     [PunRPC]
@@ -78,7 +78,7 @@ public class ClaymoreTrap : NetworkObject
         if (isExplosion) return;
 
         isExplosion = true;
-        StartCoroutine(ExplosionRoutine());
+        ExplosionRoutine().Forget();
     }
 
     private void OnDrawGizmos()

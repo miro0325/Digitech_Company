@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Photon.Pun;
 using UniRx;
+using Cysharp.Threading.Tasks;
 
 
 public class Basement : MonoBehaviourPun, IService, IPunObservable
@@ -47,11 +48,13 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
     private Animator animator;
     private Vector3 position;
     private State state;
-    private Dictionary<int, ItemBase> items = new();
+    private Dictionary<int, ItemBase> wholeItems = new();
+    private Dictionary<int, ItemBase> curGameItems = new();
     private Camera cam;
 
     public State CurState => state;
-    public Dictionary<int, ItemBase> Items => items;
+    public Dictionary<int, ItemBase> WholeItems => wholeItems;
+    public Dictionary<int, ItemBase> CurGameItems => curGameItems;
     
     private void Awake()
     {
@@ -72,6 +75,11 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
                 Camera.main.transform.SetParent(camParent);
                 Camera.main.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
             });
+            
+        gameManager
+            .ObserveEveryValueChanged(g => g.State)
+            .Where(state => state == GameState.StartWait)
+            .Subscribe(_ => curGameItems.Clear());
     }
 
     public void MoveUp()
@@ -91,16 +99,16 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
         if (eState == State.Landing) return;
         if (eState == State.TakingOff) return;
 
-        StartCoroutine(MoveRoutine(eState));
+        MoveRoutine(eState).Forget();
     }
 
-    private IEnumerator MoveRoutine(State state)
+    private async UniTask MoveRoutine(State state)
     {
         this.state = state == State.Up ? State.TakingOff : State.Landing;
 
-        yield return new WaitForSeconds(2f);
+        await UniTask.WaitForSeconds(2f);
         animator.Play(state == State.Up ? Animator_UpHash : Animator_DownHash);
-        yield return new WaitForSeconds(10f);
+        await UniTask.WaitForSeconds(10f);
         this.state = state;
     }
 
@@ -111,7 +119,10 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
             other.transform.SetParent(transform);
 
             if (other.TryGetComponent<ItemBase>(out var comp))
-                items.Add(comp.photonView.ViewID, comp);
+            {
+                wholeItems.TryAdd(comp.photonView.ViewID, comp);
+                curGameItems.TryAdd(comp.photonView.ViewID, comp);
+            }
         }
     }
 
