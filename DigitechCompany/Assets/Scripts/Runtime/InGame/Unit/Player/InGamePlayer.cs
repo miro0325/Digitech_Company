@@ -86,6 +86,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public Transform ItemHolderCamera => itemHolderCamera;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
+    public Transform Head => animator.GetHeadTransform();
 
     public void Damage(float damage)
     {
@@ -98,6 +99,18 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         curStats.SetStat(Stats.Key.Hp, x => x - damage);
     }
 
+    public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+    {
+        photonView.RPC(nameof(SetPositionAndRotationRpc), RpcTarget.All, position, rotation);
+    }
+
+    [PunRPC]
+    private void SetPositionAndRotationRpc(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+        Debug.LogError(transform.position);
+    }
+
     public void SetCamera()
     {
         cam.transform.SetParent(camHolder);
@@ -106,12 +119,15 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(ReviveRpc), photonView.Owner);   
+        photonView.RPC(nameof(SendReviveToOwnerRpc), photonView.Owner);
     }
 
     [PunRPC]
-    private void ReviveRpc()
+    private void SendReviveToOwnerRpc()
     {
+        animator.SetActiveArmModel(true);
+        animator.SetActivePlayerModel(false);
+
         input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
@@ -219,23 +235,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             Debug.LogError("Die");
             isDie = true;
             input.Player.Disable();
-            this.Invoke(() =>
-            {
-                photonView.RPC(nameof(DisableRpc), RpcTarget.All);
-                gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false);
-            }
-            , 1.5f);
+            animator.SetActivePlayerModel(true);
+            animator.SetActiveArmModel(false);
+            this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1f);
         }
     }
-
-    [PunRPC]
-    private void DisableRpc()
-    {
-        gameObject.SetActive(false);
-    }
-
     private void DoScan()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         if (scanWaitTime > 0)
@@ -307,6 +314,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoItem()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         var item = inventory.GetCurrentSlotItem();
@@ -346,6 +354,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoInteract()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactionDistance, ~LayerMask.GetMask("Ignore Raycast", "Player")))
             hit.collider.TryGetComponent(out lookInteractable);
@@ -405,6 +414,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
 
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         //crouch

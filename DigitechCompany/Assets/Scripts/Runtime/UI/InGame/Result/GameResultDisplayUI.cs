@@ -46,7 +46,7 @@ public class GameResultDisplayUI : MonoBehaviour
         foreach(var player in gameManager.PlayerDatas)
         {
             var slot = Instantiate(playerResultSlotUIPrefab, playerResultListParent);
-            slot.Initialize(player.Value, gameManager.PlayerDatas.Values.ToArray());
+            slot.Initialize(player.Value);
             playerSlotList.Add(slot);
 
             await UniTask.WaitForSeconds(0.1f);

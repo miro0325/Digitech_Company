@@ -22,15 +22,17 @@ public class SpectatorView : MonoBehaviour, IService
     [SerializeField] private LayerMask ignoreCamCollisionLayer;
 
     private int targetIndex;
+    private float remainTime;
     private float camXRotate;
     private float camDistance;
-    [SerializeField] private List<InGamePlayer> alivePlayers = new();
+    private float curMaxDistance;
+    private List<InGamePlayer> alivePlayers = new();
     private Camera cam;
 
     public void UpdateAlivePlayerList(List<InGamePlayer> players)
     {
         alivePlayers = players;
-        if(targetIndex >= players.Count)
+        if (targetIndex >= players.Count)
             targetIndex--;
     }
 
@@ -44,11 +46,11 @@ public class SpectatorView : MonoBehaviour, IService
         cam = Camera.main;
 
         player
-            .ObserveEveryValueChanged(p => p.gameObject.activeSelf)
-            .Subscribe(isActive =>
+            .ObserveEveryValueChanged(p => p.IsDie)
+            .Subscribe(isDie =>
             {
                 //initialize
-                if (!isActive)
+                if (isDie)
                 {
                     Debug.LogError("Set camera to spectate");
                     targetIndex = 0;
@@ -56,6 +58,7 @@ public class SpectatorView : MonoBehaviour, IService
                     cam.transform.SetParent(camHolder);
                     cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
                     camDistance = camDistanceClamp;
+                    remainTime = 1.5f;
                 }
                 else
                 {
@@ -68,17 +71,27 @@ public class SpectatorView : MonoBehaviour, IService
 
     private void Update()
     {
-        if (player.gameObject.activeSelf) return;
+        if (!player.IsDie) return;
         if (targetIndex == -1) return;
         if (alivePlayers.Count == 0) return;
 
-        //set spectator
-        if (input.Spectator.Change.WasPressedThisFrame())
+        if (remainTime > 0)
         {
-            targetIndex += (int)input.Spectator.Change.ReadValue<float>();
+            remainTime -= Time.deltaTime;
+            transform.position = player.Head.position;
+            return;
+        }
+        else
+        {
+            if (input.Spectator.Change.WasPressedThisFrame())
+            {
+                targetIndex += (int)input.Spectator.Change.ReadValue<float>();
 
-            if (targetIndex < 0) targetIndex = alivePlayers.Count - 1;
-            if (targetIndex > alivePlayers.Count - 1) targetIndex = 0;
+                if (targetIndex < 0) targetIndex = alivePlayers.Count - 1;
+                if (targetIndex > alivePlayers.Count - 1) targetIndex = 0;
+            }
+
+            transform.position = alivePlayers[targetIndex].transform.position + Vector3.up * 1.5f;
         }
 
         //rotation
@@ -89,12 +102,14 @@ public class SpectatorView : MonoBehaviour, IService
         camXRotate = Mathf.Clamp(camXRotate, -camXRotateClampAbs, camXRotateClampAbs);
         camHolder.localRotation = Quaternion.Euler(camXRotate, 0, 0);
 
-        transform.position = alivePlayers[targetIndex].transform.position + Vector3.up * 1.5f;
-
         //cam collision
+        curMaxDistance += input.Spectator.MouseWheel.ReadValue<float>() * 0.01f;
+        curMaxDistance = Mathf.Clamp(curMaxDistance, 0, camDistanceClamp);
+        
         if (Physics.Linecast(transform.position, cam.transform.position - cam.transform.forward * camCollisionRadius, out var hit, ~ignoreCamCollisionLayer)) camDistance = hit.distance;
         else camDistance = camDistanceClamp;
         camDistance = Mathf.Clamp(camDistance, 0, camDistanceClamp);
+        camDistance = Mathf.Min(curMaxDistance, camDistance);
         cam.transform.localPosition = Vector3.back * camDistance;
     }
 }

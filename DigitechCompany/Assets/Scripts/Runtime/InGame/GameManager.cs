@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         public string playerName = "플레이어";
         public float gainDamage;
         public float fearAmount;
+        public bool isGainMaxDamage;
+        public bool isMostParanoia;
 
         private PlayerData() { }
         public PlayerData(int viewid)
@@ -261,7 +263,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 var player = PhotonView.Find(data.Value.viewID).GetComponent<InGamePlayer>();
                 if(!data.Value.isAlive)
                 {
-                    player.transform.SetPositionAndRotation(basement.transform.position + Vector3.up, Quaternion.Euler(0, 0, 0));
+                    player.SetPositionAndRotation(basement.transform.position + Vector3.up, Quaternion.Euler(0, 0, 0));
                     player.Revive();
                 }
             }
@@ -289,6 +291,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => gameEndSign || !HasAlivePlayer);
             state = GameState.End;
 
+            //calcuate result
+            playerDatas
+                .Values
+                .OrderBy(data => data.gainDamage)
+                .First()
+                .isGainMaxDamage = true;
+            
+            var cowards = playerDatas
+                .Values
+                .Where(data => data.fearAmount > 40)
+                .ToArray();
+            
+            if(cowards.Length > 0)
+                cowards[0].isMostParanoia = true;
+            
             basement.MoveUp();
             await UniTask.WaitUntil(() => basement.CurState == Basement.State.Up);
 

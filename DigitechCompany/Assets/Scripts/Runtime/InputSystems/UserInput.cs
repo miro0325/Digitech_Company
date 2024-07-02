@@ -362,6 +362,15 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseWheel"",
+                    ""type"": ""Value"",
+                    ""id"": ""4ad2164e-e4d9-4e4f-9582-0f25fbb5cfc1"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -395,6 +404,17 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
                     ""processors"": ""Scale"",
                     ""groups"": """",
                     ""action"": ""Change"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""202fa3d3-0d58-49df-a6d9-2194773c3f8b"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseWheel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -486,6 +506,7 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
         m_Spectator = asset.FindActionMap("Spectator", throwIfNotFound: true);
         m_Spectator_Mouse = m_Spectator.FindAction("Mouse", throwIfNotFound: true);
         m_Spectator_Change = m_Spectator.FindAction("Change", throwIfNotFound: true);
+        m_Spectator_MouseWheel = m_Spectator.FindAction("MouseWheel", throwIfNotFound: true);
         // UIOpen
         m_UIOpen = asset.FindActionMap("UIOpen", throwIfNotFound: true);
     }
@@ -669,12 +690,14 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
     private List<ISpectatorActions> m_SpectatorActionsCallbackInterfaces = new List<ISpectatorActions>();
     private readonly InputAction m_Spectator_Mouse;
     private readonly InputAction m_Spectator_Change;
+    private readonly InputAction m_Spectator_MouseWheel;
     public struct SpectatorActions
     {
         private @UserInput m_Wrapper;
         public SpectatorActions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Mouse => m_Wrapper.m_Spectator_Mouse;
         public InputAction @Change => m_Wrapper.m_Spectator_Change;
+        public InputAction @MouseWheel => m_Wrapper.m_Spectator_MouseWheel;
         public InputActionMap Get() { return m_Wrapper.m_Spectator; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -690,6 +713,9 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
             @Change.started += instance.OnChange;
             @Change.performed += instance.OnChange;
             @Change.canceled += instance.OnChange;
+            @MouseWheel.started += instance.OnMouseWheel;
+            @MouseWheel.performed += instance.OnMouseWheel;
+            @MouseWheel.canceled += instance.OnMouseWheel;
         }
 
         private void UnregisterCallbacks(ISpectatorActions instance)
@@ -700,6 +726,9 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
             @Change.started -= instance.OnChange;
             @Change.performed -= instance.OnChange;
             @Change.canceled -= instance.OnChange;
+            @MouseWheel.started -= instance.OnMouseWheel;
+            @MouseWheel.performed -= instance.OnMouseWheel;
+            @MouseWheel.canceled -= instance.OnMouseWheel;
         }
 
         public void RemoveCallbacks(ISpectatorActions instance)
@@ -817,6 +846,7 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
     {
         void OnMouse(InputAction.CallbackContext context);
         void OnChange(InputAction.CallbackContext context);
+        void OnMouseWheel(InputAction.CallbackContext context);
     }
     public interface IUIOpenActions
     {

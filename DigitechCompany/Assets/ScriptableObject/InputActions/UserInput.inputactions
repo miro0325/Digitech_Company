@@ -1,5 +1,5 @@
 {
-    "name": "UserInputAction",
+    "name": "UserInput",
     "maps": [
         {
             "name": "Player",
@@ -340,6 +340,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "MouseWheel",
+                    "type": "Value",
+                    "id": "4ad2164e-e4d9-4e4f-9582-0f25fbb5cfc1",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -373,6 +382,17 @@
                     "processors": "Scale",
                     "groups": "",
                     "action": "Change",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "202fa3d3-0d58-49df-a6d9-2194773c3f8b",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseWheel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

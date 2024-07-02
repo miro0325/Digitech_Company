@@ -9,7 +9,7 @@ public class PlayerResultSlotUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerName;
     [SerializeField] private TextMeshProUGUI playerData;
 
-    public void Initialize(GameManager.PlayerData data, GameManager.PlayerData[] datas)
+    public void Initialize(GameManager.PlayerData data)
     {
         playerName.text = data.playerName;
         playerName.fontStyle = FontStyles.Strikethrough;
@@ -17,9 +17,9 @@ public class PlayerResultSlotUI : MonoBehaviour
         playerData.text = "";
         if(data.isAlive)
             playerData.text += "사망\n";
-        if(datas.OrderBy(d => d.gainDamage).First() == data)
+        if(data.isGainMaxDamage)
             playerData.text += "가장 많은 피해를 받은 플레이어\n";
-        if(datas.OrderBy(d => d.fearAmount).First() == data)
+        if(data.isMostParanoia)
             playerData.text += "가장 피해망상이 심한 플레이어\n";
     }
 }

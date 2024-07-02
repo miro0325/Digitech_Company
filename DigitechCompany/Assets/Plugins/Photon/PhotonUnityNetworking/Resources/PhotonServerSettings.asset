@@ -108,6 +108,8 @@ MonoBehaviour:
   - SendGameDataLoadToClientRpc
   - SendLoadCompleteToMasterRpc
   - ReviveRpc
+  - SendReviveToOwnerRpc
+  - SetPositionAndRotationRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -108,7 +108,7 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
 
         await UniTask.WaitForSeconds(2f);
         animator.Play(state == State.Up ? Animator_UpHash : Animator_DownHash);
-        await UniTask.WaitForSeconds(10f);
+        await UniTask.WaitForSeconds(7f);
         this.state = state;
     }
 
