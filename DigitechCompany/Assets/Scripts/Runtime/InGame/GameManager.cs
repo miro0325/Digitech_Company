@@ -38,20 +38,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     }
 
     [Serializable]
-    public class PlayerData
+    public class PlayerData : IEqualityComparer<PlayerData>
     {
+        public int viewID;
         public bool isAlive;
-        public bool[] sync;
-        public int inGamePlayerViewId;
-        public string playerName;
+        public bool[] sync = new bool[(int)SyncTarget.End];
+        public string playerName = "플레이어";
+        public float gainDamage;
+        public float fearAmount;
+
+        private PlayerData() { }
+        public PlayerData(int viewid)
+        {
+            this.viewID = viewid;
+        }
 
         public static byte[] Serialize(object customObject)
         {
             var data = (PlayerData)customObject;
             var bytes = new byte[0];
+            Serializer.Serialize(data.viewID, ref bytes);
             Serializer.Serialize(data.isAlive, ref bytes);
             Serializer.Serialize(data.sync, ref bytes);
-            Serializer.Serialize(data.inGamePlayerViewId, ref bytes);
             Serializer.Serialize(data.playerName, ref bytes);
             return bytes;
         }
@@ -59,11 +67,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             var data = new PlayerData();
             int offset = 0;
+            data.viewID = Serializer.DeserializeInt(bytes, ref offset);
             data.isAlive = Serializer.DeserializeBool(bytes, ref offset);
             data.sync = Serializer.DeserializeBoolArray(bytes, ref offset);
-            data.inGamePlayerViewId = Serializer.DeserializeInt(bytes, ref offset);
             data.playerName = Serializer.DeserializeString(bytes, ref offset);
             return data;
+        }
+
+        public bool Equals(PlayerData x, PlayerData y)
+        {
+            return x.viewID == y.viewID;
+        }
+
+        public int GetHashCode(PlayerData obj)
+        {
+            return obj.viewID.GetHashCode();
         }
     }
 
@@ -110,11 +128,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void SendPlayerJoinToAllRpc(Player newPlayer, int inGamePlayerViewId)
     {
         Debug.LogError($"Player: {newPlayer} join");
-        var newPlayerData = new PlayerData()
-        {
-            sync = new bool[(int)SyncTarget.End],
-            inGamePlayerViewId = inGamePlayerViewId
-        };
+        var newPlayerData = new PlayerData(inGamePlayerViewId);
 
         playerDatas.Add(newPlayer, newPlayerData);
 
@@ -136,7 +150,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         spectatorView.UpdateAlivePlayerList(
             playerDatas
             .Where(p => p.Value.isAlive)
-            .Select(p => PhotonView.Find(p.Value.inGamePlayerViewId).GetComponent<InGamePlayer>())
+            .Select(p => PhotonView.Find(p.Value.viewID).GetComponent<InGamePlayer>())
             .ToList()
         );
     }
@@ -244,7 +258,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             state = GameState.StartWait;
             foreach(var data in playerDatas)
             {
-                var player = PhotonView.Find(data.Value.inGamePlayerViewId).GetComponent<InGamePlayer>();
+                var player = PhotonView.Find(data.Value.viewID).GetComponent<InGamePlayer>();
                 if(!data.Value.isAlive)
                 {
                     player.transform.SetPositionAndRotation(basement.transform.position + Vector3.up, Quaternion.Euler(0, 0, 0));

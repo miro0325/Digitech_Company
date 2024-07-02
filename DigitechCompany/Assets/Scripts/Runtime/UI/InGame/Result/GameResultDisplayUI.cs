@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
@@ -15,8 +16,10 @@ public class GameResultDisplayUI : MonoBehaviour
     [SerializeField] private RectTransform itemResultListParent;
     [SerializeField] private ItemResultSlotUI itemResultSlotUIPrefab;
     [SerializeField] private RectTransform playerResultListParent;
+    [SerializeField] private PlayerResultSlotUI playerResultSlotUIPrefab;
 
-    private List<ItemResultSlotUI> list = new();
+    private List<ItemResultSlotUI> itemSlotList = new();
+    private List<PlayerResultSlotUI> playerSlotList = new();
 
     private void Start()
     {
@@ -28,14 +31,23 @@ public class GameResultDisplayUI : MonoBehaviour
 
     private async UniTask DisplayRoutine()
     {
-        list.ForEach(x => Destroy(x.gameObject));
-        list.Clear();
+        itemSlotList.ForEach(x => Destroy(x.gameObject));
+        itemSlotList.Clear();
 
         foreach (var item in basement.CurGameItems)
         {
             var slot = Instantiate(itemResultSlotUIPrefab, itemResultListParent);
             slot.Initialize(item.Value);
-            list.Add(slot);
+            itemSlotList.Add(slot);
+
+            await UniTask.WaitForSeconds(0.1f);
+        }
+
+        foreach(var player in gameManager.PlayerDatas)
+        {
+            var slot = Instantiate(playerResultSlotUIPrefab, playerResultListParent);
+            slot.Initialize(player.Value, gameManager.PlayerDatas.Values.ToArray());
+            playerSlotList.Add(slot);
 
             await UniTask.WaitForSeconds(0.1f);
         }
