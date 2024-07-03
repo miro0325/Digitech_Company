@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 public class ProceduralWalk : MonoBehaviour
 {
     [SerializeField]
     private Transform body;
+    [SerializeField]
+    private NavMeshAgent agent;
     [SerializeField]
     private Transform target;
     [SerializeField]
@@ -32,7 +35,6 @@ public class ProceduralWalk : MonoBehaviour
     
     private void Start()
     {
-       
         oldPosition = transform.position;
         newPosition = transform.position;
         curPosition = transform.position;
@@ -47,9 +49,9 @@ public class ProceduralWalk : MonoBehaviour
 
     private void UpdateFootPosition()
     {
-
+        float bodyMoveSpeed = agent.speed;
+        float adjustedStepSpeed = stepSpeed + bodyMoveSpeed * 0.5f;
         transform.position = curPosition;
-        Vector3 checkPos = body.position - transform.position;
         Ray ray = new Ray(target.position+body.up, -body.up);
         Debug.DrawRay(target.position+body.up, -body.up, Color.red);
         if (Physics.Raycast(ray, out RaycastHit hit, 2, isGround))
@@ -61,13 +63,14 @@ public class ProceduralWalk : MonoBehaviour
                 newPosition = hit.point;
             }
         }
+        
         if (lerp < 1)
         {
             Vector3 footPos = Vector3.Lerp(oldPosition, newPosition, lerp);
             footPos.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
 
             curPosition = footPos;
-            lerp += Time.deltaTime * stepSpeed;
+            lerp += Time.deltaTime * adjustedStepSpeed;
         }
         else
         {

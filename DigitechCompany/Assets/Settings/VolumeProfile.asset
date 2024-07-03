@@ -131,8 +131,8 @@ MonoBehaviour:
   - {fileID: 849379129802519247}
   - {fileID: -7893295128165547882}
   - {fileID: -7011558710299706105}
-  - {fileID: 3641323105403131862}
   - {fileID: -9170837804346770043}
+  - {fileID: 2664095223697943571}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -149,6 +149,31 @@ MonoBehaviour:
   mode:
     m_OverrideState: 1
     m_Value: 2
+--- !u!114 &2664095223697943571
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a63c84604bca1434c9df57589d46e73a, type: 3}
+  m_Name: Pixelate
+  m_EditorClassIdentifier: 
+  active: 1
+  IsEnable:
+    m_OverrideState: 1
+    m_Value: 1
+  resolution:
+    m_OverrideState: 1
+    m_Value: 1920
+  pixelWidth:
+    m_OverrideState: 1
+    m_Value: 4
+  pixelHeight:
+    m_OverrideState: 1
+    m_Value: 4
 --- !u!114 &3641323105403131862
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -161,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63c84604bca1434c9df57589d46e73a, type: 3}
   m_Name: Pixelate
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   IsEnable:
     m_OverrideState: 1
     m_Value: 1

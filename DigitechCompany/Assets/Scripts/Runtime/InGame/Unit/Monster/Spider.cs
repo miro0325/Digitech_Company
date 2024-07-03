@@ -13,15 +13,29 @@ public class Spider : MonsterBase
     {
     }
 
-    protected override void Move()
+    public override void Move(Vector3 targetPos)
     {
+        base.Move(targetPos);
     }
 
     protected override void Spawn()
     {
-        
-        tree = new BehaviorTree.Tree(new Patrol(this,waypoints));
+
+        tree = new BehaviorTree.Tree(new Selector(new List<Node>
+        {
+            new Sequence(new List<Node>
+            {
+                new CheckEnemyInFOV(fov),
+                new TraceTarget(this)
+            }),
+            new Patrol(this,waypoints)
+        }));
+        //tree = new BehaviorTree.Tree(
+        //    new Patrol(this,waypoints)
+        //);
     }
+
+    
 
     protected override void Start()
     {
@@ -29,8 +43,8 @@ public class Spider : MonsterBase
         Spawn();
     }
 
-    private void Update()
+    protected override void Update()
     {
-        tree.Update();
+        base.Update();
     }
 }

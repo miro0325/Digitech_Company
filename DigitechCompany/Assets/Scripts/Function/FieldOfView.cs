@@ -27,7 +27,8 @@ public class FieldOfView : MonoBehaviour
 
     private void Start()
     {
-        LoopFindVisibleTargets();
+        wait = new WaitForSeconds(viewCooldown);
+        StartCoroutine(LoopFindVisibleTargets());
     }
 
     private IEnumerator LoopFindVisibleTargets()
@@ -41,6 +42,7 @@ public class FieldOfView : MonoBehaviour
 
     private void FindVisibleTargets()
     {
+        
         targetItems.Clear();
         targetUnits.Clear();
         Collider[] hits = Physics.OverlapSphere(transform.position,viewRadius,targetMask);

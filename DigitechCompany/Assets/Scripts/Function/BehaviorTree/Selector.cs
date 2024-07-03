@@ -11,9 +11,11 @@ namespace BehaviorTree
 
         public override NodeState Evaluate()
         {
-            foreach(var node in children)
+            Debug.Log("Check Select");
+            foreach (var node in children)
             {
-                switch(node.Evaluate())
+                var nodeState = node.Evaluate();
+                switch(nodeState)
                 {
                     case NodeState.Failure:
                         continue;

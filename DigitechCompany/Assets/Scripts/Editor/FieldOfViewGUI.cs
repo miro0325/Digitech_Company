@@ -13,6 +13,7 @@ public class FieldOfViewGUI : Editor
         Handles.DrawWireArc(fov.transform.position, Vector3.up, Vector3.forward, 360, fov.ViewRadius);
         Vector3 viewAngleA = fov.DirFromAngle(-fov.ViewRange / 2);
         Vector3 viewAngleB = fov.DirFromAngle(fov.ViewRange / 2);
+        Handles.color = Color.cyan;
 
         Handles.DrawLine(fov.transform.position, fov.transform.position + viewAngleA * fov.ViewRadius);
         Handles.DrawLine(fov.transform.position, fov.transform.position + viewAngleB * fov.ViewRadius);

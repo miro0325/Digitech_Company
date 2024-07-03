@@ -24,15 +24,16 @@ namespace BehaviorTree
                 switch (node.Evaluate())
                 {
                     case NodeState.Failure:
-                        continue;
+                        state = NodeState.Failure;
+                        return state;
                     case NodeState.Running:
                         isRunningInChild = true;
-                        return state;
+                        continue;
                     case NodeState.Succes:
+                        continue;
+                    default:
                         state = NodeState.Succes;
                         return state;
-                    default:
-                        continue;
                 }
             }
             state = isRunningInChild ? NodeState.Running : NodeState.Succes;

@@ -16,10 +16,10 @@ public class NetworkItemData
 public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
     //service
-    private ResourceLoader resourceLoader;
-    private ResourceLoader ResourceLoader => resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
-    private TestBasement testBasement;
-    private TestBasement TestBasement => testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private ResourceLoader _resourceLoader;
+    private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
+    private TestBasement _testBasement;
+    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
 
     //field
     private string itemDataJson;
@@ -57,7 +57,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 
                 if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                    var itemKeys = ResourceLoader.itemPrefabs.Keys.ToArray();
+                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
                     var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity) as ItemBase;
                     item.SetLayRotation(Random.Range(0, 360));
@@ -84,6 +84,15 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 
         var json = networkItemData.ToJson();
         itemDataJson = json;
+    }
+
+    public void SpawnItem(Vector3 spawnPos,string key)
+    {
+        if (!resourceLoader.itemPrefabs.ContainsKey(key)) return;
+        var item = NetworkObject.Instantiate($"Prefabs/Items/{key}", spawnPos + Vector3.up, Quaternion.identity) as ItemBase;
+        item.SetLayRotation(Random.Range(0, 360));
+        item.Initialize(key);
+        items.Add(item.photonView.ViewID, item);
     }
 
     /// <summary>
@@ -113,7 +122,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     public void DestoryItems(bool withoutBasement)
     {
         Dictionary<int ,ItemBase> excepts = new();
-        if(withoutBasement) excepts = TestBasement.Items;
+        if(withoutBasement) excepts = testBasement.Items;
         
         foreach(var kvp in items.ToArray())
         {

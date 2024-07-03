@@ -19,23 +19,26 @@ public class Patrol : Node
 
     private bool isDelay = false;
     private bool isCalculatePath = false;
+    private bool isRandomPoint = false;
 
     private NavMeshPath path = new NavMeshPath();
 
 
-    public Patrol(MonsterBase monster, Transform[] waypoints, List<Node> children,float delayTime = 1) : base(children)
+    public Patrol(MonsterBase monster, Transform[] waypoints, List<Node> children, bool isRandomPoint = false, float delayTime = 1 ) : base(children)
     {
         this.transform = monster.transform;
         this.monster = monster;
         this.waypoints = waypoints;
+        this.isRandomPoint = isRandomPoint;
         this.delayTime = delayTime;
     }
 
-    public Patrol(MonsterBase monster, Transform[] waypoints, float delayTime = 1) : base()
+    public Patrol(MonsterBase monster, Transform[] waypoints, bool isRandomPoint = false, float delayTime = 1) : base()
     {
         this.transform = monster.transform;
         this.monster = monster;
         this.waypoints = waypoints;
+        this.isRandomPoint = isRandomPoint;
         this.delayTime = delayTime;
     }
 
@@ -55,12 +58,24 @@ public class Patrol : Node
         else
         {
             Transform curPoint = waypoints[curIndex];
-            if (Vector3.Distance(transform.position, curPoint.position) < 0.01f)
+            if (Vector3.Distance(transform.position, curPoint.position) < 0.7f)
             {
                 transform.position = curPoint.position;
                 isDelay = true;
-                curIndex = (curIndex + 1) % waypoints.Length;
-                cornerIndex = 0;
+                if(!isRandomPoint)
+                {
+                    curIndex = (curIndex + 1) % waypoints.Length;
+                }
+                else
+                {
+                    int newIndex = Random.Range(0, waypoints.Length);   
+                    while(curIndex == newIndex)
+                    {
+                        newIndex = Random.Range(0, waypoints.Length);
+                    }
+                    curIndex = newIndex;
+                }
+                isCalculatePath = false;
             }
             else
             {
@@ -68,21 +83,15 @@ public class Patrol : Node
                 {
                     path = new NavMeshPath();
                     monster.Agent.CalculatePath(curPoint.position, path);
+                    cornerIndex = 0;
                     isCalculatePath = true;
                 }
-                //Debug.Log(path.corners.Length + " " + curPoint.position);
                 if (path.corners.Length > 0 && cornerIndex < path.corners.Length)
                 {
-                    Debug.Log("test");
-                    monster.Agent.SetDestination(path.corners[cornerIndex]);
+                    monster.Move(path.corners[cornerIndex]);
                     if (Vector3.Distance(transform.position, path.corners[cornerIndex]) < 0.01f)
                     {
-                        if(cornerIndex+1>=path.corners.Length)
-                        {
-                            isCalculatePath=false;
-                            cornerIndex = 0;
-                        }
-                        else
+                        if(cornerIndex < path.corners.Length - 1) //endpoint
                         {
                             cornerIndex++;
                         }
@@ -93,6 +102,6 @@ public class Patrol : Node
         }
         
         state = NodeState.Running;
-        return base.Evaluate();
+        return state;
     }
 }
