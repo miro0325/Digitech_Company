@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum ItemType { Sell, Buy }
 
+[Serializable]
 public class ItemData
 {
     public string key;

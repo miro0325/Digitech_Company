@@ -18,8 +18,8 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     //service
     private ResourceLoader _resourceLoader;
     private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
-    private TestBasement _testBasement;
-    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private Basement _basement;
+    private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
 
     //field
     private string itemDataJson;
@@ -107,7 +107,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         for (int i = 0; i < datas.Length; i++)
         {
             var data = datas[i];
-            var item = NetworkObject.Sync(data.viewId, $"Prefabs/Items/{data.key}") as ItemBase;
+            var item = NetworkObject.Sync( $"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);
@@ -122,7 +122,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     public void DestoryItems(bool withoutBasement)
     {
         Dictionary<int ,ItemBase> excepts = new();
-        if(withoutBasement) excepts = testBasement.Items;
+        if(withoutBasement) excepts = basement.WholeItems;
         
         foreach(var kvp in items.ToArray())
         {

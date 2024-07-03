@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Rendering;
 using UniRx;
+using System.Collections.Generic;
 
 public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 {
@@ -26,6 +27,7 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
     private bool isRun;
     private bool isJump;
     private Vector2 moveInput;
+    private SkinnedMeshRenderer[] playerModelRenderers;
 
     public void Initialize(InGamePlayer player)
     {
@@ -49,7 +51,22 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
         if (!photonView.IsMine) return;
 
         this.player = player;
-        playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>().For((i, ele) => ele.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
+        playerModelRenderers = playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>();
+    }
+
+    public void SetActivePlayerModel(bool active)
+    {
+        playerModelRenderers.For((i, ele) => ele.shadowCastingMode = active ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly);
+    }
+
+    public void SetActiveArmModel(bool active)
+    {
+        camAnimator.gameObject.SetActive(active);
+    }
+
+    public Transform GetHeadTransform()
+    {
+        return playerModelAnimator.GetBoneTransform(HumanBodyBones.Head);
     }
 
     private void DoSetting()
@@ -63,6 +80,14 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 
     private void DoAnimation()
     {
+        if(player.IsDie)
+        {
+            playerModelAnimator.enabled = false;
+            return;
+        }
+
+        playerModelAnimator.enabled = true;
+
         playerModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
         playerModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
         playerModelAnimator.SetBool(Animator_IsGroundHash, isGround);

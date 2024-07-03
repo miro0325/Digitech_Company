@@ -43,6 +43,5 @@ public partial class Mask : ItemBase
             transform.localPosition = Vector3.Lerp(transform.localPosition, targetPosition, Time.deltaTime * 5);
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * 5);
         }
-        Debug.Log(transform.position);
     }
 }

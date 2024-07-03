@@ -25,7 +25,7 @@ public class TestShovel : ItemBase, IInteractable
 
     public override string GetUseExplain(InteractID id, UnitBase unit)
     {
-        if(id == InteractID.ID2) return "?•Œë¦¬ê¸°";
+        if(id == InteractID.ID2) return "°ø°Ý";
         return "";
     }
     
