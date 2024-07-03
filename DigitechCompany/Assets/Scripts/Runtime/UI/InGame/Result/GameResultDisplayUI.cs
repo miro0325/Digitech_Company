@@ -43,7 +43,10 @@ public class GameResultDisplayUI : MonoBehaviour
             await UniTask.WaitForSeconds(0.1f);
         }
 
-        foreach(var player in gameManager.PlayerDatas)
+        playerSlotList.ForEach(x => Destroy(x.gameObject));
+        playerSlotList.Clear();
+
+        foreach (var player in gameManager.PlayerDatas)
         {
             var slot = Instantiate(playerResultSlotUIPrefab, playerResultListParent);
             slot.Initialize(player.Value);

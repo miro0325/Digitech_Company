@@ -15,7 +15,7 @@ public class PlayerResultSlotUI : MonoBehaviour
         playerName.fontStyle = FontStyles.Strikethrough;
         
         playerData.text = "";
-        if(data.isAlive)
+        if(!data.isAlive)
             playerData.text += "사망\n";
         if(data.isGainMaxDamage)
             playerData.text += "가장 많은 피해를 받은 플레이어\n";

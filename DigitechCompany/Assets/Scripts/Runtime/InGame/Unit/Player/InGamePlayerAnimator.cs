@@ -98,8 +98,6 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
         if (!photonView.IsMine) return;
 
         //arm animator
-        armModelAnimator.SetFloat(Animator_MoveXHash, moveInput.x);
-        armModelAnimator.SetFloat(Animator_MoveYHash, moveInput.y);
         armModelAnimator.SetBool(Animator_IsGroundHash, isGround);
 
         if (moveInput == Vector2.zero) armModelAnimator.SetInteger(Animator_MoveStateHash, 0);
