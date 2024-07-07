@@ -19,11 +19,15 @@ public class SawTrap : NetworkObject, IPunObservable
         MoveRoutine().Forget();
     }
 
+    private void Update()
+    {
+        blade.Rotate(0, rotateSpeed * Time.deltaTime, 0);
+    }
+
     private async UniTask MoveRoutine()
     {
         while(true)
         {
-            blade.Rotate(0, rotateSpeed * Time.deltaTime, 0);
             transform.position = Vector3.MoveTowards(transform.position, points[curPointIndex], speed * Time.deltaTime);
 
             if(Vector3.Distance(transform.position, points[curPointIndex]) < speed * Time.deltaTime * 1.1f)

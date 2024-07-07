@@ -24,6 +24,56 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
     ""name"": ""UserInput"",
     ""maps"": [
         {
+            ""name"": ""Lobby"",
+            ""id"": ""e38fa875-5526-4e2e-91d7-382b44b847e5"",
+            ""actions"": [
+                {
+                    ""name"": ""UpDown"",
+                    ""type"": ""Value"",
+                    ""id"": ""ee59bcda-7b79-4d74-9bc5-624f6685df81"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""b5c1e69f-7d48-470d-8aaa-52b9e1b5e68e"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""8b328288-e7aa-4d5b-b288-c178cb5f5749"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""5d0cb986-4e80-4c12-9716-631884e90b5e"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
+        },
+        {
             ""name"": ""Player"",
             ""id"": ""b5539bad-94ee-42d6-b9ba-f483621ea4ae"",
             ""actions"": [
@@ -419,12 +469,6 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
-        },
-        {
-            ""name"": ""UIOpen"",
-            ""id"": ""e38fa875-5526-4e2e-91d7-382b44b847e5"",
-            ""actions"": [],
-            ""bindings"": []
         }
     ],
     ""controlSchemes"": [
@@ -490,6 +534,9 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
         }
     ]
 }");
+        // Lobby
+        m_Lobby = asset.FindActionMap("Lobby", throwIfNotFound: true);
+        m_Lobby_UpDown = m_Lobby.FindAction("UpDown", throwIfNotFound: true);
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
@@ -507,8 +554,6 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
         m_Spectator_Mouse = m_Spectator.FindAction("Mouse", throwIfNotFound: true);
         m_Spectator_Change = m_Spectator.FindAction("Change", throwIfNotFound: true);
         m_Spectator_MouseWheel = m_Spectator.FindAction("MouseWheel", throwIfNotFound: true);
-        // UIOpen
-        m_UIOpen = asset.FindActionMap("UIOpen", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -566,6 +611,52 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
     {
         return asset.FindBinding(bindingMask, out action);
     }
+
+    // Lobby
+    private readonly InputActionMap m_Lobby;
+    private List<ILobbyActions> m_LobbyActionsCallbackInterfaces = new List<ILobbyActions>();
+    private readonly InputAction m_Lobby_UpDown;
+    public struct LobbyActions
+    {
+        private @UserInput m_Wrapper;
+        public LobbyActions(@UserInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @UpDown => m_Wrapper.m_Lobby_UpDown;
+        public InputActionMap Get() { return m_Wrapper.m_Lobby; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(LobbyActions set) { return set.Get(); }
+        public void AddCallbacks(ILobbyActions instance)
+        {
+            if (instance == null || m_Wrapper.m_LobbyActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_LobbyActionsCallbackInterfaces.Add(instance);
+            @UpDown.started += instance.OnUpDown;
+            @UpDown.performed += instance.OnUpDown;
+            @UpDown.canceled += instance.OnUpDown;
+        }
+
+        private void UnregisterCallbacks(ILobbyActions instance)
+        {
+            @UpDown.started -= instance.OnUpDown;
+            @UpDown.performed -= instance.OnUpDown;
+            @UpDown.canceled -= instance.OnUpDown;
+        }
+
+        public void RemoveCallbacks(ILobbyActions instance)
+        {
+            if (m_Wrapper.m_LobbyActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ILobbyActions instance)
+        {
+            foreach (var item in m_Wrapper.m_LobbyActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_LobbyActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public LobbyActions @Lobby => new LobbyActions(this);
 
     // Player
     private readonly InputActionMap m_Player;
@@ -746,44 +837,6 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
         }
     }
     public SpectatorActions @Spectator => new SpectatorActions(this);
-
-    // UIOpen
-    private readonly InputActionMap m_UIOpen;
-    private List<IUIOpenActions> m_UIOpenActionsCallbackInterfaces = new List<IUIOpenActions>();
-    public struct UIOpenActions
-    {
-        private @UserInput m_Wrapper;
-        public UIOpenActions(@UserInput wrapper) { m_Wrapper = wrapper; }
-        public InputActionMap Get() { return m_Wrapper.m_UIOpen; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(UIOpenActions set) { return set.Get(); }
-        public void AddCallbacks(IUIOpenActions instance)
-        {
-            if (instance == null || m_Wrapper.m_UIOpenActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_UIOpenActionsCallbackInterfaces.Add(instance);
-        }
-
-        private void UnregisterCallbacks(IUIOpenActions instance)
-        {
-        }
-
-        public void RemoveCallbacks(IUIOpenActions instance)
-        {
-            if (m_Wrapper.m_UIOpenActionsCallbackInterfaces.Remove(instance))
-                UnregisterCallbacks(instance);
-        }
-
-        public void SetCallbacks(IUIOpenActions instance)
-        {
-            foreach (var item in m_Wrapper.m_UIOpenActionsCallbackInterfaces)
-                UnregisterCallbacks(item);
-            m_Wrapper.m_UIOpenActionsCallbackInterfaces.Clear();
-            AddCallbacks(instance);
-        }
-    }
-    public UIOpenActions @UIOpen => new UIOpenActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -829,6 +882,10 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_XRSchemeIndex];
         }
     }
+    public interface ILobbyActions
+    {
+        void OnUpDown(InputAction.CallbackContext context);
+    }
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -847,8 +904,5 @@ public partial class @UserInput: IInputActionCollection2, IDisposable
         void OnMouse(InputAction.CallbackContext context);
         void OnChange(InputAction.CallbackContext context);
         void OnMouseWheel(InputAction.CallbackContext context);
-    }
-    public interface IUIOpenActions
-    {
     }
 }
