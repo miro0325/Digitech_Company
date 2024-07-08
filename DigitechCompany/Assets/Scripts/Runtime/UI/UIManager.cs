@@ -65,7 +65,7 @@ public class UIManager : MonoBehaviour, IService
         return false;
     }
 
-    public void CloseRecent()
+    public void CloseRecently()
     {
         //has default view
         if (!ReferenceEquals(defaultView, null))

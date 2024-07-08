@@ -5,12 +5,15 @@ using UnityEngine.InputSystem;
 
 public abstract class OptionSelectUIView : UIView
 {
+    private PopupUI _popupUI;
+    private PopupUI popupUI => _popupUI ??= ServiceLocator.ForGlobal().Get<PopupUI>();
+
     [SerializeField] protected UIEventReceiver[] options;
     [SerializeField] protected RectTransform arrow;
 
     protected ReactiveProperty<int> index = new();
 
-    protected abstract Action SetOption(int index);
+    protected abstract Action GetOptionAction(int index);
 
     protected virtual void Start()
     {
@@ -19,7 +22,7 @@ public abstract class OptionSelectUIView : UIView
             var index = i;
             options[i].Initialize(
                 () => this.index.Value = index,
-                SetOption(index)
+                GetOptionAction(index)
             );
         }
         
@@ -28,10 +31,14 @@ public abstract class OptionSelectUIView : UIView
 
     protected virtual void Update()
     {
+        if(popupUI.IsOpen) return;
+
         if(Keyboard.current.wKey.wasPressedThisFrame) AddIndex(true);
         if(Keyboard.current.sKey.wasPressedThisFrame) AddIndex(false);
         if(Keyboard.current.upArrowKey.wasPressedThisFrame) AddIndex(true);
         if(Keyboard.current.downArrowKey.wasPressedThisFrame) AddIndex(false);
+        if(Keyboard.current.enterKey.wasPressedThisFrame) GetOptionAction(index.Value)?.Invoke(); 
+        if(Keyboard.current.spaceKey.wasPressedThisFrame) GetOptionAction(index.Value)?.Invoke(); 
     }
 
     protected void AddIndex(bool positive)

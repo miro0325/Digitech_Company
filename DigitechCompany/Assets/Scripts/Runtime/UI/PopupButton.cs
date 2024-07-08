@@ -5,16 +5,21 @@ using UnityEngine.UI;
 
 public class PopupButton : MonoBehaviour
 {
-    private TextMeshProUGUI text;
+    private PopupUI _popupUI;
+    private PopupUI popupUI => _popupUI ??= ServiceLocator.ForGlobal().Get<PopupUI>();
+
+    [SerializeField] private TextMeshProUGUI text;
     private Button button;
     private Action onClick;
 
     private void Start()
     {
-        text = GetComponent<TextMeshProUGUI>();
         button = GetComponent<Button>();
-
-        button.onClick.AddListener(() => onClick?.Invoke());
+        button.onClick.AddListener(() =>
+        {
+            onClick?.Invoke();
+            popupUI.Close();
+        });
     }
 
     public void Initialize(string explain, Action onClick)
