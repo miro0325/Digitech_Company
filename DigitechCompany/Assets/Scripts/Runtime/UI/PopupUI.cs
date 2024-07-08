@@ -13,7 +13,7 @@ public class PopupUI : MonoBehaviour, IService
         public readonly string display;
         public readonly Action clickAction;
 
-        public ButtonData(string display, Action clickAction)
+        public ButtonData(string display, Action clickAction = null)
         {
             this.display = display;
             this.clickAction = clickAction;

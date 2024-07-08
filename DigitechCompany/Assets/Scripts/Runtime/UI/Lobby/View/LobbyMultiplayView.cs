@@ -19,16 +19,28 @@ public class LobbyMultiplayView : UIView, ILobbyCallbacks
         gameObject.SetActive(false);
     }
 
+    private void OnEnable()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+    private void OnDisable()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
     private void Start()
     {
         testButton.onClick.AddListener(() =>
         {
-            PhotonNetwork.CreateRoom("Test");
+            Debug.Log("Create Room");
+            PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 4 });
         });
     }
 
     public void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        Debug.Log("Room Updated");
         foreach(var info in roomList)
         {
             Debug.LogError(info.Name);

@@ -37,10 +37,7 @@ public class LobbyUIView : OptionSelectUIView
                                 Application.Quit();
                             }
                         ),
-                        new PopupUI.ButtonData(
-                            "돌아가기",
-                            null
-                        )
+                        new PopupUI.ButtonData("돌아가기")
                     );
                 };
         }
