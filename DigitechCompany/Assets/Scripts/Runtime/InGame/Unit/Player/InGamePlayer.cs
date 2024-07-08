@@ -9,6 +9,7 @@ using System;
 using UnityEngine.InputSystem;
 using UniRx.Triggers;
 using UnityEngine.InputSystem.Composites;
+using Cysharp.Threading.Tasks;
 
 public enum InteractID
 {
@@ -27,8 +28,11 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
-    private TestBasement _testBasement;
-    private TestBasement testBasement => _testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private Basement _basement;
+    private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
+    private GameManager _gameManager;
+    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
+    private UserInput input => UserInput.input;
 
     //inspector field
     [Space(20)]
@@ -67,11 +71,9 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private IInteractable lookInteractable;
     private Stats testBaseStat; //test base stat(need to change)
     private ReactiveProperty<int> curHandItemViewId = new();
-    private InGameInputAction inGameInput;
     private InGamePlayerAnimator animator;
 
     //property
-    public InputActionAsset testasset => inGameInput.asset;
     public bool IsRun => isRun;
     public bool IsCrouch => isCrouch;
     public bool IsGround => isGround;
@@ -84,21 +86,29 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public Transform ItemHolderCamera => itemHolderCamera;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
+    public Transform Head => animator.GetHeadTransform();
 
-    #region Temp 
-    private bool isConnectedTerminal = false;
-
-    public void ControlTerminal(bool value)
+    public void Damage(float damage)
     {
-        isConnectedTerminal = value;
+        photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }
-    #endregion
 
-    public void SetPosition(Vector3 pos)
+    [PunRPC]
+    private void SendDamageToOwnerRpc(float damage)
     {
-        if(photonView.IsMine) cc.enabled = false;
-        transform.position = pos;
-        if(photonView.IsMine) cc.enabled = true;
+        curStats.SetStat(Stats.Key.Hp, x => x - damage);
+    }
+
+    public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+    {
+        photonView.RPC(nameof(SetPositionAndRotationRpc), RpcTarget.All, position, rotation);
+    }
+
+    [PunRPC]
+    private void SetPositionAndRotationRpc(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+        Debug.LogError(transform.position);
     }
 
     public void SetCamera()
@@ -109,16 +119,29 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        SetCamera();
+        photonView.RPC(nameof(SendReviveToOwnerRpc), photonView.Owner);
+    }
+
+    [PunRPC]
+    private void SendReviveToOwnerRpc()
+    {
+        animator.SetActiveArmModel(true);
+        animator.SetActivePlayerModel(false);
+
+        input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
+        gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
+        SetCamera();
+        cc.enabled = true;
         isDie = false;
     }
 
     public override void OnCreate()
     {
-        gameObject.SetActive(false);
         base.OnCreate();
+
+        gameObject.SetActive(false);
 
         //cache and initialize member
         cc = GetComponent<CharacterController>();
@@ -127,6 +150,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         //ik setting
         if (!photonView.IsMine) return;
+
+        curStats.OnStatChanged += (key, prev, cur) =>
+        {
+            if (key == Stats.Key.Hp)
+                Debug.LogError(curStats.GetStat(key));
+        };
 
         cc.enabled = true;
 
@@ -150,23 +179,13 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         camView.gameObject.SetActive(true);
 
         //cache initialize
-        inGameInput = new();
         scanSphereMaterial = scanSphere.GetComponent<MeshRenderer>().sharedMaterial;
         cam = Camera.main;
-
-        //enable player input
-        this
-            .ObserveEveryValueChanged(t => t.isDie)
-            .Subscribe(isDie =>
-            {
-                if (isDie) inGameInput.Player.Disable();
-                else inGameInput.Player.Enable();
-            });
 
         //scroll
         this
             .UpdateAsObservable()
-            .Select(_ => inGameInput.Player.MouseWheel.ReadValue<float>())
+            .Select(_ => input.Player.MouseWheel.ReadValue<float>())
             .Where(x => x != 0)
             .ThrottleFrame(2)
             .Subscribe(x =>
@@ -175,8 +194,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
                 inventory.Index += x > 0 ? -1 : 1;
             });
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         ServiceLocator.For(this).Register(this);
     }
 
@@ -186,19 +203,18 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             .ObserveEveryValueChanged(t => t.isInBasement)
             .Subscribe(x =>
             {
-                if (isInBasement) transform.SetParent(testBasement.transform);
+                if (isInBasement) transform.SetParent(basement.transform);
                 else transform.SetParent(null);
             });
 
         transform
             .ObserveEveryValueChanged(t => transform.parent)
-            .Subscribe(parent => isInBasement = ReferenceEquals(parent, testBasement.transform));
+            .Subscribe(parent => isInBasement = ReferenceEquals(parent, basement.transform));
     }
 
     private void Update()
     {
-        /* temp */
-        if (isConnectedTerminal) return;
+        DoLife();
         DoScan();
         DoItem();
         DoInteract();
@@ -211,8 +227,24 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         cc.Move(velocity * Time.fixedDeltaTime);
     }
 
+    private void DoLife()
+    {
+        if (!photonView.IsMine) return;
+
+        if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
+        {
+            Debug.LogError("Die");
+            isDie = true;
+            input.Player.Disable();
+            animator.SetActivePlayerModel(true);
+            animator.SetActiveArmModel(false);
+            cc.enabled = false;
+            this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1.5f);
+        }
+    }
     private void DoScan()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         if (scanWaitTime > 0)
@@ -221,43 +253,42 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
         else
         {
-            if (inGameInput.Player.Scan.WasPressedThisFrame())
+            if (input.Player.Scan.WasPressedThisFrame())
             {
                 scanWaitTime = 1.33f;
-                StartCoroutine(ScanRoutine());
+                ScanRoutine().Forget();
             }
         }
+    }
 
-        IEnumerator ScanRoutine()
+    private async UniTask ScanRoutine()
+    {
+        //calculate
+        scanData = new ScanData { gameTime = Time.time, items = new() };
+        foreach (var kvp in itemManager.Items)
         {
-            //calculate
-            scanData = new ScanData { gameTime = Time.time, items = new() };
-            foreach (var kvp in itemManager.Items)
+            if (kvp.Value.InHand) continue;
+
+            if (IsInView(kvp.Value.MeshRenderer))
             {
-                if (kvp.Value.InHand) continue;
-
-                if (IsInView(kvp.Value.MeshRenderer))
-                {
-                    scanData.price += kvp.Value.SellPrice;
-                    scanData.items.Add(kvp.Value);
-                }
+                scanData.price += kvp.Value.SellPrice;
+                scanData.items.Add(kvp.Value);
             }
-
-            //animation
-            scanSphere.gameObject.SetActive(true);
-            scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
-            yield return new WaitForSeconds(0.5f);
-
-            var startColor = scanSphereMaterial.color;
-            var targetColor = startColor;
-            targetColor.a = 0;
-            scanSphereMaterial.DOColor(targetColor, 0.5f);
-            yield return new WaitForSeconds(0.5f);
-
-            scanSphere.gameObject.SetActive(false);
-            scanSphereMaterial.color = startColor;
-            scanSphere.localScale = Vector3.one * 0.1f;
         }
+
+        //animation
+        scanSphere.gameObject.SetActive(true);
+        scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
+        await UniTask.WaitForSeconds(0.5f);
+
+        var startColor = scanSphereMaterial.color;
+        var targetColor = new Color(startColor.r, startColor.g, startColor.b, 0);
+        scanSphereMaterial.DOColor(targetColor, 0.5f);
+        await UniTask.WaitForSeconds(0.5f);
+
+        scanSphere.gameObject.SetActive(false);
+        scanSphereMaterial.color = startColor;
+        scanSphere.localScale = Vector3.one * 0.1f;
     }
 
     private bool IsInView(Renderer toCheck)
@@ -285,6 +316,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoItem()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         var item = inventory.GetCurrentSlotItem();
@@ -292,17 +324,17 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         {
             curHandItemViewId.Value = item.photonView.ViewID;
 
-            if (inGameInput.Player.Interact.WasPressedThisFrame())
+            if (input.Player.Interact.WasPressedThisFrame())
             {
-                var interactId = (InteractID)(int)inGameInput.Player.Interact.ReadValue<float>();
+                var interactId = (InteractID)(int)input.Player.Interact.ReadValue<float>();
                 if (item.IsUsable(interactId))
                     item.OnUsePressed(interactId);
             }
 
-            if (inGameInput.Player.Interact.WasReleasedThisFrame())
+            if (input.Player.Interact.WasReleasedThisFrame())
                 item.OnUseReleased();
 
-            if (inGameInput.Player.Discard.WasPressedThisFrame())
+            if (input.Player.Discard.WasPressedThisFrame())
                 DiscardCurrentItem();
         }
         else
@@ -324,6 +356,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void DoInteract()
     {
+        if (isDie) return;
         if (!photonView.IsMine) return;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactionDistance, ~LayerMask.GetMask("Ignore Raycast", "Player")))
             hit.collider.TryGetComponent(out lookInteractable);
@@ -338,11 +371,11 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             {
                 Debug.Log("Target Interact ID is not None");
                 //if pressed target interact id => mark interact is start
-                if (inGameInput.Player.Interact.WasPressedThisFrame() && inGameInput.Player.Interact.ReadValue<float>() == (int)targetInteractId)
+                if (input.Player.Interact.WasPressedThisFrame() && input.Player.Interact.ReadValue<float>() == (int)targetInteractId)
                     interactRequireTimes[(int)targetInteractId] += Time.deltaTime;
 
                 //if released target interact id => set require time 0
-                if (inGameInput.Player.Interact.WasReleasedThisFrame())
+                if (input.Player.Interact.WasReleasedThisFrame())
                     interactRequireTimes[(int)targetInteractId] = 0;
 
                 //if interact marked
@@ -383,15 +416,16 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         isGround = Physics.CheckSphere(transform.position + groundCastOffset, groundCastRadius, groundCastMask);
 
+        if (isDie) return;
         if (!photonView.IsMine) return;
 
         //crouch
-        if (inGameInput.Player.Crouch.WasPressedThisFrame())
+        if (input.Player.Crouch.WasPressedThisFrame())
             isCrouch = !isCrouch;
 
         if (isCrouch)
         {
-            if (inGameInput.Player.Run.IsPressed())
+            if (input.Player.Run.IsPressed())
                 isCrouch = false;
 
             camView.localPosition =
@@ -404,7 +438,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         //movement
-        moveInput = inGameInput.Player.Move.ReadValue<Vector2>();
+        moveInput = input.Player.Move.ReadValue<Vector2>();
         var moveInputMag = Mathf.Clamp01(moveInput.magnitude);
         var relativeDir = transform.TransformDirection(new Vector3(moveInput.x, 0, moveInput.y)).normalized;
         var weightShave = Mathf.Lerp(1f, 0.5f, inventory.WholeWeight / curStats.GetStat(Stats.Key.Weight));
@@ -426,7 +460,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             }
 
             //setting stamina minimums for running
-            if (inGameInput.Player.Run.IsPressed() && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
+            if (input.Player.Run.IsPressed() && curStats.GetStat(Stats.Key.Stamina) >= 0.5f) isRun = true;
         }
         else
         {
@@ -438,7 +472,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             }
 
             if (curStats.GetStat(Stats.Key.Stamina) <= 0) isRun = false;
-            if (!inGameInput.Player.Run.IsPressed()) isRun = false;
+            if (!input.Player.Run.IsPressed()) isRun = false;
         }
         velocity = speed * moveInputMag * relativeDir;
 
@@ -446,7 +480,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         if (cc.isGrounded) velocityY = Mathf.Clamp(velocityY, 0, velocityY);
         else velocityY -= gravity * Time.deltaTime;
 
-        if (inGameInput.Player.Jump.WasPressedThisFrame() && isGround)
+        if (input.Player.Jump.WasPressedThisFrame() && isGround)
         {
             isJump = true;
             velocityY = jumpScale;
@@ -463,7 +497,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (!photonView.IsMine) return;
 
-        var mouseInput = inGameInput.Player.Mouse.ReadValue<Vector2>();// * Time.deltaTime;
+        var mouseInput = input.Player.Mouse.ReadValue<Vector2>();// * Time.deltaTime;
 
         //camera rotation
         camRotateX -= mouseInput.y * dataContainer.userData.mouseSensivity.y;

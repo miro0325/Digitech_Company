@@ -16,10 +16,10 @@ public class NetworkItemData
 public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 {
     //service
-    private ResourceLoader resourceLoader;
-    private ResourceLoader ResourceLoader => resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
-    private TestBasement testBasement;
-    private TestBasement TestBasement => testBasement ??= ServiceLocator.For(this).Get<TestBasement>();
+    private ResourceLoader _resourceLoader;
+    private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
+    private Basement _basement;
+    private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
 
     //field
     private string itemDataJson;
@@ -57,7 +57,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
 
                 if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                    var itemKeys = ResourceLoader.itemPrefabs.Keys.ToArray();
+                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
                     var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity) as ItemBase;
                     item.SetLayRotation(Random.Range(0, 360));
@@ -98,7 +98,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         for (int i = 0; i < datas.Length; i++)
         {
             var data = datas[i];
-            var item = NetworkObject.Sync(data.viewId, $"Prefabs/Items/{data.key}") as ItemBase;
+            var item = NetworkObject.Sync( $"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);
@@ -113,7 +113,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     public void DestoryItems(bool withoutBasement)
     {
         Dictionary<int ,ItemBase> excepts = new();
-        if(withoutBasement) excepts = TestBasement.Items;
+        if(withoutBasement) excepts = basement.WholeItems;
         
         foreach(var kvp in items.ToArray())
         {

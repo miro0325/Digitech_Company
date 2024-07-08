@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class InGamePlayerIKHandler : MonoBehaviour
 {
+    [SerializeField] private bool editorExecute;
     [SerializeField] private Animator animator;
     private Transform leftHandIKTarget;
     private Transform rightHandIKTarget;
@@ -54,6 +55,7 @@ public class InGamePlayerIKHandler : MonoBehaviour
 
     private void Update()
     {
-        animator.Update(0);
+        if(editorExecute)
+            animator.Update(0);
     }
 }

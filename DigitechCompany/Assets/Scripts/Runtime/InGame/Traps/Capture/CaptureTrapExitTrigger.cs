@@ -21,7 +21,7 @@ public class CaptureTrapExitTrigger : MonoBehaviour, IInteractable
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        return "≈ª√‚ Ω√µµ";
+        return unit.photonView.ViewID == trap.CapturedPlayerViewId ? "≈ª√‚ Ω√µµ" : "";
     }
 
     public void OnInteract(UnitBase unit)

@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
+using UniRx;
 using UnityEngine;
 
 public class NetworkObject : MonoBehaviourPun
@@ -8,8 +12,8 @@ public class NetworkObject : MonoBehaviourPun
 
     /// <summary>
     /// Instantiate prefab from resources folder<br/>
-    /// Send RPC to everyone (not buffered) <br/>
-    /// You can use this when you need to cache object with SyncInstantiate
+    /// Send RPC everyone (not buffered) <br/>
+    /// You can use this method when you need to spawn object and sync manually with SyncInstantiate
     /// </summary>
     /// <param name="prefab">resource fild path</param>
     /// <param name="pos">position</param>
@@ -17,10 +21,10 @@ public class NetworkObject : MonoBehaviourPun
     /// <returns></returns>
     public static NetworkObject Instantiate(string prefab, Vector3 pos = default, Quaternion quat = default)
         => networkObjectManager.InstantiateNetworkObjectInternal(prefab, pos, quat, false);
-    
+
     /// <summary>
     /// Instantiate prefab from resources folder<br/>
-    /// Send RPC to everyone <br/>
+    /// Send RPC everyone <br/>
     /// This is same as PhotonNetwork.Instantiate()
     /// </summary>
     /// <param name="prefab">resource fild path</param>
@@ -40,13 +44,13 @@ public class NetworkObject : MonoBehaviourPun
     /// <summary>
     /// Instantiate prefab from resources folder and sync using view id<br/>
     /// If photon view is not exist, Instantiate new prefab at prefab path and sync view id
-    /// You can use this with NetworkObject.Instantiate()
+    /// You can use this method with NetworkObject.Instantiate()
     /// </summary>
     /// <param name="viewId">view id to sync</param>
     /// <param name="prefab">resource fild path</param>
     /// <returns></returns>
-    public static NetworkObject Sync(int viewId, string prefab = null)
-        => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab);
+    public static NetworkObject Sync(string prefab, int viewId, Vector3 pos = default, Quaternion quat = default)
+        => networkObjectManager.SyncNetworkObjectInternal(viewId, prefab, pos, quat);
 
     public virtual void OnCreate() { }
 }

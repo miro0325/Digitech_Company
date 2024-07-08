@@ -2,17 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class ChargeEnergy : MonoBehaviour, IInteractable
 {
+    private UserInput input => UserInput.input;
+
     [SerializeField] private float chargingTime = 1;
     private bool isCharging = false;
-    private WaitForSeconds wait;
-
-    private void Awake()
-    {
-        wait = new WaitForSeconds(chargingTime);
-    }
 
     public string GetInteractionExplain(UnitBase unit)
     {
@@ -51,20 +48,22 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
         if(player && !isCharging)
         {
            if (player.Inventory.GetCurrentSlotItem() == null) return;
-           StartCoroutine(ChargingItem(player));
+           ChargingItem(player).Forget();
         }
     }
 
-    IEnumerator ChargingItem(InGamePlayer player)
+    async UniTask ChargingItem(InGamePlayer player)
     {
         isCharging = true;
-        player.ControlTerminal(true);
+        
+        input.Player.Disable();
         var originPos = player.ItemHolder.transform.position;
-        yield return player.ItemHolder.transform.DOMove(transform.position, 0.5f).WaitForCompletion();
-        yield return wait;
+        player.ItemHolder.transform.DOMove(transform.position, 0.5f);
+        await UniTask.WaitForSeconds(chargingTime + 0.5f);
+        
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => {
             isCharging = false;
-            player.ControlTerminal(false);
+            input.Player.Enable();
         });
     }
 }

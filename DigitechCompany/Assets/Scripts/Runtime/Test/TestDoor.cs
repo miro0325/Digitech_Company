@@ -29,6 +29,6 @@ public class TestDoor : MonoBehaviour, IInteractable
     public void OnInteract(UnitBase unit)
     {
         var player = unit as InGamePlayer;
-        if(player) player.SetPosition(position);
+        if(player) player.transform.position = position;
     }
 }

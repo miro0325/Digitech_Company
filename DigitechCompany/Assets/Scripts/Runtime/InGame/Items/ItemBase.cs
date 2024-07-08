@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using UniRx;
 using UnityEngine;
@@ -104,6 +105,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public override void OnCreate()
     {
+        base.OnCreate();
+
         //getcomponent
         rb = GetComponent<Rigidbody>();
         collider = GetComponent<Collider>();
@@ -111,9 +114,9 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
         meshRenderer = GetComponentInChildren<MeshRenderer>();
 
         ownUnitViewId
-            .Subscribe(viewId => 
-            {                
-                if(viewId == 0)
+            .Subscribe(viewId =>
+            {
+                if (viewId == 0)
                 {
                     OwnUnit = null;
                     transform.SetParent(null);
@@ -124,7 +127,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
                 OwnUnit = unit;
 
                 var player = unit as InGamePlayer;
-                if(player)
+                if (player)
                     //if player view is camera set camera holder other is body holder
                     transform.SetParent(player.photonView.IsMine ? player.ItemHolderCamera : player.ItemHolder);
                 else
@@ -218,7 +221,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     protected virtual void OnUseReleasedRpc()
     {
 
-    } 
+    }
 
     public virtual void OnDiscard()
     {
@@ -247,9 +250,25 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(0, layRotation, 0), Time.deltaTime * 1080);
     }
 
+    // protected override void OnSendData(List<System.Func<object>> send)
+    // {
+    //     send.Add(() => key);
+    //     send.Add(() => layRotation);
+    //     send.Add(() => ownUnitViewId.Value);
+    //     send.Add(() => sellPrice);
+    // }
+
+    // protected override void OnReceiveData(List<System.Action<object>> receive)
+    // {
+    //     receive.Add(obj => key = (string)obj);
+    //     receive.Add(obj => layRotation = (float)obj);
+    //     receive.Add(obj => ownUnitViewId.Value = (int)obj);
+    //     receive.Add(obj => sellPrice = (float)obj);
+    // }
+
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if(stream.IsWriting)
+        if (stream.IsWriting)
         {
             stream.SendNext(key);
             stream.SendNext(layRotation);
