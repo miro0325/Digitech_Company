@@ -31,6 +31,8 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 
     public void Initialize(InGamePlayer player)
     {
+        this.player = player;
+
         player
             .CurrentHandItemViewID
             .Subscribe(x =>
@@ -49,8 +51,6 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
             });
 
         if (!photonView.IsMine) return;
-
-        this.player = player;
         playerModelRenderers = playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>();
     }
 
