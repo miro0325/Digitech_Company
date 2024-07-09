@@ -106,8 +106,7 @@ public class AttackableItem : ItemBase, IInteractable
     public void OnAttack()
     {
         Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
-
-        Debug.Log("Attack!" + hits.Length);
+        //Debug.Log("Attack!" + hits.Length);
         foreach (Collider hit in hits)
         {
             var entity = hit.GetComponent<IDamagable>();

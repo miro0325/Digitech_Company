@@ -10,7 +10,7 @@ public class Rats : MonsterBase
 {
     public enum RatsState
     {
-        Idle, Searching, Stolen, Attack, RunAway, Bring, Protect, Death
+        Idle, Searching, Stolen, Attack, Guard, Bring, Protect, Death
     }
 
     public static Vector3 NestPosition;
@@ -78,19 +78,19 @@ public class Rats : MonsterBase
                         {
                             new Action(() => CheckState(RatsState.Searching)),
                             new Action(() => SearchItem()),
-                            //new CheckEnemyInFOV(fov,true),
-                            //new Action(() => SetState(RatsState.RunAway)),
+                            new CheckEnemyInFOV(fov,true),
+                            new Action(() => SetState(RatsState.Guard)),
                         }),
                         new Sequence(new List<Node>
                         {
                             new Action(() => CheckState(RatsState.Bring)),
                             new Action(() => GoToItem()),
                         }),
-                        //new Sequence(new List<Node>
-                        //{
-                        //    new Action(() => CheckState(RatsState.RunAway)),
-                        //    new Action(() => GoToRandomPos(transform.position,5,10))
-                        //}),
+                        new Sequence(new List<Node>
+                        {
+                            new Action(() => CheckState(RatsState.Guard)),
+                            new Action(() => GuardFromPlayer())
+                        }),
                         new Sequence(new List<Node>
                         {
                             new Action(() => CheckState(RatsState.Attack)),
@@ -165,22 +165,26 @@ public class Rats : MonsterBase
     private NodeState CheckItemInNest()
     {
         if(targetPlayer != null && !targetPlayer.IsDie) return NodeState.Succes;
+        ItemBase stolenItem = null;
         foreach(var item in itemsInNest)
         {
             if(item.CurUnit is InGamePlayer)
             {
+                stolenItem = item;
                 targetPlayer = item.CurUnit as InGamePlayer;
                 ChangeTexture(true);
                 state = RatsState.Attack;
                 return NodeState.Succes;
             }
         }
+        if(stolenItem != null)
+            itemsInNest.Remove(stolenItem);
         return NodeState.Failure;
     }
 
     private NodeState CheckPlayerFromNest()
     {
-        if (state.Equals(RatsState.Attack) || state.Equals(RatsState.RunAway) || itemsInNest.Count == 0 ) return NodeState.Failure;
+        if (state.Equals(RatsState.Attack) || itemsInNest.Count == 0 ) return NodeState.Failure;
         if(itemsInNest.Count == 0) return NodeState.Failure;    
         Collider[] hits = Physics.OverlapBox(NestPosition, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Player"));
         var players = hits.Select(x => x.GetComponent<InGamePlayer>()).ToArray();
@@ -228,19 +232,12 @@ public class Rats : MonsterBase
         }
         if(agent.isStopped) agent.isStopped = false;
         Move(destination);
-        Collider[] hits = Physics.OverlapBox(transform.position, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Item"));
-        var items = hits.Select(x => x.GetComponent<ItemBase>()).Where(x => !itemsInNest.Contains(x)).Where(x => x.CurUnit == null).ToArray();
-        if (items.Length > 0)
+        if(DetectItem())
         {
-            if(targetItem == null)
-            {
-                targetItem = items[0];
-                curSearchCount = 0;
-                isArrive = true;
-                state = RatsState.Bring;
-                targetPos = GetNavMeshPosition(targetItem.transform.position, default(NavMeshHit));
-                return NodeState.Succes;
-            }
+            isArrive = true;
+            curSearchCount = 0;
+            state = RatsState.Bring;
+            return NodeState.Succes;
         }
         if (Vector3.Distance(transform.position, destination) < 1f) {
             curSearchCount++;
@@ -260,7 +257,7 @@ public class Rats : MonsterBase
         }
         if (agent.isStopped) agent.isStopped = false;
         Move(targetPos);
-        if(PickItem())
+        if(PickItem(targetItem))
         {
             state = RatsState.Idle;
             return NodeState.Succes;
@@ -268,41 +265,22 @@ public class Rats : MonsterBase
         return NodeState.Running;
     }
 
-    private NodeState GoToRandomPos(Vector3 pos, float minRange, float maxRange, int count = 100)
+    private NodeState GuardFromPlayer()
     {
-        bool isFind = false;
-        NodeState nodeState = NodeState.Running;
-        if(!isAlreadySetRandomPoint)
+        var targetPlayers = fov.TargetUnits.Where(x => x is InGamePlayer).Select(x => x as InGamePlayer).Where(x => !x.IsDie).ToArray();
+        if (targetPlayers.Any())
         {
-            int i = 0;
-            //NavMeshHit navMeshHit;
-            //Vector3 randomPos = transform.position;
-            while (i < count)
-            {
-                Vector3 randomDir = Random.Range(minRange, maxRange) * Random.insideUnitSphere;
-                randomDir.y = 0.1f;
-                Debug.DrawLine(pos,pos+randomDir);
-                if (SetDestinationToPosition(pos + randomDir))
-                {
-                    Debug.Log("Succes Calculate");
-                    isFind = true;
-                    break;
-                }
-                i++;
-            }
-            //targetPos = randomPos;
-            Debug.Log(destination);
-            isAlreadySetRandomPoint = true;
-        }
-        if (!isFind) destination = transform.position;
-        Move(destination);
-        if(Vector3.Distance(transform.position, destination) < 0.5f)
+            agent.isStopped = true;
+            var player = targetPlayers.First();
+            RotateToDir(player.transform.position);
+            return NodeState.Running;
+        } 
+        else
         {
-            nodeState = NodeState.Succes;
+            agent.isStopped = true;
             state = RatsState.Searching;
-            isAlreadySetRandomPoint = false;
+            return NodeState.Failure;
         }
-        return nodeState;
     }
 
     private NodeState CheckTarget()
@@ -310,7 +288,17 @@ public class Rats : MonsterBase
         if(targetPlayer == null || (targetPlayer != null && targetPlayer.IsDie))
         {
             ChangeTexture(false);
-            state = RatsState.Idle;
+            if (DetectItem())
+            {
+                isArrive = true;
+                curSearchCount = 0;
+                state = RatsState.Bring;
+                return NodeState.Failure;
+            }
+            else
+            {
+                state = RatsState.Idle;
+            }
             return NodeState.Failure;
         } else
         {
@@ -410,14 +398,14 @@ public class Rats : MonsterBase
         isAttacking = false;
     }
 
-    private bool PickItem()
+    private bool PickItem(ItemBase _targetItem)
     {
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
-            originItemSize = targetItem.transform.localScale;
-            targetItem.OnInteract(this);
-            targetItem.transform.localPosition = Vector3.zero;
-            targetItem.transform.localScale *= itemHolder.localScale.x;
+            originItemSize = _targetItem.transform.localScale;
+            _targetItem.OnInteract(this);
+            _targetItem.transform.localPosition = Vector3.zero;
+            _targetItem.transform.localScale *= itemHolder.localScale.x;
             weapon.gameObject.SetActive(false);
             
             return true;
@@ -435,6 +423,23 @@ public class Rats : MonsterBase
             targetItem = null;
             weapon.gameObject.SetActive(true);
             return true;
+        }
+        return false;
+    }
+
+    private bool DetectItem()
+    {
+        Collider[] hits = Physics.OverlapBox(transform.position, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Item"));
+        var items = hits.Select(x => x.GetComponent<ItemBase>()).Where(x => !itemsInNest.Contains(x)).Where(x => x.CurUnit == null).ToArray();
+        if (items.Length > 0)
+        {
+            if (targetItem == null)
+            {
+                targetItem = items[0];
+                targetPos = GetNavMeshPosition(targetItem.transform.position, default(NavMeshHit));
+                return true;
+            }
+            return false;
         }
         return false;
     }
