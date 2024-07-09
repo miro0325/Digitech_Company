@@ -10,7 +10,7 @@ public class PlayUI : MonoBehaviour
         ServiceLocator
             .For(this)
             .Get<InGamePlayer>()
-            .ObserveEveryValueChanged(p => p.gameObject.activeSelf)
-            .Subscribe(active => view.SetActive(active));
+            .ObserveEveryValueChanged(p => p.IsDie)
+            .Subscribe(active => view.SetActive(!active));
     }
 }

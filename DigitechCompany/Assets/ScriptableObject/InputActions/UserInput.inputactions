@@ -2,6 +2,56 @@
     "name": "UserInput",
     "maps": [
         {
+            "name": "Lobby",
+            "id": "e38fa875-5526-4e2e-91d7-382b44b847e5",
+            "actions": [
+                {
+                    "name": "UpDown",
+                    "type": "Value",
+                    "id": "ee59bcda-7b79-4d74-9bc5-624f6685df81",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "1D Axis",
+                    "id": "b5c1e69f-7d48-470d-8aaa-52b9e1b5e68e",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "8b328288-e7aa-4d5b-b288-c178cb5f5749",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "5d0cb986-4e80-4c12-9716-631884e90b5e",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        },
+        {
             "name": "Player",
             "id": "b5539bad-94ee-42d6-b9ba-f483621ea4ae",
             "actions": [
@@ -397,12 +447,6 @@
                     "isPartOfComposite": false
                 }
             ]
-        },
-        {
-            "name": "UIOpen",
-            "id": "e38fa875-5526-4e2e-91d7-382b44b847e5",
-            "actions": [],
-            "bindings": []
         }
     ],
     "controlSchemes": [

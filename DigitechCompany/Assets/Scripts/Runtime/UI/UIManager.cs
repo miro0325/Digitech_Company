@@ -8,54 +8,28 @@ using UnityEngine.SceneManagement;
 public class UIManager : MonoBehaviour, IService
 {
     [SerializeField] private GameObject background;
+    [SerializeField] private UIView defaultView;
 
     private UIView current;
     private Stack<UIView> viewStack = new();
-    private UIViewContainer globalViews;
-    private Dictionary<Scene, UIViewContainer> sceneViews = new();
+    private Dictionary<Type, UIView> views = new();
 
     private void Awake()
     {
-        if (ServiceLocator.ForGlobal().TryRegister(this))
-        {
-            SceneManager.sceneUnloaded += scene =>
-            {
-                if (!ReferenceEquals(current, null))
-                {
-                    current.Close();
-                    current = null;
-                }
-                viewStack.Clear();
-                sceneViews.Remove(scene);
-            };
-
-            this.ObserveEveryValueChanged(x => x.current)
-                .Subscribe(view => background.SetActive(!ReferenceEquals(current, null)));
-        }
+        ServiceLocator.For(this).TryRegister(this);
+        this.ObserveEveryValueChanged(x => x.current).Subscribe(view => background.SetActive(!ReferenceEquals(current, null)));
     }
 
-    public void RegisterView<TView>(TView view, bool dontDestoryOnLoad) where TView : UIView
+    private void Start()
     {
-        if (dontDestoryOnLoad) //global
-        {
-            if (!globalViews)
-            {
-                globalViews = new GameObject("UI View Container [Global]").AddComponent<UIViewContainer>();
-                DontDestroyOnLoad(globalViews);
-            }
-            globalViews.BindingViewInternal(view);
-            DontDestroyOnLoad(view);
-        }
-        else //current scene
-        {
-            var scene = view.gameObject.scene;
-            if (!sceneViews.ContainsKey(scene))
-            {
-                var newContainer = new GameObject("UI View Container [Scene]").AddComponent<UIViewContainer>();
-                sceneViews.Add(scene, newContainer);
-            }
-            sceneViews[scene].BindingViewInternal(view);
-        }
+        current = defaultView;
+        defaultView?.Open();
+    }
+
+    public void RegisterView<TView>(TView view) where TView : UIView
+    {
+        Debug.Log(typeof(TView));
+        views.TryAdd(typeof(TView), view);
     }
 
     public TView Open<TView>() where TView : UIView
@@ -81,36 +55,64 @@ public class UIManager : MonoBehaviour, IService
 
     private bool TryGetView<TView>(out TView view) where TView : UIView
     {
-        if (globalViews && globalViews.TryGetViewInternal(out view))
-            return true;
-
-        foreach (var sceneView in sceneViews)
+        UIView instance;
+        if (views.TryGetValue(typeof(TView), out instance))
         {
-            if (sceneView.Value.TryGetViewInternal(out view))
-                return true;
+            view = instance as TView;
+            return true;
         }
-
         view = null;
         return false;
     }
 
-    public void CloseRecent()
+    public void CloseRecently()
     {
-        if (current == null)
+        //has default view
+        if (!ReferenceEquals(defaultView, null))
         {
-            Debug.LogWarning($"There is not exist current open view");
-            return;
-        }
+            if (ReferenceEquals(current, defaultView))
+            {
+                Debug.LogWarning($"Default ui was set, Request was ignored");
+                return;
+            }
 
-        current.Close();
-        if (viewStack.Count > 0)
-        {
-            current = viewStack.Pop();
-            current.Open();
+            current.Close();
+            if (viewStack.Count > 0)
+            {
+                current = viewStack.Pop();
+                current.Open();
+            }
+            else
+            {
+                if (ReferenceEquals(defaultView, null))
+                {
+                    current = null;
+                }
+                else
+                {
+                    current = defaultView;
+                    current.Open();
+                }
+            }
         }
         else
         {
-            current = null;
+            if (current = null)
+            {
+                Debug.LogWarning($"There is not exist current open view");
+                return;
+            }
+
+            current.Close();
+            if (viewStack.Count > 0)
+            {
+                current = viewStack.Pop();
+                current.Open();
+            }
+            else
+            {
+                current = null;
+            }
         }
     }
 }

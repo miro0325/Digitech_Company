@@ -133,6 +133,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         curStats.ChangeFrom(maxStats);
         gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
         SetCamera();
+        cc.enabled = true;
         isDie = false;
     }
 
@@ -237,7 +238,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             input.Player.Disable();
             animator.SetActivePlayerModel(true);
             animator.SetActiveArmModel(false);
-            this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1f);
+            cc.enabled = false;
+            this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1.5f);
         }
     }
     private void DoScan()

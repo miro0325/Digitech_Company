@@ -8,6 +8,7 @@ using Photon.Realtime;
 using UnityEngine.InputSystem;
 using MSLIMA.Serializer;
 using Sherbert.Framework.Generic;
+using Unity.AI.Navigation;
 
 public enum SyncTarget
 {
@@ -43,7 +44,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         public int viewID;
         public bool isAlive;
         public bool[] sync = new bool[(int)SyncTarget.End];
-        public string playerName = "ÇÃ·¹ÀÌ¾î";
+        public string playerName = "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½";
         public float gainDamage;
         public float fearAmount;
         public bool isGainMaxDamage;
@@ -100,7 +101,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
 
     //inspector
-    [SerializeField] private MeshRenderer[] rooms;
+    [SerializeField] private NavMeshSurface surface;
     [SerializeField] private TestTrapData[] trapDatas;
 
     //field
@@ -320,8 +321,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void InitializeGameAndRequestLoad()
     {
-        itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
-        testSpawner.SpawnMonsters();
+        var map = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity);
+        surface.BuildNavMesh();
+
+        var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
+
+        Debug.Log(rooms.Length);
+
+        itemManager.SpawnItem(1, rooms);
         playerDatas[PhotonNetwork.LocalPlayer].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 

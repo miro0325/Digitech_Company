@@ -159,9 +159,9 @@ Transform:
   - {fileID: 1443094661}
   - {fileID: 1591973280}
   - {fileID: 1318686454}
-  - {fileID: 2142553172}
   - {fileID: 1478106706}
   - {fileID: 1944875202}
+  - {fileID: 2142553172}
   - {fileID: 831521178}
   - {fileID: 2139816010}
   m_Father: {fileID: 0}
@@ -1480,6 +1480,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 84249951}
     m_Modifications:
+    - target: {fileID: 2793636788809391080, guid: dd8a924a7441a5d449f0cd6a468f9be7,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2864915064015088004, guid: dd8a924a7441a5d449f0cd6a468f9be7,
         type: 3}
       propertyPath: m_Name
@@ -1554,7 +1559,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: dd8a924a7441a5d449f0cd6a468f9be7, type: 3}
 --- !u!4 &2142553172 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 3209353215035880254, guid: dd8a924a7441a5d449f0cd6a468f9be7,
+  m_CorrespondingSourceObject: {fileID: 2793636788809391081, guid: dd8a924a7441a5d449f0cd6a468f9be7,
     type: 3}
   m_PrefabInstance: {fileID: 2142553171}
   m_PrefabAsset: {fileID: 0}
