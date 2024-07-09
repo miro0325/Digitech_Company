@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class PopupUI : MonoBehaviour, IService
 {
     public class ButtonData

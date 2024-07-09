@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LobbyRoomSlot : MonoBehaviour
@@ -11,6 +12,8 @@ public class LobbyRoomSlot : MonoBehaviour
     private PopupUI popupUI => _popupUI ??= ServiceLocator.ForGlobal().Get<PopupUI>();
     private LobbyPunCallbackReceiver _callbackReceiver;
     private LobbyPunCallbackReceiver callbackReceiver => _callbackReceiver ??= ServiceLocator.For(this).Get<LobbyPunCallbackReceiver>();
+    private LobbyFadeOutUI _fadeOutUI;
+    private LobbyFadeOutUI fadeOutUI => _fadeOutUI ??= ServiceLocator.For(this).Get<LobbyFadeOutUI>();
 
     [SerializeField] private TextMeshProUGUI roomName;
     [SerializeField] private TextMeshProUGUI data;
@@ -38,7 +41,7 @@ public class LobbyRoomSlot : MonoBehaviour
 
     public void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel("InGame");
+        fadeOutUI.FadeOut(2f, () => SceneManager.LoadScene("InGame"));
         popupUI.Close();
     }
 
