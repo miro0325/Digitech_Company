@@ -329,6 +329,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         Debug.Log(rooms.Length);
 
         itemManager.SpawnItem(1, rooms);
+        testSpawner.SpawnMonsters();
         playerDatas[PhotonNetwork.LocalPlayer].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 
