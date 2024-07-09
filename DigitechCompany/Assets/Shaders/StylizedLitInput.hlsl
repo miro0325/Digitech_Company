@@ -15,6 +15,7 @@
 CBUFFER_START(UnityPerMaterial)
 float4 _BaseMap_ST;
 float4 _BrushTex_ST;
+float4 _EmissionTex_ST;
 float4 _DetailAlbedoMap_ST;
 half4 _BaseColor;
 half4 _SpecColor;
@@ -98,6 +99,7 @@ TEXTURE2D(_MetallicGlossMap);   SAMPLER(sampler_MetallicGlossMap);
 TEXTURE2D(_SpecGlossMap);       SAMPLER(sampler_SpecGlossMap);
 TEXTURE2D(_ClearCoatMap);       SAMPLER(sampler_ClearCoatMap);
 TEXTURE2D(_BrushTex);           SAMPLER(sampler_BrushTex);
+TEXTURE2D(_EmissionTex);        SAMPLER(sampler_EmissionTex);
 
 #ifdef _SPECULAR_SETUP
     #define SAMPLE_METALLICSPECULAR(uv) SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv)

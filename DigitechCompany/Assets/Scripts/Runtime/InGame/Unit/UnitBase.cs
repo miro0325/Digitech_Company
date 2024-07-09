@@ -1,7 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 
-public abstract class UnitBase : NetworkObject
+public abstract class UnitBase : NetworkObject,IDamagable
 {
     [Header("BaseUnit")]
     [SerializeField] protected Transform itemHolder;
@@ -19,6 +19,8 @@ public abstract class UnitBase : NetworkObject
 
     public abstract Stats BaseStats { get; }
 
+    public GameObject OwnObject => this.gameObject;
+
     public override void OnCreate()
     {
         base.OnCreate();
@@ -32,4 +34,25 @@ public abstract class UnitBase : NetworkObject
             curStats.SetStat(key, x => x + diff);
         };
     }
+    
+    public virtual void Damage(float damage, UnitBase attacker)
+    {
+        photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
+    }
+
+    [PunRPC]
+    protected void SendDamageToOwnerRpc(float damage)
+    {
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
+        curStats.SetStat(Stats.Key.Hp, x => x - damage);
+        if (curStats.GetStat(Stats.Key.Hp) <= 0)
+        {
+            Death();
+        }
+    }
+
+    protected virtual void Death()
+    {
+
+    } 
 }

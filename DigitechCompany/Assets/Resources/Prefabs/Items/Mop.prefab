@@ -182,6 +182,7 @@ Transform:
   - {fileID: 2850510037709950021}
   - {fileID: 1206278127}
   - {fileID: 2103392091}
+  - {fileID: 4874079430570005239}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -277,6 +278,9 @@ MonoBehaviour:
   camHoldRot: {x: 68.21302, y: 105.77199, z: 289.679}
   leftHandPoint: {fileID: 1206278127}
   rightHandPoint: {fileID: 2103392091}
+  attackPoint: {fileID: 4874079430570005239}
+  atkDamage: 20
+  attackRadius: 0.4
 --- !u!114 &1152228089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,3 +297,34 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!1 &6528896963639935300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4874079430570005239}
+  m_Layer: 7
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4874079430570005239
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6528896963639935300}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.714, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1562513690961932807}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

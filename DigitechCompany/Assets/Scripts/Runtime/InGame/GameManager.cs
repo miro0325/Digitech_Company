@@ -90,6 +90,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //service
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
+    private TestSpawner _testSpawner;
+    private TestSpawner testSpawner => _testSpawner ??= ServiceLocator.For(this).Get<TestSpawner>();
     private SpectatorView _spectatorView;
     private SpectatorView spectatorView => _spectatorView ??= ServiceLocator.For(this).Get<SpectatorView>();
     private InGamePlayer _player;
@@ -319,6 +321,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void InitializeGameAndRequestLoad()
     {
         itemManager.SpawnItem(1, rooms.Select(r => r.bounds).ToArray());
+        testSpawner.SpawnMonsters();
         playerDatas[PhotonNetwork.LocalPlayer].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 

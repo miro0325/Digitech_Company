@@ -61,7 +61,7 @@ public class ClaymoreTrap : NetworkObject
         {
             var distanceRatio = explosion.distance / explosionRange;
             var damageFactor = distanceRatio < 0.5f ? 1 : distanceRatio * 2;
-            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor);
+            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor,null);
         }
         GetComponent<MeshRenderer>().enabled = false;
         lr.enabled = false;

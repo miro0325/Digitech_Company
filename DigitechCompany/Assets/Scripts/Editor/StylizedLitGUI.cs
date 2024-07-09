@@ -1,6 +1,7 @@
 //using UnityEngine;
 //using UnityEngine.Rendering;
 
+
 //namespace UnityEditor.Rendering.Universal.ShaderGUI
 //{
 //    public static class StylizedLitGUI
@@ -147,7 +148,7 @@
 //                clearCoatMask = BaseShaderGUI.FindProperty("_ClearCoatMask", properties, false);
 //                clearCoatSmoothness = BaseShaderGUI.FindProperty("_ClearCoatSmoothness", properties, false);
 
-//                useBrushTex = BaseShaderGUI.FindProperty("_UseBrushTex",properties, false);
+//                useBrushTex = BaseShaderGUI.FindProperty("_UseBrushTex", properties, false);
 //                brushTex = BaseShaderGUI.FindProperty("_BrushTex", properties, false);
 //                medColor = BaseShaderGUI.FindProperty("_MedColor", properties, false);
 //                medSmooth = BaseShaderGUI.FindProperty("_MedSmooth", properties, false);
@@ -155,7 +156,7 @@
 //                medBrushStrength = BaseShaderGUI.FindProperty("_MedBrushStrength", properties, false);
 //                shadowColor = BaseShaderGUI.FindProperty("_ShadowColor", properties, false);
 //                shadowSmooth = BaseShaderGUI.FindProperty("_ShadowSmooth", properties, false);
-//                shadowThreshold = BaseShaderGUI.FindProperty("_ShadowThreshold", properties, false); 
+//                shadowThreshold = BaseShaderGUI.FindProperty("_ShadowThreshold", properties, false);
 //                shadowBrushStrength = BaseShaderGUI.FindProperty("_ShadowBrushStrength", properties, false);
 //                reflectColor = BaseShaderGUI.FindProperty("_ReflectColor", properties, false);
 //                reflectSmooth = BaseShaderGUI.FindProperty("_ReflectSmooth", properties, false);
@@ -188,14 +189,14 @@
 //                materialEditor.TexturePropertySingleLine(StStyles.occlusionText, properties.occlusionMap,
 //                    properties.occlusionMap.textureValue != null ? properties.occlusionStrength : null);
 //            }
-            
+
 //            // Check that we have all the required properties for clear coat,
 //            // otherwise we will get null ref exception from MaterialEditor GUI helpers.
 //            if (ClearCoatAvailable(material))
 //                DoClearCoat(properties, materialEditor, material);
 //        }
 
-        
+
 
 //        private static bool ClearCoatAvailable(Material material)
 //        {
@@ -270,7 +271,42 @@
 //                opaque = ((BaseShaderGUI.SurfaceType)material.GetFloat(Property.SurfaceType) == BaseShaderGUI.SurfaceType.Opaque);
 //            return opaque;
 //        }
+//        public void DrawStylizedInputs(Material material)
+//{
+//    if(litProperties.brushTex != null) // Draw the baseMap, most shader will have at least a baseMap
+//    {
+//        EditorGUILayout.HelpBox("Brush Texture", MessageType.None);
+//        EditorGUILayout.Space();
+//        materialEditor.TexturePropertySingleLine(Styles.brushTexGUI, litProperties.brushTex);
+//        // TODO Temporary fix for Lightmapping, to be replaced with attribute tag.
+//        if(material.HasProperty("_BrushTex"))
+//        {
+//            material.SetTexture("_BrushTex", litProperties.brushTex.textureValue);
+//            if(material.GetTexture("_BrushTex") != null)
+//            {
+//                var brushTexTiling = litProperties.brushTex.textureScaleAndOffset;
+//                material.SetTextureScale("_BrushTex", new Vector2(brushTexTiling.x, brushTexTiling.y));
+//                material.SetTextureOffset("_BrushTex", new Vector2(brushTexTiling.z, brushTexTiling.w));
+//            }
+//        }
+//        if(material.GetTexture("_BrushTex") != null)
+//        {
+//            materialEditor.TextureScaleOffsetProperty(litProperties.brushTex);
+//            materialEditor.ShaderProperty(litProperties.brushStrength, Styles.brushStrengthGUI, 2);
+//            materialEditor.ShaderProperty(litProperties.shadowBrushStrength, Styles.shadowBrushStrengthGUI, 2);
+//            materialEditor.ShaderProperty(litProperties.refBrushStrength, Styles.refBrushStrengthGUI, 2);
+//        }
+//    }
 
+//    EditorGUILayout.Space();
+
+//    EditorGUILayout.HelpBox("Stylized Diffuse", MessageType.None);
+
+//    materialEditor.ShaderProperty(litProperties.midColor, Styles.midColorGUI, 2);
+//    materialEditor.ShaderProperty(litProperties.midContrast, Styles.midContrastGUI, 2);
+//    materialEditor.ShaderProperty(litProperties.midTex, Styles.midTexGUI, 2);
+//    materialEditor.ShaderProperty(litProperties.midSmooth, Styles.midSmoothGUI, 2);
+//}
 //        public static void DoSmoothness(MaterialEditor materialEditor, Material material, MaterialProperty smoothness, MaterialProperty smoothnessMapChannel, string[] smoothnessChannelNames)
 //        {
 //            EditorGUI.indentLevel += 2;
@@ -374,5 +410,5 @@
 //        }
 
 //    }
-    
+
 //}

@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class ChargeEnergy : MonoBehaviour, IInteractable
 {
+    private UserInput input => UserInput.input;
+
     [SerializeField] private ParticleSystem chargingEffect;
     [SerializeField] private float chargingTime = 1;
     [SerializeField] private float interactableRange;
@@ -61,7 +63,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
     IEnumerator ChargingItem(InGamePlayer player)
     {
         isCharging = true;
-        player.ControlTerminal(true);
+        input.Player.Disable();
         var item = player.Inventory.GetCurrentSlotItem();
         var originPos = player.ItemHolder.transform.position;
         var itemOriginPos = item.transform.position;
@@ -72,7 +74,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
         item.transform.DOMove(itemOriginPos, 0.5f);
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => {
             isCharging = false;
-            player.ControlTerminal(false);
+            input.Player.Enable();
         });
     }
 }

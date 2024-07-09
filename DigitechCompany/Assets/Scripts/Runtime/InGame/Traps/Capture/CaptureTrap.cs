@@ -69,7 +69,7 @@ public class CaptureTrap : NetworkObject
                         capturePlayerDamageTime = 1;
                         state = State.Capture;
 
-                        if(photonView.IsMine) CapturedPlayer.Damage(20);
+                        if(photonView.IsMine) CapturedPlayer.Damage(20,null);
                         Debug.Log("Captured!");
                     }
                 }
@@ -85,7 +85,7 @@ public class CaptureTrap : NetworkObject
                     }
                     else
                     {
-                        CapturedPlayer.Damage(1);
+                        CapturedPlayer.Damage(1,null);
                         capturePlayerDamageTime = 1;
                     }
                 }

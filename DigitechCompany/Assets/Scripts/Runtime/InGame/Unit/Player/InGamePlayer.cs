@@ -88,7 +88,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
 
-    public void Damage(float damage)
+    public override void Damage(float damage, UnitBase attacker)
     {
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }

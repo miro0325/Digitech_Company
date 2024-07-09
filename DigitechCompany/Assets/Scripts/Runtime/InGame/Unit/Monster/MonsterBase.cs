@@ -6,6 +6,11 @@ using BehaviorTree;
 
 public abstract class MonsterBase : UnitBase
 {
+    protected static int Animator_AttackHash = Animator.StringToHash("Attack");
+    protected static int Animator_DamagedHash = Animator.StringToHash("Damaged");
+    protected static int Animator_DeathHash = Animator.StringToHash("Death");
+
+    [Header("Monstar Basic Setting"),Space(20)]
     [SerializeField]
     protected FieldOfView fov;
     [SerializeField]
@@ -15,11 +20,19 @@ public abstract class MonsterBase : UnitBase
     [SerializeField]
     protected Animator animator;
 
-    protected Stats testBaseStat;
+    [Header("Monstar Attack Setting"), Space(20)]
+    [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected float attackRadius;
+    [SerializeField] protected float attackRange;
+    [Space(5)][SerializeField] protected float attackDamage;
+ 
     protected NavMeshAgent agent;
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
     protected Vector3 destination;
+    protected bool isAttacking = false;
+    protected bool isDeath = false;
+    protected Stats testBaseStat = new();
 
     public override Stats BaseStats => testBaseStat;
     public NavMeshAgent Agent => agent;
@@ -33,6 +46,11 @@ public abstract class MonsterBase : UnitBase
             animator = GetComponent<Animator>();
         }
         Spawn();
+    }
+
+    public virtual void Inititalize(Transform[] waypoints)
+    {
+        this.waypoints = waypoints;
     }
 
     protected virtual void Update()
@@ -73,7 +91,12 @@ public abstract class MonsterBase : UnitBase
 
     protected abstract void Attack();
 
-    protected abstract void Death();
+    protected override void Death()
+    {
+        animator.SetTrigger(Animator_DeathHash);
+        agent.isStopped = true;
+        isDeath = true;
+    }
 
     public Vector3 GetNavMeshPosition(Vector3 pos, NavMeshHit navMeshHit = default(NavMeshHit), float sampleRadius = 5f, int areaMask = -1)
     {
@@ -105,4 +128,21 @@ public abstract class MonsterBase : UnitBase
         return true;
     }
 
+    protected NodeState CheckDeath(bool reverse = false)
+    {
+        NodeState state;
+        if (isDeath) state = reverse ? NodeState.Succes : NodeState.Failure;
+        else state = reverse ? NodeState.Failure : NodeState.Succes;
+        return state;
+    }
+
+    public override void Damage(float damage,UnitBase attacker)
+    {
+        curStats.SetStat(Stats.Key.Hp, x => x - damage);
+        animator.SetTrigger(Animator_DamagedHash);
+        if(curStats.GetStat(Stats.Key.Hp) <= 0)
+        {
+            Death();
+        }
+    }
 }

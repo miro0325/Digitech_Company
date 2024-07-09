@@ -10,19 +10,23 @@ public class TraceTarget : Node
 
     private NavMeshPath path = new NavMeshPath();
     private int cornerIndex = 0;
-    private bool isCalculatePath = false;
     private float dist;
+    private bool isCalculatePath = false;
+    private bool isContinue;
 
-    public TraceTarget(MonsterBase monster, float dist = 0.01f) : base()
+
+    public TraceTarget(MonsterBase monster, float dist = 0.01f, bool isContinue = true) : base()
     {
         this.monster = monster;
         this.dist = dist;
+        this.isContinue = isContinue;
     }
 
-    public TraceTarget(MonsterBase monster, List<Node> children, float dist = 0.01f) : base(children)
+    public TraceTarget(MonsterBase monster, List<Node> children, float dist = 0.01f, bool isContinue = true) : base(children)
     {
         this.monster = monster;
         this.dist = dist;
+        this.isContinue = isContinue;
     }
 
     public override NodeState Evaluate()
@@ -38,14 +42,11 @@ public class TraceTarget : Node
                     isCalculatePath = true;
                 }
             }
-        }
-        if(!isCalculatePath)
-        {
             if (Vector3.Distance(monster.transform.position, target.position) > 0.5f)
             {
                 monster.Move(target.position);
             }
-        } 
+        }
         else
         {
             monster.Move(target.position);
@@ -67,7 +68,7 @@ public class TraceTarget : Node
                 return NodeState.Succes;
             }
         }
-        state = NodeState.Running;
+        state = isContinue ? NodeState.Running : NodeState.Failure;
         return state;   
     }
 }
