@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     //inspector
     [SerializeField] private NavMeshSurface surface;
+    [SerializeField] private MeshRenderer[] rooms;
     [SerializeField] private TestTrapData[] trapDatas;
 
     //field
@@ -321,15 +322,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void InitializeGameAndRequestLoad()
     {
-        var map = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity);
+        // var map = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity);
         surface.BuildNavMesh();
 
-        var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
+        // var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
 
         Debug.Log(rooms.Length);
 
-        itemManager.SpawnItem(1, rooms);
-        testSpawner.SpawnMonsters();
+        itemManager.SpawnItem(1, rooms.Select(m => m.bounds).ToArray());
+        // testSpawner.SpawnMonsters();
         playerDatas[PhotonNetwork.LocalPlayer].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 
