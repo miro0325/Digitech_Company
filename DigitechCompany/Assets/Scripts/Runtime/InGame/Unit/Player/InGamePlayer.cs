@@ -123,7 +123,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         animator.SetActiveArmModel(true);
         animator.SetActivePlayerModel(false);
 
-        animator.enabled = true;
         input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
@@ -131,6 +130,15 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         SetCamera();
         cc.enabled = true;
         isDie = false;
+
+        photonView.RPC(nameof(SendReviveToOtherRpc), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    private void SendReviveToOtherRpc()
+    {
+        animator.SetActivePlayerModel(true);
+        gameObject.SetActive(true);
     }
 
     public override void OnCreate()
@@ -519,12 +527,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (stream.IsWriting)
         {
+            stream.SendNext(isDie);
             stream.SendNext(isInBasement);
             stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
+            isDie = (bool)stream.ReceiveNext();
             isInBasement = (bool)stream.ReceiveNext();
             gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();
