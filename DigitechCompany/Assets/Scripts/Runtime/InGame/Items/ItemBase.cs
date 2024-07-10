@@ -117,6 +117,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
         ownUnitViewId
             .Subscribe(viewId =>
             {
+                Debug.Log($"View ID : {viewId}");
                 if (viewId == 0)
                 {
                     OwnUnit = null;

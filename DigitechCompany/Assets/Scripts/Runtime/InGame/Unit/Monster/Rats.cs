@@ -443,4 +443,13 @@ public class Rats : MonsterBase
         }
         return false;
     }
+
+    public override void Damage(float damage, UnitBase attacker)
+    {
+        base.Damage(damage, attacker);
+        if(state != RatsState.Attack)
+        {
+            state = RatsState.Attack;
+        }
+    }
 }

@@ -77,12 +77,12 @@ namespace Basements
         {
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
             input.Player.Disable();
-
-            prevCamPos = cam.transform.position;
-            prevCamRot = cam.transform.eulerAngles;
+            //prevCamPos = cam.transform.position;
+            //prevCamRot = cam.transform.eulerAngles;
             isMoving = true;
-            cam.transform.DOMove(watchCamLocation.position, moveDelay);
-            cam.transform.DORotate(watchCamLocation.eulerAngles, moveDelay).OnComplete(
+            cam.transform.SetParent(watchCamLocation);
+            cam.transform.DOLocalMove(Vector3.zero, moveDelay);
+            cam.transform.DOLocalRotate(Vector3.zero, moveDelay).OnComplete(
                 () => { consoleInput.ActivateInputField(); isMoving = false; }
             );
         }
@@ -92,8 +92,9 @@ namespace Basements
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
             isMoving = true;
             consoleInput.DeactivateInputField();
-            cam.transform.DOMove(prevCamPos, moveDelay);
-            cam.transform.DORotate(prevCamRot, moveDelay).OnComplete(
+            cam.transform.SetParent(curPlayer.CameraHolder);
+            cam.transform.DOLocalMove(Vector3.zero, moveDelay);
+            cam.transform.DOLocalRotate(Vector3.zero, moveDelay).OnComplete(
                 () => { isMoving = false; isConnectTerminal = false; input.Player.Enable(); curPlayer = null; }
             );
         }

@@ -84,6 +84,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
     public Transform ItemHolderCamera => itemHolderCamera;
+    public Transform CameraHolder => camHolder;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
