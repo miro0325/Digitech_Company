@@ -79,6 +79,11 @@ public class CaptureTrap : NetworkObject
 
                 if (photonView.IsMine)
                 {
+                    if(CapturedPlayer.IsDie)
+                    {
+                        photonView.RPC(nameof(ExitRpc), RpcTarget.All);
+                    }
+
                     if (capturePlayerDamageTime > 0)
                     {
                         capturePlayerDamageTime -= Time.deltaTime;

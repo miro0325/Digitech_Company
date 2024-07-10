@@ -53,9 +53,10 @@ public class ClaymoreTrap : NetworkObject
     {
         await UniTask.WaitForSeconds(0.5f);
 
-        var explosionHits =
-                Physics.SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
-                .Where(col => col.collider is CharacterController);
+        var explosionHits = 
+                Physics
+                    .SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
+                    .Where(col => col.collider is CharacterController);
 
         foreach (var explosion in explosionHits)
         {
