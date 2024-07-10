@@ -26,10 +26,9 @@ public class LobbyRoomSlot : MonoBehaviour
         {
             fadeOutUI.FadeOut(2f, () =>
             {
-                SceneManager.LoadScene("InGame");
                 PhotonNetwork.JoinRoom(info.Name);
+                popupUI.Open("规 立加吝...");
             });
-            // popupUI.Open("规 立加吝...");
         });
     }
 
@@ -45,7 +44,8 @@ public class LobbyRoomSlot : MonoBehaviour
 
     public void OnJoinedRoom()
     {
-        // popupUI.Close();
+        PhotonNetwork.LoadLevel("InGame");
+        popupUI.Close();
     }
 
     public void Initialize(RoomInfo info)

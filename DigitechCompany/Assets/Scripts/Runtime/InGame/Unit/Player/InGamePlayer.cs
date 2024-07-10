@@ -123,6 +123,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         animator.SetActiveArmModel(true);
         animator.SetActivePlayerModel(false);
 
+        animator.enabled = true;
         input.Player.Enable();
         gameObject.SetActive(true);
         curStats.ChangeFrom(maxStats);
