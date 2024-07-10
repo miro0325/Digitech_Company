@@ -58,6 +58,7 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
     
     private void Awake()
     {
+        Debug.Log("test");
         ServiceLocator.For(this).Register(this);
     }
 

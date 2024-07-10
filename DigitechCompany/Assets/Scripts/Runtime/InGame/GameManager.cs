@@ -121,7 +121,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     {
         ServiceLocator.For(this).Register(this);
         Serializer.RegisterCustomType<PlayerData>((byte)'C');
-        inGamePlayerViewId = NetworkObject.InstantiateBuffered("Prefabs/Player").photonView.ViewID;
+        var player = NetworkObject.InstantiateBuffered("Prefabs/Player") as InGamePlayer;
+        player.gameObject.name = "asdf";
+        inGamePlayerViewId = player.photonView.ViewID;
     }
 
     private void Start()
@@ -156,7 +158,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         spectatorView.UpdateAlivePlayerList(
             playerDatas
             .Where(p => p.Value.isAlive)
-            .Select(p => PhotonView.Find(p.Value.viewID).GetComponent<InGamePlayer>())
+            .Select(p =>
+            {
+                Debug.Log(p.Value.viewID);
+                var pv = PhotonView.Find(p.Value.viewID);
+                Debug.Log(pv.gameObject.name);
+                return pv.GetComponent<InGamePlayer>();
+            })
             .ToList()
         );
     }

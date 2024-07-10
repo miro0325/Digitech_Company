@@ -35,6 +35,7 @@ public class NetworkObjectManager : MonoBehaviourPun, IService
     [PunRPC]
     private void InstantiateNetworkObjectRpc(string prefab, int viewId, Vector3 pos, Quaternion quat)
     {
+        Debug.Log("Rpc");
         var @object = Instantiate(Resources.Load<NetworkObject>(prefab), pos, quat);
         var pv = @object.GetComponent<PhotonView>();
 

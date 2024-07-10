@@ -94,12 +94,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }
 
-    [PunRPC]
-    private void SendDamageToOwnerRpc(float damage)
-    {
-        curStats.SetStat(Stats.Key.Hp, x => x - damage);
-    }
-
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
     {
         photonView.RPC(nameof(SetPositionAndRotationRpc), RpcTarget.All, position, rotation);
@@ -200,10 +194,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void Start()
     {
+        Debug.Log(gameObject.scene.name);
         this
             .ObserveEveryValueChanged(t => t.isInBasement)
             .Subscribe(x =>
             {
+                Debug.Log(basement);
                 if (isInBasement) transform.SetParent(basement.transform);
                 else transform.SetParent(null);
             });
