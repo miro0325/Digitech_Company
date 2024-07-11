@@ -71,6 +71,8 @@ public class SpectatorView : MonoBehaviour, IService
 
     private void Update()
     {
+        if (ReferenceEquals(player, null)) return;
+
         if (!player.IsDie) return;
         if (targetIndex == -1) return;
         if (alivePlayers.Count == 0) return;

@@ -17,16 +17,24 @@ public class InventoryUI : MonoBehaviour
 
     private void Start()
     {
-        for(int i = 0; i < player.Inventory.Size; i++)
-        {
-            var slot = Instantiate(slotPrefab, transform);
-            inventoryBoxes.Add(slot.transform as RectTransform);
-            itemIconImages.Add(slot.transform.GetChild(0).GetComponent<Image>());
-        }
+        ServiceLocator
+            .For(this)
+            .Get<GameManager>()
+            .OnLoadComplete += () =>
+            {
+                for (int i = 0; i < player.Inventory.Size; i++)
+                {
+                    var slot = Instantiate(slotPrefab, transform);
+                    inventoryBoxes.Add(slot.transform as RectTransform);
+                    itemIconImages.Add(slot.transform.GetChild(0).GetComponent<Image>());
+                };
+            };
     }
 
     private void Update()
     {
+        if (ReferenceEquals(player, null)) return;
+
         for(int i = 0; i < player.Inventory.Size; i++)
         {
             inventoryBoxes[i].localScale =
