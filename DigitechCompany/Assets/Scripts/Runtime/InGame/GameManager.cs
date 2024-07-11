@@ -123,15 +123,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         JoinLoadTask().Forget();
     }
 
-    #region Join
-    [PunRPC]
-    private void SendPlayerJoinToAllRpc(Player newPlayer, int inGamePlayerViewId)
-    {
-        Debug.LogError($"Player: {newPlayer.ActorNumber} join");
-        var newPlayerData = new PlayerData(inGamePlayerViewId);
-        playerDatas.Add(newPlayer.ActorNumber, newPlayerData);
-    }
-
     public async UniTask JoinLoadTask()
     {
         photonView.RPC(nameof(SendJoinLoadToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer);
@@ -140,6 +131,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         inGamePlayerViewId = NetworkObject.Instantiate("Prefabs/Player", basement.transform.position, Quaternion.identity).photonView.ViewID;
         photonView.RPC(nameof(SendPlayerJoinToAllRpc), RpcTarget.All, PhotonNetwork.LocalPlayer, inGamePlayerViewId);
         photonView.RPC(nameof(SendRequestGameStateToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer);
+    }
+
+    [PunRPC]
+    private void SendPlayerJoinToAllRpc(Player newPlayer, int inGamePlayerViewId)
+    {
+        Debug.LogError($"Player: {newPlayer.ActorNumber} join");
+        var newPlayerData = new PlayerData(inGamePlayerViewId);
+        playerDatas.Add(newPlayer.ActorNumber, newPlayerData);
     }
 
     [PunRPC]
@@ -200,9 +199,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 surface.BuildNavMesh();
                 break;
         }
+
         joinSyncCompleted[syncTarget] = true;
     }
-    #endregion
 
     public void SendPlayerState(Player player, bool isAlive)
     {

@@ -138,7 +138,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     public bool SetDestinationToPosition(Vector3 position, bool checkForPath = false)
     {
-        NavMeshHit hit = default(NavMeshHit);
+        NavMeshHit hit = default;
         if (checkForPath)
         {
             position = GetNavMeshPosition(position, hit, 1.75f);

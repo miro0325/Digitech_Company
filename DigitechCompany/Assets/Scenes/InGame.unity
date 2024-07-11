@@ -1901,24 +1901,9 @@ MonoBehaviour:
   - {fileID: 646014551}
   - {fileID: 646014550}
   - {fileID: 646014549}
-  trapDatas:
-  - prefab: Prefabs/Traps/Capture
-    position: {x: 1.98, y: 0.407, z: 4.17}
-    rotation: {x: 0, y: 0, z: 0}
-    viewid: 0
-  - prefab: Prefabs/Traps/Claymore
-    position: {x: -7.97, y: 0.407, z: -1.58}
-    rotation: {x: -90, y: 0, z: 90}
-    viewid: 0
-  - prefab: Prefabs/Traps/Claymore
-    position: {x: -9.18, y: 0.407, z: 2.64}
-    rotation: {x: 270, y: 269.99994, z: 0}
-    viewid: 0
-  - prefab: Prefabs/Traps/Saw
-    position: {x: -13.19, y: 2.87, z: 5.54}
-    rotation: {x: 0, y: 0, z: 0}
-    viewid: 0
+  joinSyncCompleted: 000000
   playerDatas:
+    keys: 
     values: []
 --- !u!114 &293386056
 MonoBehaviour:
@@ -10111,6 +10096,37 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 3956274453028883495, guid: b061ea9ed4f2bbc43a7a9745353187f1, type: 3}
+--- !u!1 &1752174359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1752174360}
+  m_Layer: 0
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1752174360
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752174359}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 22
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1771653492
 PrefabInstance:
   m_ObjectHideFlags: 0

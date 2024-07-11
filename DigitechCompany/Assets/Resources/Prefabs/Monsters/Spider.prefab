@@ -763,7 +763,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3864811414245532875}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.3
   m_Speed: 3.5
@@ -799,7 +799,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 4533226164529577591}
   - {fileID: -3897669536047213738}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

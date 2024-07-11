@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using BehaviorTree;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.AI;
 
 
 public class Spider : MonsterBase
@@ -15,6 +16,13 @@ public class Spider : MonsterBase
     
     protected override void Spawn()
     {
+        receivePos = transform.position;
+        receiveRot = transform.rotation;
+
+        if(!photonView.IsMine) return;
+
+        transform.position = GetNavMeshPosition(transform.position);
+        GetComponent<NavMeshAgent>().enabled = true;
         testBaseStat.SetStat(Stats.Key.Hp, x => 100);
         maxStats.ChangeFrom(testBaseStat);
         tree = new BehaviorTree.Tree(new Sequence(new List<Node>
@@ -42,6 +50,13 @@ public class Spider : MonsterBase
     protected override void Update()
     {
         base.Update();
+        Debug.LogError(transform.position);
+        if(!photonView.IsMine)
+        {
+            var lerpPosition = Vector3.Lerp(transform.position, receivePos, Time.deltaTime * 8);
+            var lerpRotation = Quaternion.Lerp(transform.rotation, receiveRot, Time.deltaTime * 8);
+            transform.SetPositionAndRotation(lerpPosition, lerpRotation);
+        }
     }
 
     private NodeState CheckPlayerInFOV()
