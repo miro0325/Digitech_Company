@@ -44,7 +44,7 @@ public class Spider : MonsterBase
     protected override void Update()
     {
         base.Update();
-        Debug.LogError(transform.position);
+        //Debug.LogError(transform.position);
     }
 
     private NodeState CheckPlayerInFOV()

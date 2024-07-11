@@ -18,7 +18,7 @@ public class TestSpawner : MonoBehaviourPun, IService
         curMonsters.Clear();
         foreach (string key in monsters)
         {
-            var m = NetworkObject.Instantiate($"Prefabs/Monsters/{key}", new Vector3(-4.3261f, 2f, 16.69641f), Quaternion.identity) as MonsterBase;
+            var m = NetworkObject.Instantiate($"Prefabs/Monsters/{key}", new Vector3(-4.3261f, 0.5f, 16.69641f), Quaternion.identity) as MonsterBase;
             m.Inititalize(waypoints);
             curMonsters.Add(m);
         }

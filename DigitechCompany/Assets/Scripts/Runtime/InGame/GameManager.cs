@@ -96,6 +96,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //inspector
     [SerializeField] private NavMeshSurface surface;
     [SerializeField] private MeshRenderer[] rooms;
+    public MeshFilter[] meshFilters;
 
     //field
     private int inGamePlayerViewId;
@@ -196,7 +197,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 }
                 break;
             case SyncTarget.Map:
-                surface.BuildNavMesh();
+                //foreach (var meshFilter in meshFilters)
+                //{
+                //    if (meshFilter != null && meshFilter.sharedMesh != null)
+                //    {
+                //        Mesh mesh = meshFilter.sharedMesh;
+                //        mesh.UploadMeshData(false); // 메쉬를 읽기 가능하게 설정
+                //    }
+                //}
+                //surface.BuildNavMesh();
                 break;
         }
 
@@ -336,8 +345,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         // var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
-
-        surface.BuildNavMesh();
+        //foreach (var meshFilter in meshFilters)
+        //{
+        //    if (meshFilter != null && meshFilter.sharedMesh != null)
+        //    {
+        //        Mesh mesh = meshFilter.sharedMesh;
+        //        mesh.UploadMeshData(false); // 메쉬를 읽기 가능하게 설정
+        //    }
+        //}
+        //surface.BuildNavMesh();
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, null);
 
@@ -357,7 +373,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 itemManager.SyncItem(datas);
                 break;
             case SyncTarget.Map:
-                surface.BuildNavMesh();
+                //foreach (var meshFilter in meshFilters)
+                //{
+                //    if (meshFilter != null && meshFilter.sharedMesh != null)
+                //    {
+                //        Mesh mesh = meshFilter.sharedMesh;
+                //        mesh.UploadMeshData(false); // 메쉬를 읽기 가능하게 설정
+                //    }
+                //}
+                //surface.BuildNavMesh();
                 break;
         }
         photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);
