@@ -28,6 +28,7 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
     private bool isJump;
     private Vector2 moveInput;
     private SkinnedMeshRenderer[] playerModelRenderers;
+    private Rigidbody[] playerModelRigidbodys;
 
     public void Initialize(InGamePlayer player)
     {
@@ -50,8 +51,13 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
                 else bodyHandIK.SetHandIKTarget(curItem.LeftHandPoint, curItem.RightHandPoint);
             });
 
-        if (!photonView.IsMine) return;
         playerModelRenderers = playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>();
+        playerModelRigidbodys = playerModelAnimator.GetComponentsInChildren<Rigidbody>();
+    }
+
+    public void SetEnableRagDoll(bool enabled)
+    {
+        playerModelRigidbodys?.For((i, ele) => ele.isKinematic = !enabled);
     }
 
     public void SetActivePlayerModel(bool active)
@@ -61,7 +67,7 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 
     public void SetActiveArmModel(bool active)
     {
-        camAnimator.gameObject.SetActive(active);
+        armModelAnimator.gameObject.SetActive(active);
     }
 
     public Transform GetHeadTransform()

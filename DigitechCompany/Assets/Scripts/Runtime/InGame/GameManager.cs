@@ -152,14 +152,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     {
         this.state = (GameState)state;
 
-        switch (this.state)
-        {
-            case GameState.StartWait:
-                player.Revive();
-                break;
-        }
-
+        if(this.state == GameState.StartWait) player.Revive();
         if (photonView.IsMine) GameRoutine().Forget();
+
+        Debug.LogError("OnLoadComplete");
         OnLoadComplete?.Invoke();
     }
 
@@ -196,7 +192,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 }
                 break;
             case SyncTarget.Map:
-                surface.BuildNavMesh();
+                // surface.BuildNavMesh();
                 break;
         }
 
@@ -334,12 +330,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     {
         // var map = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity);
         // var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
-        playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;
-        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
-        surface.BuildNavMesh();
-        playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
+        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
+        playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;
+
+        // surface.BuildNavMesh();
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, null);
+        playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         Debug.Log(rooms.Length);
         itemManager.SpawnItem(1, rooms.Select(m => m.bounds).ToArray());
@@ -357,7 +354,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 itemManager.SyncItem(datas);
                 break;
             case SyncTarget.Map:
-                surface.BuildNavMesh();
+                // surface.BuildNavMesh();
                 break;
         }
         photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);

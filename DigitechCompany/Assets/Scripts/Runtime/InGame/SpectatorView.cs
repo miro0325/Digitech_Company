@@ -45,28 +45,34 @@ public class SpectatorView : MonoBehaviour, IService
     {
         cam = Camera.main;
 
-        player
-            .ObserveEveryValueChanged(p => p.IsDie)
-            .Subscribe(isDie =>
+        ServiceLocator
+            .For(this)
+            .Get<GameManager>()
+            .OnLoadComplete += () =>
             {
-                //initialize
-                if (isDie)
-                {
-                    Debug.LogError("Set camera to spectate");
-                    targetIndex = 0;
-                    input.Spectator.Enable();
-                    cam.transform.SetParent(camHolder);
-                    cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
-                    camDistance = camDistanceClamp;
-                    remainTime = 1.5f;
-                }
-                else
-                {
-                    Debug.LogError("Set camera to play");
-                    targetIndex = -1;
-                    input.Spectator.Disable();
-                }
-            });
+                player
+                    .ObserveEveryValueChanged(p => p.IsDie)
+                    .Subscribe(isDie =>
+                    {
+                        //initialize
+                        if (isDie)
+                        {
+                            Debug.LogError("Set camera to spectate");
+                            targetIndex = 0;
+                            input.Spectator.Enable();
+                            cam.transform.SetParent(camHolder);
+                            cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
+                            camDistance = camDistanceClamp;
+                            remainTime = 1.5f;
+                        }
+                        else
+                        {
+                            Debug.LogError("Set camera to play");
+                            targetIndex = -1;
+                            input.Spectator.Disable();
+                        }
+                    });
+            };
     }
 
     private void Update()
@@ -107,7 +113,7 @@ public class SpectatorView : MonoBehaviour, IService
         //cam collision
         curMaxDistance += input.Spectator.MouseWheel.ReadValue<float>() * 0.01f;
         curMaxDistance = Mathf.Clamp(curMaxDistance, 0, camDistanceClamp);
-        
+
         if (Physics.Linecast(transform.position, cam.transform.position - cam.transform.forward * camCollisionRadius, out var hit, ~ignoreCamCollisionLayer)) camDistance = hit.distance;
         else camDistance = camDistanceClamp;
         camDistance = Mathf.Clamp(camDistance, 0, camDistanceClamp);

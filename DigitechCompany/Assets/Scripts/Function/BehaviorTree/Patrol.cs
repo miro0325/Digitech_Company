@@ -83,7 +83,7 @@ public class Patrol : Node
                 if(!isCalculatePath)
                 {
                     path = new NavMeshPath();
-                    monster.Agent.CalculatePath(curPoint, path);
+                    // monster.Agent.CalculatePath(curPoint, path);
                     cornerIndex = 0;
                     isCalculatePath = true;
                 }

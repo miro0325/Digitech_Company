@@ -38,24 +38,27 @@ public class LobbyMultiplayView : UIView
 
         callbackReceiver.onRoomListUpdate += roomList =>
         {
-            if (roomSlots.Count > roomList.Count)
+            while (roomSlots.Count != roomList.Count)
             {
-                for (int i = 0; i < roomSlots.Count - roomList.Count; i++)
+                if (roomSlots.Count > roomList.Count)
                 {
-                    Destroy(roomSlots[^1]);
-                    roomSlots.RemoveAt(roomSlots.Count - 1);
+                    for (int i = 0; i < roomSlots.Count - roomList.Count; i++)
+                    {
+                        Destroy(roomSlots[^1]);
+                        roomSlots.RemoveAt(roomSlots.Count - 1);
+                    }
                 }
-            }
-            else
-            {
-                for (int i = 0; i < roomList.Count - roomSlots.Count; i++)
-                    roomSlots.Add(Instantiate(roomSlotPrefab, roomSlotParent));
+                else
+                {
+                    for (int i = 0; i < roomList.Count - roomSlots.Count; i++)
+                        roomSlots.Add(Instantiate(roomSlotPrefab, roomSlotParent));
+                }
             }
 
             for (int i = 0; i < roomList.Count; i++)
                 roomSlots[i].Initialize(roomList[i]);
         };
-        
+
         gameObject.SetActive(false);
     }
 

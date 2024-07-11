@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using BehaviorTree;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.AI;
 
 
 
@@ -37,7 +38,11 @@ public class Spider : MonsterBase
     protected override void Start()
     {
         base.Start();
-        agent.SetDestination(transform.position);
+        
+        Debug.Log(NavMesh.SamplePosition(transform.position, out var hit, 5, -1));
+        agent.enabled = true;
+        // agent.Warp(hit.position);
+        agent.SetDestination(hit.position);
         Spawn();
     }
 
@@ -45,6 +50,7 @@ public class Spider : MonsterBase
     {
         base.Update();
         Debug.LogError(transform.position);
+        Debug.LogError(agent.enabled);
     }
 
     private NodeState CheckPlayerInFOV()

@@ -6,7 +6,7 @@ public class FallArea : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.layer == LayerMask.GetMask("Monster","Player"))
+        if(other.gameObject.layer == LayerMask.NameToLayer("Monster") || other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             if(other.TryGetComponent(out UnitBase unit))
             {

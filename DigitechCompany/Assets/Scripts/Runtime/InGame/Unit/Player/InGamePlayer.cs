@@ -114,29 +114,31 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(SendReviveToOwnerRpc), photonView.Owner);
+        photonView.RPC(nameof(SendReviveToAllRpc), photonView.Owner);
     }
 
     [PunRPC]
-    private void SendReviveToOwnerRpc()
+    private void SendReviveToAllRpc()
     {
-        animator.SetActiveArmModel(true);
-        animator.SetActivePlayerModel(false);
+        if (photonView.IsMine)
+        {
+            animator.SetActiveArmModel(true);
+            animator.SetActivePlayerModel(false);
+            animator.SetEnableRagDoll(false);
 
-        input.Player.Enable();
-        gameObject.SetActive(true);
-        curStats.ChangeFrom(maxStats);
-        gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
-        SetCamera();
-        cc.enabled = true;
+            input.Player.Enable();
+            gameObject.SetActive(true);
+            curStats.ChangeFrom(maxStats);
+            gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
+            SetCamera();
+            cc.enabled = true;
+            isDie = false;
+
+            return;
+        }
+
         isDie = false;
-
-        photonView.RPC(nameof(SendReviveToOtherRpc), RpcTarget.Others);
-    }
-
-    [PunRPC]
-    private void SendReviveToOtherRpc()
-    {
+        animator.SetEnableRagDoll(false);
         animator.SetActivePlayerModel(true);
         gameObject.SetActive(true);
     }
@@ -239,15 +241,27 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
         {
-            Debug.LogError("Die");
             isDie = true;
+            photonView.RPC(nameof(SendDieToAllRpc), RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void SendDieToAllRpc()
+    {
+        isDie = true;
+        animator.SetEnableRagDoll(true);
+        animator.SetActivePlayerModel(true);
+        
+        if(photonView.IsMine)
+        {
             input.Player.Disable();
-            animator.SetActivePlayerModel(true);
             animator.SetActiveArmModel(false);
             cc.enabled = false;
             this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1.5f);
         }
     }
+
     private void DoScan()
     {
         if (isDie) return;
