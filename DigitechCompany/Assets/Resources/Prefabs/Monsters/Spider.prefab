@@ -582,6 +582,7 @@ GameObject:
   - component: {fileID: 4533226164529577545}
   - component: {fileID: -3897669536047213738}
   - component: {fileID: 8923223543857133881}
+  - component: {fileID: -6886395286883424787}
   m_Layer: 8
   m_Name: Spider
   m_TagString: Untagged
@@ -735,11 +736,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 0}
   fov: {fileID: 4533226164529577588}
-  waypoints:
-  - {x: -0.000000027273614, y: 7.24e-43, z: 0.00000017155033}
-  - {x: 0.00000020990485, y: 3.4640794e-19, z: 7.2e-43}
-  - {x: 4.6e-44, y: 0.000013660923, z: -0.000000027273614}
-  - {x: 7.24e-43, y: -0.000000027273671, z: 7.24e-43}
+  waypoints: []
   tempSpeed: 3
   animator: {fileID: 4533226164529577587}
   attackPoint: {fileID: 8565772117261691576}
@@ -799,7 +796,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 4533226164529577591}
   - {fileID: -3897669536047213738}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -844,6 +840,22 @@ CapsuleCollider:
   m_Height: 1.68
   m_Direction: 2
   m_Center: {x: 0, y: 0.43, z: -0.29}
+--- !u!114 &-6886395286883424787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3864811414245532875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &4600804285405898879
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class TestSpawner : MonoBehaviourPun, IService
     
     public void SpawnMonsters()
     {
-        foreach(var monster in curMonsters)
+        foreach (var monster in curMonsters)
         {
             NetworkObject.Destory(monster.photonView.ViewID);
         }
@@ -20,20 +20,10 @@ public class TestSpawner : MonoBehaviourPun, IService
         {
             var m = NetworkObject.Instantiate($"Prefabs/Monsters/{key}", new Vector3(-4.3261f, 0.4100053f, 16.69641f), Quaternion.identity) as MonsterBase;
             m.Inititalize(waypoints);
-            curMonsters.Add(m); 
+            curMonsters.Add(m);
         }
-        //photonView.RPC(nameof(MonsterSettingRPC),RpcTarget.Others);
     }
 
-    //[PunRPC]
-    //private void MonsterSettingRPC()
-    //{
-    //    foreach (var m in curMonsters)
-    //    {
-    //        m.Inititalize(waypoints);
-    //    }
-    //}
-    
     private void Awake()
     {
         ServiceLocator.For(this).Register(this);

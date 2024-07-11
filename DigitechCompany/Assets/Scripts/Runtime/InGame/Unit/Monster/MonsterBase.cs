@@ -45,6 +45,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         agent = GetComponent<NavMeshAgent>();
         agent.speed = tempSpeed;
+        //if(!photonView.IsMine) agent.enabled = false;
         if(animator == null)
         {
             animator = GetComponent<Animator>();
@@ -73,9 +74,9 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     protected virtual void Update()
     {
-        if (!photonView.IsMine) return;
+        //if (!photonView.IsMine) return;
         tree.Update();
-        FixTransform();
+        //FixTransform();
     }
 
     protected void FixTransform()
@@ -176,17 +177,17 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(transform.position);
-            stream.SendNext(transform.rotation);
-        }
-        else
-        {
-            receivePos = (Vector3)stream.ReceiveNext();
-            receiveRot = (Quaternion)stream.ReceiveNext();
-            //transform.position = (Vector3)stream.ReceiveNext();
-            //transform.rotation = (Quaternion)stream.ReceiveNext();
-        }
+        //if (stream.IsWriting)
+        //{
+        //    stream.SendNext(transform.position);
+        //    stream.SendNext(transform.rotation);
+        //}
+        //else
+        //{
+        //    receivePos = (Vector3)stream.ReceiveNext();
+        //    receiveRot = (Quaternion)stream.ReceiveNext();
+        //    //transform.position = (Vector3)stream.ReceiveNext();
+        //    //transform.rotation = (Quaternion)stream.ReceiveNext();
+        //}
     }
 }

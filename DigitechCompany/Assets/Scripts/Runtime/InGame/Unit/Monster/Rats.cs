@@ -117,7 +117,7 @@ public class Rats : MonsterBase
     {
         base.Start();
         var itemManager = ServiceLocator.For(this).Get<ItemManager>();
-        itemManager?.SpawnItem(waypoints[0], "Shovel");
+        //itemManager?.SpawnItem(waypoints[0], "Shovel");
 
         //this
         //    .ObserveEveryValueChanged(t => targetPlayerViewId)
@@ -137,15 +137,17 @@ public class Rats : MonsterBase
     {
         base.Update();
         animator.SetBool("IsRun", !agent.isStopped);
-        //switch(state)
-        //{
-        //    case RatsState.Attack:
-        //        agent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
-        //        break;
-        //   default:
-        //        agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-        //        break;
-        //}
+        switch (state)
+        {
+            case RatsState.Attack:
+                agent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
+                break;
+            default:
+                agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+                break;
+        }
+        //var a = FindObjectsOfType<Transform>().OrderByDescending(x => x.position.magnitude).First();
+        //Debug.Log(a);
 
     }
 
@@ -243,6 +245,7 @@ public class Rats : MonsterBase
             isArrive = false;
             curIndex = Random.Range(0, waypoints.Count);
         }
+        Debug.Log(curIndex);
         if(!SetDestinationToPosition(waypoints[curIndex], true))
         {
             return NodeState.Failure;
@@ -546,6 +549,7 @@ public class Rats : MonsterBase
             stream.SendNext(targetPos);
             stream.SendNext(NestPosition);
             stream.SendNext(isArrive);
+            stream.SendNext(curIndex);
         }
         else
         {
@@ -554,6 +558,7 @@ public class Rats : MonsterBase
             targetPos = (Vector3)stream.ReceiveNext();
             NestPosition = (Vector3)stream.ReceiveNext();
             isArrive = (bool)stream.ReceiveNext();
+            curIndex = (int)stream.ReceiveNext();
         }
     }
 }

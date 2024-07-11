@@ -6,6 +6,7 @@ using BehaviorTree;
 using UnityEngine.Animations.Rigging;
 
 
+
 public class Spider : MonsterBase
 {
     [Header("Spider Setting")]
@@ -36,12 +37,14 @@ public class Spider : MonsterBase
     protected override void Start()
     {
         base.Start();
+        agent.SetDestination(transform.position);
         Spawn();
     }
 
     protected override void Update()
     {
         base.Update();
+        Debug.LogError(transform.position);
     }
 
     private NodeState CheckPlayerInFOV()
