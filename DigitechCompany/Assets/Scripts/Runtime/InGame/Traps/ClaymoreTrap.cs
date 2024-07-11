@@ -29,10 +29,10 @@ public class ClaymoreTrap : NetworkObject
         while (repeat)
         {
             lr.SetPosition(0, ray.position);
-            Debug.DrawRay(ray.position, ray.forward, Color.cyan);
+            //Debug.DrawRay(ray.position, ray.forward, Color.cyan);
             if (Physics.Raycast(ray.position, ray.forward, out var hit, detectDistance))
             {
-                Debug.Log(hit.collider.name);
+                //Debug.Log(hit.collider.name);
                 lr.SetPosition(1, ray.transform.position + ray.forward * hit.distance);
                 if (hit.collider.TryGetComponent<InGamePlayer>(out _))
                 {

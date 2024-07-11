@@ -28,7 +28,7 @@ public class Spider : MonsterBase
                     new Action(() => FollowTarget()),
                     new Action(() => AttackTarget())
                 }),
-                new Patrol(this,waypoints)
+                new Patrol(this,waypoints.ToArray())
             })
         }));
     }

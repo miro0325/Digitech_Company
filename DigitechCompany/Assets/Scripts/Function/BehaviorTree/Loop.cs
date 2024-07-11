@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         public override NodeState Evaluate()
         {
-            Debug.Log("Check Loop");
+            //Debug.Log("Check Loop");
             bool isRunningInChild = false;
             foreach (var node in children)
             {

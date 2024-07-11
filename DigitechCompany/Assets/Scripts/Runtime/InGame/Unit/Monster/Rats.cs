@@ -117,7 +117,7 @@ public class Rats : MonsterBase
     {
         base.Start();
         var itemManager = ServiceLocator.For(this).Get<ItemManager>();
-        itemManager?.SpawnItem(waypoints[0].position, "Shovel");
+        itemManager?.SpawnItem(waypoints[0], "Shovel");
 
         //this
         //    .ObserveEveryValueChanged(t => targetPlayerViewId)
@@ -220,8 +220,8 @@ public class Rats : MonsterBase
         //agent.avoidancePriority
         if(Vector3.Distance(transform.position, destination) < 0.5f)
         {
-            if(targetItem != null)
-                Debug.Log(targetItem.CurUnit);
+            //if(targetItem != null)
+            //    Debug.Log(targetItem.CurUnit);
             DropItem();
             Debug.Log(targetItem != null);
             state = RatsState.Searching;
@@ -241,9 +241,9 @@ public class Rats : MonsterBase
         if(isArrive)
         {
             isArrive = false;
-            curIndex = Random.Range(0, waypoints.Length);
+            curIndex = Random.Range(0, waypoints.Count);
         }
-        if(!SetDestinationToPosition(waypoints[curIndex].position, true))
+        if(!SetDestinationToPosition(waypoints[curIndex], true))
         {
             return NodeState.Failure;
         }
@@ -274,7 +274,7 @@ public class Rats : MonsterBase
         }
         if (agent.isStopped) agent.isStopped = false;
         Move(targetPos);
-        if(PickItem(targetItem))
+        if(PickItem())
         {
             state = RatsState.Idle;
             return NodeState.Succes;
@@ -416,14 +416,15 @@ public class Rats : MonsterBase
         isAttacking = false;
     }
 
-    private bool PickItem(ItemBase _targetItem)
+    private bool PickItem()
     {
+        photonView.RPC(nameof(DropItemRPC), RpcTarget.Others);
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
-            originItemSize = _targetItem.transform.localScale;
-            _targetItem.OnInteract(this);
-            _targetItem.transform.localPosition = Vector3.zero;
-            _targetItem.transform.localScale *= itemHolder.localScale.x;
+            originItemSize = targetItem.transform.localScale;
+            targetItem.OnInteract(this);
+            targetItem.transform.localPosition = Vector3.zero;
+            targetItem.transform.localScale *= itemHolder.localScale.x;
             weapon.gameObject.SetActive(false);
             
             return true;
@@ -431,8 +432,22 @@ public class Rats : MonsterBase
         return false;
     }
 
+    [PunRPC]
+    private void PickItemRPC()
+    {
+        if (Vector3.Distance(transform.position, targetPos) < 0.7f)
+        {
+            originItemSize = targetItem.transform.localScale;
+            targetItem.OnInteract(this);
+            targetItem.transform.localPosition = Vector3.zero;
+            targetItem.transform.localScale *= itemHolder.localScale.x;
+            weapon.gameObject.SetActive(false);
+        }
+    }
+
     private bool DropItem()
     {
+        photonView.RPC(nameof(DropItemRPC), RpcTarget.Others);
         if (targetItem == null || (targetItem != null && targetItem.CurUnit == null)) return false;
         if (targetItem.CurUnit.gameObject.Equals(gameObject))
         {
@@ -444,6 +459,20 @@ public class Rats : MonsterBase
             return true;
         }
         return false;
+    }
+
+    [PunRPC]
+    private void DropItemRPC()
+    {
+        if (targetItem == null || (targetItem != null && targetItem.CurUnit == null)) return;
+        if (targetItem.CurUnit.gameObject.Equals(gameObject))
+        {
+            itemsInNest.Add(targetItem);
+            targetItem.OnDiscard();
+            targetItem.transform.localScale = originItemSize;
+            targetItem = null;
+            weapon.gameObject.SetActive(true);
+        }
     }
 
     private bool DetectItem()
@@ -463,42 +492,68 @@ public class Rats : MonsterBase
         return false;
     }
 
+    [PunRPC]
+
     public override void Damage(float damage, UnitBase attacker)
     {
         if (state != RatsState.Attack)
         {
             ChangeTexture(true);
             //targetPlayerViewId = TargetPlayer.photonView.ViewID;
+            Collider[] hit = Physics.OverlapSphere(transform.position, 2.5f, LayerMask.GetMask("Monster"));
+            foreach(Collider c in hit)
+            {
+                if(c.TryGetComponent(out Rats rat))
+                {
+                    rat.MakeAngry(attacker as InGamePlayer);
+                }
+            }
             TargetPlayer = attacker as InGamePlayer;
             state = RatsState.Attack;
         }
         base.Damage(damage, attacker);
     }
 
-    private void Mad()
+    public void MakeAngry(InGamePlayer player)
     {
-
+        if (state != RatsState.Attack)
+        {
+            ChangeTexture(true);
+            TargetPlayer = player;
+            state = RatsState.Attack;
+        }
+        photonView.RPC(nameof(MakeAngryRPC), RpcTarget.Others, player.photonView.ViewID);
     }
 
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if(stream.IsWriting)
-    //    {
-    //        stream.SendNext((int)state);
-    //        stream.SendNext(targetPlayerViewId);
-    //        stream.SendNext(targetPos);
-    //        stream.SendNext(NestPosition);
-    //        stream.SendNext(itemsInNest);
-    //        stream.SendNext(isArrive);
-    //    }
-    //    else
-    //    {
-    //        state = (RatsState)(int)stream.ReceiveNext();
-    //        targetPlayerViewId = (int)stream.ReceiveNext();
-    //        targetPos = (Vector3)stream.ReceiveNext();
-    //        targetItem = (ItemBase)stream.ReceiveNext();
-    //        NestPosition = (Vector3)stream.ReceiveNext();
-    //        isArrive = (bool)stream.ReceiveNext();
-    //    }
-    //}
+    [PunRPC]
+    private void MakeAngryRPC(int playerViewId)
+    {
+        if (state != RatsState.Attack)
+        {
+            ChangeTexture(true);
+            TargetPlayer = PhotonView.Find(playerViewId).GetComponent<InGamePlayer>();
+            state = RatsState.Attack;
+        }
+    }
+
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        base.OnPhotonSerializeView(stream, info);
+        if (stream.IsWriting)
+        {
+            stream.SendNext((int)state);
+            stream.SendNext(targetPlayerViewId);
+            stream.SendNext(targetPos);
+            stream.SendNext(NestPosition);
+            stream.SendNext(isArrive);
+        }
+        else
+        {
+            state = (RatsState)(int)stream.ReceiveNext();
+            targetPlayerViewId = (int)stream.ReceiveNext();
+            targetPos = (Vector3)stream.ReceiveNext();
+            NestPosition = (Vector3)stream.ReceiveNext();
+            isArrive = (bool)stream.ReceiveNext();
+        }
+    }
 }

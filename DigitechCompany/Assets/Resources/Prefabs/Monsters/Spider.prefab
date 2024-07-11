@@ -581,7 +581,6 @@ GameObject:
   - component: {fileID: 4533226164529577590}
   - component: {fileID: 4533226164529577545}
   - component: {fileID: -3897669536047213738}
-  - component: {fileID: 2259245112377887029}
   - component: {fileID: 8923223543857133881}
   m_Layer: 8
   m_Name: Spider
@@ -737,10 +736,10 @@ MonoBehaviour:
   itemHolder: {fileID: 0}
   fov: {fileID: 4533226164529577588}
   waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {x: -0.000000027273614, y: 7.24e-43, z: 0.00000017155033}
+  - {x: 0.00000020990485, y: 3.4640794e-19, z: 7.2e-43}
+  - {x: 4.6e-44, y: 0.000013660923, z: -0.000000027273614}
+  - {x: 7.24e-43, y: -0.000000027273671, z: 7.24e-43}
   tempSpeed: 3
   animator: {fileID: 4533226164529577587}
   attackPoint: {fileID: 8565772117261691576}
@@ -798,8 +797,9 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 4533226164529577591}
   - {fileID: -3897669536047213738}
-  - {fileID: 2259245112377887029}
+  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -819,33 +819,17 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: Attack
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: Damaged
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: Death
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
---- !u!114 &2259245112377887029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3864811414245532875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!136 &8923223543857133881
 CapsuleCollider:
   m_ObjectHideFlags: 0

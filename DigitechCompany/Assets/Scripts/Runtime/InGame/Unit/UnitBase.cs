@@ -16,10 +16,24 @@ public abstract class UnitBase : NetworkObject,IDamagable
     public Stats CurStats => curStats;
     public Stats.Modifier Modifier => modifier;
     public Inventory Inventory => inventory;
+    public virtual bool IsDie
+    {
+        get 
+        {
+            if (curStats == null) return true;
+            if(curStats.GetStat(Stats.Key.Hp) <= 0)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
 
     public abstract Stats BaseStats { get; }
 
     public GameObject OwnObject => this.gameObject;
+
+    public bool IsInvulnerable => IsDie;
 
     public override void OnCreate()
     {
@@ -37,6 +51,7 @@ public abstract class UnitBase : NetworkObject,IDamagable
     
     public virtual void Damage(float damage, UnitBase attacker)
     {
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }
 

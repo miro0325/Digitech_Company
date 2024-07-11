@@ -111,6 +111,15 @@ MonoBehaviour:
   - SendReviveToOwnerRpc
   - SetPositionAndRotationRpc
   - SendReviveToOtherRpc
+  - Damage
+  - DropItemRPC
+  - PickItemRPC
+  - MonsterSettingRPC
+  - InitRPC
+  - MakeAngryRPC
+  - CloseDoorRPC
+  - OpenDoorRPC
+  - InteractDoorRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

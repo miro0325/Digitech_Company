@@ -963,7 +963,6 @@ GameObject:
   - component: {fileID: 3697752146121768886}
   - component: {fileID: 3697752146121768873}
   - component: {fileID: 3697752146121768872}
-  - component: {fileID: 3697752146121768875}
   - component: {fileID: 3697752146121768874}
   - component: {fileID: 3460338138072610868}
   m_Layer: 8
@@ -1006,10 +1005,10 @@ MonoBehaviour:
   itemHolder: {fileID: 5608524817079616401}
   fov: {fileID: 3697752146121768887}
   waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {x: 9.801947e+31, y: 7.23e-43, z: 3.360866e+21}
+  - {x: 0.00000017063654, y: 3.4599187e-19, z: 7.2e-43}
+  - {x: 4.6e-44, y: 3.3983355e+21, z: 9.801947e+31}
+  - {x: 7.23e-43, y: 9.801986e+31, z: 7.23e-43}
   tempSpeed: 5
   animator: {fileID: 3697752146121768874}
   attackPoint: {fileID: 0}
@@ -1083,16 +1082,16 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 3
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: Attack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: IsRun
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: Death
   - Type: 3
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: AttackState
   m_SynchronizeLayers:
   - SynchronizeType: 0
@@ -1116,27 +1115,12 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 3697752146121768884}
   - {fileID: 3697752146121768873}
-  - {fileID: 3697752146121768875}
+  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &3697752146121768875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4042786954871760151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!95 &3697752146121768874
 Animator:
   serializedVersion: 5

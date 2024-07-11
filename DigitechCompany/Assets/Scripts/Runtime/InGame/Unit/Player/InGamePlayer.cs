@@ -78,7 +78,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public bool IsCrouch => isCrouch;
     public bool IsGround => isGround;
     public bool IsJump => isJump;
-    public bool IsDie => isDie;
+    public new bool IsDie => isDie;
     public Vector2 MoveInput => moveInput;
     public float[] InteractRequireTimes => interactRequireTimes;
     public IInteractable LookInteractable => lookInteractable;

@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using BehaviorTree;
+using Photon.Pun;
 
-public abstract class MonsterBase : UnitBase
+public abstract class MonsterBase : UnitBase, IPunObservable
 {
     protected static int Animator_AttackHash = Animator.StringToHash("Attack");
     protected static int Animator_DamagedHash = Animator.StringToHash("Damaged");
@@ -14,7 +16,7 @@ public abstract class MonsterBase : UnitBase
     [SerializeField]
     protected FieldOfView fov;
     [SerializeField]
-    protected Transform[] waypoints;
+    protected List<Vector3> waypoints = new();
     [SerializeField]
     protected float tempSpeed;
     [SerializeField]
@@ -30,6 +32,8 @@ public abstract class MonsterBase : UnitBase
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
     protected Vector3 destination;
+    protected Vector3 receivePos;
+    protected Quaternion receiveRot;
     protected bool isAttacking = false;
     protected bool isDeath = false;
     protected Stats testBaseStat = new();
@@ -50,12 +54,37 @@ public abstract class MonsterBase : UnitBase
 
     public virtual void Inititalize(Transform[] waypoints)
     {
-        this.waypoints = waypoints;
+        this.waypoints = waypoints.Select(x => x.position).ToList();
+        if (!photonView.IsMine) return;
+        foreach(var waypoint in waypoints)
+        {
+            photonView.RPC(nameof(InitRPC), RpcTarget.Others, waypoint.position);
+        }
+    }
+
+    [PunRPC]
+    protected virtual void InitRPC(Vector3 point)
+    {
+        
+        Debug.Log(point + " " + photonView.ViewID);
+        if(gameObject != null)
+            waypoints.Add(point);
     }
 
     protected virtual void Update()
     {
+        if (!photonView.IsMine) return;
         tree.Update();
+        FixTransform();
+    }
+
+    protected void FixTransform()
+    {
+        if(!photonView.IsMine)
+        {
+            transform.position = Vector3.Lerp(transform.position, receivePos, 10 * Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, receiveRot, 10 * Time.deltaTime);
+        }
     }
 
     protected bool RotateToDir(Vector3 targetPos, float betweenAngle = 10f)
@@ -70,7 +99,7 @@ public abstract class MonsterBase : UnitBase
         if (Quaternion.Angle(Quaternion.Euler(Vector3.up * angle), transform.rotation) < betweenAngle)
         {
             agent.speed = tempSpeed;
-            Debug.Log("Rotate Complete");
+            //Debug.Log("Rotate Complete");
             return true;
         }
         else
@@ -138,11 +167,26 @@ public abstract class MonsterBase : UnitBase
 
     public override void Damage(float damage,UnitBase attacker)
     {
-        curStats.SetStat(Stats.Key.Hp, x => x - damage);
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
+        
+        base.Damage(damage, attacker);
         animator.SetTrigger(Animator_DamagedHash);
-        if(curStats.GetStat(Stats.Key.Hp) <= 0)
+        
+    }
+
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
         {
-            Death();
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            receivePos = (Vector3)stream.ReceiveNext();
+            receiveRot = (Quaternion)stream.ReceiveNext();
+            //transform.position = (Vector3)stream.ReceiveNext();
+            //transform.rotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }

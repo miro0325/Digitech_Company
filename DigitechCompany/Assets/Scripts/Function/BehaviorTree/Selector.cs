@@ -11,7 +11,7 @@ namespace BehaviorTree
 
         public override NodeState Evaluate()
         {
-            Debug.Log("Check Select");
+            //Debug.Log("Check Select");
             foreach (var node in children)
             {
                 var nodeState = node.Evaluate();

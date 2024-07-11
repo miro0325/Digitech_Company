@@ -103,7 +103,7 @@ public class AttackableItem : ItemBase, IInteractable
         }
     }
 
-    public void OnAttack()
+    public virtual void OnAttack()
     {
         Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
         //Debug.Log("Attack!" + hits.Length);
@@ -111,6 +111,7 @@ public class AttackableItem : ItemBase, IInteractable
         {
             var entity = hit.GetComponent<IDamagable>();
             if(OwnUnit.gameObject == entity.OwnObject) continue;
+            if (entity.IsInvulnerable) continue;
             Debug.Log(entity.OwnObject.name);
             if(entity is InGamePlayer)
             {

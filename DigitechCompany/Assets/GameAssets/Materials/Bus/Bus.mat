@@ -117,14 +117,14 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 0.23
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.3
+    - _FresnelThreshold: 0.932
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _LightStrength: 1
     - _MedBrushStrength: 1
     - _MedSmooth: 0
-    - _MedThreshold: 0.778
+    - _MedThreshold: 1
     - _MetalReflectProbeIntensity: 1.2
     - _Metallic: 0
     - _Mode: 0
@@ -149,7 +149,7 @@ Material:
     - _SpecularHighlights: 1
     - _SpecularIntensity: 2.02
     - _SpecularSmooth: 0
-    - _SpecularThreshold: 0.278
+    - _SpecularThreshold: 0.387
     - _SrcBlend: 1
     - _Surface: 0
     - _UVSec: 0

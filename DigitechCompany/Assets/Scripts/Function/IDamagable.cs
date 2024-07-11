@@ -8,6 +8,11 @@ public interface IDamagable
     {
         get;
     }
+
+    public bool IsInvulnerable
+    {
+        get;
+    }
     
     public void Damage(float damage,UnitBase attacker);
 }

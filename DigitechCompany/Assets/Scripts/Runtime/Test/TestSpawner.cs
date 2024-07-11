@@ -22,7 +22,17 @@ public class TestSpawner : MonoBehaviourPun, IService
             m.Inititalize(waypoints);
             curMonsters.Add(m); 
         }
+        //photonView.RPC(nameof(MonsterSettingRPC),RpcTarget.Others);
     }
+
+    //[PunRPC]
+    //private void MonsterSettingRPC()
+    //{
+    //    foreach (var m in curMonsters)
+    //    {
+    //        m.Inititalize(waypoints);
+    //    }
+    //}
     
     private void Awake()
     {

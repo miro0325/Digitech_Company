@@ -9,7 +9,7 @@ public class Patrol : Node
     private MonsterBase monster;
     
     private Transform transform;
-    private Transform[] waypoints;
+    private Vector3[] waypoints;
 
     private int curIndex = 0;
     private int cornerIndex = 0;
@@ -24,7 +24,7 @@ public class Patrol : Node
     private NavMeshPath path = new NavMeshPath();
 
 
-    public Patrol(MonsterBase monster, Transform[] waypoints, List<Node> children, bool isRandomPoint = false, float delayTime = 1 ) : base(children)
+    public Patrol(MonsterBase monster, Vector3[] waypoints, List<Node> children, bool isRandomPoint = false, float delayTime = 1 ) : base(children)
     {
         this.transform = monster.transform;
         this.monster = monster;
@@ -33,7 +33,7 @@ public class Patrol : Node
         this.delayTime = delayTime;
     }
 
-    public Patrol(MonsterBase monster, Transform[] waypoints, bool isRandomPoint = false, float delayTime = 1) : base()
+    public Patrol(MonsterBase monster, Vector3[] waypoints, bool isRandomPoint = false, float delayTime = 1) : base()
     {
         this.transform = monster.transform;
         this.monster = monster;
@@ -57,10 +57,10 @@ public class Patrol : Node
         }
         else
         {
-            Transform curPoint = waypoints[curIndex];
-            if (Vector3.Distance(transform.position, curPoint.position) < 0.7f)
+            Vector3 curPoint = waypoints[curIndex];
+            if (Vector3.Distance(transform.position, curPoint) < 0.7f)
             {
-                transform.position = curPoint.position;
+                transform.position = curPoint;
                 isDelay = true;
                 if(!isRandomPoint)
                 {
@@ -82,7 +82,7 @@ public class Patrol : Node
                 if(!isCalculatePath)
                 {
                     path = new NavMeshPath();
-                    monster.Agent.CalculatePath(curPoint.position, path);
+                    monster.Agent.CalculatePath(curPoint, path);
                     cornerIndex = 0;
                     isCalculatePath = true;
                 }
