@@ -16,7 +16,6 @@ public class InteractableDisplayUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private Image requireTime;
 
-
     private void Update()
     {
         if (ReferenceEquals(player, null)) return;
