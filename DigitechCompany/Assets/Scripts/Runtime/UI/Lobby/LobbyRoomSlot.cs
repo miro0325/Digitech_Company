@@ -24,28 +24,32 @@ public class LobbyRoomSlot : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(() =>
         {
-            fadeOutUI.FadeOut(2f, () =>
-            {
-                PhotonNetwork.JoinRoom(info.Name);
-                popupUI.Open("规 立加吝...");
-            });
+            PhotonNetwork.JoinRoom(info.Name);
+            popupUI.Open("规 立加吝...");
         });
     }
 
     private void OnEnable()
     {
         callbackReceiver.onJoinedRoom += OnJoinedRoom;
+        callbackReceiver.onJoinRoomFailed += OnJoinedRoomFailed;
     }
 
     private void OnDisable()
     {
         callbackReceiver.onJoinedRoom -= OnJoinedRoom;
+        callbackReceiver.onJoinRoomFailed -= OnJoinedRoomFailed;
     }
 
     public void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel("InGame");
-        popupUI.Close();
+            popupUI.Close();
+        fadeOutUI.FadeOut(2f, () => PhotonNetwork.LoadLevel("InGame"));
+    }
+
+    public void OnJoinedRoomFailed(short returnCode, string message)
+    {
+        popupUI.Open($"规 立加 角菩\n{message}");
     }
 
     public void Initialize(RoomInfo info)

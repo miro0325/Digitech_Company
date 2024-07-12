@@ -10,6 +10,7 @@ public class LobbyPunCallbackReceiver : MonoBehaviourPunCallbacks, IService
     public event Action onCreatedRoom;
     public event Action<List<RoomInfo>> onRoomListUpdate;
     public event Action onJoinedRoom;
+    public event Action<short, string> onJoinRoomFailed;
 
     private void Awake()
     {
@@ -20,4 +21,5 @@ public class LobbyPunCallbackReceiver : MonoBehaviourPunCallbacks, IService
     public override void OnCreatedRoom() => onCreatedRoom?.Invoke();
     public override void OnRoomListUpdate(List<RoomInfo> roomList) => onRoomListUpdate?.Invoke(roomList);
     public override void OnJoinedRoom() => onJoinedRoom?.Invoke();
+    public override void OnJoinRoomFailed(short returnCode, string message) => onJoinRoomFailed?.Invoke(returnCode, message);
 }
