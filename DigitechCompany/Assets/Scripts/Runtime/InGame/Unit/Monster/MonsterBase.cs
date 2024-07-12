@@ -31,12 +31,13 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected NavMeshAgent agent;
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
+    protected Stats testBaseStat = new();
     protected Vector3 destination;
     protected Vector3 receivePos;
     protected Quaternion receiveRot;
     protected bool isAttacking = false;
     protected bool isDeath = false;
-    protected Stats testBaseStat = new();
+    public int curIndex = -1;
 
     public override Stats BaseStats => testBaseStat;
     public NavMeshAgent Agent => agent;
@@ -115,8 +116,14 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     public virtual void Move(Vector3 targetPos)
     {
-        if(RotateToDir(targetPos))
-            agent.SetDestination(targetPos);
+        if (SetDestinationToPosition(targetPos, true))
+        {
+            if (RotateToDir(destination))
+            {
+                agent.SetDestination(destination);
+            }
+        }
+        
     }
 
     protected abstract void Attack();

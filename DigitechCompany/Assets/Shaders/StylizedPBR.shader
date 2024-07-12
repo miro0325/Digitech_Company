@@ -129,7 +129,8 @@ Shader "Custom/StylizedPBR"
             #pragma fragment frag noshadow
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            
+            #include "StylizedLitInput.hlsl"
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -141,10 +142,6 @@ Shader "Custom/StylizedPBR"
                 float4 vertex : SV_POSITION;
                 float4 color : COLOR;
             };
-
-            
-            float _Outline_Bold;
-            float4 _Outline_Color;
 
             v2f vert (appdata v)
             {
