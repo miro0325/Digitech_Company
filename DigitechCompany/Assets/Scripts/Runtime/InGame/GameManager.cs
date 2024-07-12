@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 var players = DictionaryJsonUtility.FromJson<int, PlayerData>(data);
                 foreach (var player in players)
                     playerDatas.Add(player.Key, player.Value);
-                Debug.Log(playerDatas.Count);
+                Debug.Log(players.Count);
                 foreach (var kvp in playerDatas)
                 {
                     if (kvp.Value.viewID != 0)

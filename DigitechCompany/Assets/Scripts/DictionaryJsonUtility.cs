@@ -13,7 +13,7 @@ public class DataDictionary<TKey, TValue>
 [Serializable]
 public class JsonDataArray<TKey, TValue>
 {
-    public List<DataDictionary<TKey, TValue>> data;
+    public List<DataDictionary<TKey, TValue>> data = new();
 }
 
 public static class DictionaryJsonUtility
@@ -28,17 +28,12 @@ public static class DictionaryJsonUtility
     /// <returns></returns>
     public static string ToJson<TKey, TValue>(Dictionary<TKey, TValue> jsonDicData, bool pretty = false)
     {
-        List<DataDictionary<TKey, TValue>> dataList = new List<DataDictionary<TKey, TValue>>();
-        DataDictionary<TKey, TValue> dictionaryData;
+        JsonDataArray<TKey, TValue> arrayJson = new JsonDataArray<TKey, TValue>();
         foreach (TKey key in jsonDicData.Keys)
         {
-            dictionaryData = new DataDictionary<TKey, TValue>();
-            dictionaryData.Key = key;
-            dictionaryData.Value = jsonDicData[key];
-            dataList.Add(dictionaryData);
+            var dictionaryData = new DataDictionary<TKey, TValue> { Key = key, Value = jsonDicData[key] };
+            arrayJson.data.Add(dictionaryData);
         }
-        JsonDataArray<TKey, TValue> arrayJson = new JsonDataArray<TKey, TValue>();
-        arrayJson.data = dataList;
 
         return JsonUtility.ToJson(arrayJson, pretty);
     }
@@ -53,17 +48,15 @@ public static class DictionaryJsonUtility
 
     public static Dictionary<TKey, TValue> FromJson<TKey, TValue>(string jsonData)
     {
-        List<DataDictionary<TKey, TValue>> dataList = JsonUtility.FromJson<List<DataDictionary<TKey, TValue>>>(jsonData);
+        var dataList = JsonUtility.FromJson<JsonDataArray<TKey, TValue>>(jsonData);
 
         Dictionary<TKey, TValue> returnDictionary = new Dictionary<TKey, TValue>();
-
-        for (int i = 0; i < dataList.Count; i++)
+        for (int i = 0; i < dataList.data.Count; i++)
         {
-            DataDictionary<TKey, TValue> dictionaryData = dataList[i];
-            returnDictionary[dictionaryData.Key] = dictionaryData.Value;
+            DataDictionary<TKey, TValue> dictionaryData = dataList.data[i];
+            returnDictionary.Add(dictionaryData.Key, dictionaryData.Value);
         }
 
         return returnDictionary;
-
     }
 }

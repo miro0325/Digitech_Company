@@ -9,8 +9,6 @@ public class SpectatorView : MonoBehaviour, IService
 {
     private DataContainer _dataContainer;
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
-    private GameManager _gameManager;
-    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     private InGamePlayer _player;
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
     private UserInput input => UserInput.input;
@@ -21,13 +19,14 @@ public class SpectatorView : MonoBehaviour, IService
     [SerializeField] private float camCollisionRadius;
     [SerializeField] private LayerMask ignoreCamCollisionLayer;
 
-    private int targetIndex;
-    private float remainTime;
-    private float camXRotate;
-    private float camDistance;
-    private float curMaxDistance;
-    private List<InGamePlayer> alivePlayers = new();
-    private Camera cam;
+    [Header("Private")]
+    [SerializeField] private int targetIndex;
+    [SerializeField] private float remainTime;
+    [SerializeField] private float camXRotate;
+    [SerializeField] private float camDistance;
+    [SerializeField] private float curMaxDistance;
+    [SerializeField] private List<InGamePlayer> alivePlayers = new();
+    [SerializeField] private Camera cam;
 
     public void UpdateAlivePlayerList(List<InGamePlayer> players)
     {
