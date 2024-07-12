@@ -42,6 +42,9 @@ float _SpecularThreshold, _SpecularSmooth, _SpecularIntensity, _FresnelThreshold
 float _ReflectProbeIntensity, _ReflectProbeRotation, _MetalReflectProbeIntensity;
 float _MedBrushStrength, _ShadowBrushStrength, _ReflectBrushStrength;
 float _ReceiveShadows;
+//Outline
+float4 _Outline_Color;
+float _Outline_Bold;
 CBUFFER_END
 
 // NOTE: Do not ifdef the properties for dots instancing, but ifdef the actual usage.
@@ -69,6 +72,9 @@ UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
     UNITY_DOTS_INSTANCED_PROP(float4, _ReflectColor)
     UNITY_DOTS_INSTANCED_PROP(float4 , _SpecularLightOffset)
     UNITY_DOTS_INSTANCED_PROP(float , _MedThreshold)
+
+    UNITY_DOTS_INSTANCED_PROP(float4 , _Outline_Color)
+    UNITY_DOTS_INSTANCED_PROP(float , _Outline_Bold)
    
 UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
 
@@ -88,6 +94,7 @@ UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
 #define _Surface                UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO(float  , Metadata_Surface)
 
 #define _MedThreshold           UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO(float  , Metadata_MedThreshold)
+#define _Outline_Bold          UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO(float  , Metadata_Outline_Bold)
 #endif
 
 TEXTURE2D(_ParallaxMap);        SAMPLER(sampler_ParallaxMap);

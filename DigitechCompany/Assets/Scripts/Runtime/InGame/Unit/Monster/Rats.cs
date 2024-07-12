@@ -28,7 +28,7 @@ public class Rats : MonsterBase
     [SerializeField]
     private int maxSearchCount = 3;
     private int curSearchCount = 0;
-    private int curIndex = -1;
+    
 
     [SerializeField]
     private float itemDetectRange;
