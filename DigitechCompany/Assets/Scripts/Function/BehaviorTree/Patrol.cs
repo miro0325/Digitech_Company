@@ -44,7 +44,7 @@ public class Patrol : Node
 
     public override NodeState Evaluate()
     {
-        Debug.LogError("Patrol");
+        //Debug.LogError("Patrol");
         if(isDelay)
         {
             curTime += Time.deltaTime;

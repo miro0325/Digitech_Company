@@ -65,9 +65,11 @@ public class Rats : MonsterBase
         tree = new BehaviorTree.Tree(new Loop(new List<Node> {
             new Action(() => CheckItemInNest()),
             new Action(() => CheckPlayerFromNest()),
+            new Action(() => DetectDoor()),
             new Sequence(new List<Node>
             {
                 new Action(() => CheckDeath()),
+                
                 new Selector(
                     new List<Node>
                     {
@@ -135,8 +137,11 @@ public class Rats : MonsterBase
 
     protected override void Update()
     {
-        base.Update();
-        animator.SetBool("IsRun", !agent.isStopped);
+        if(photonView.IsMine)
+        {
+            base.Update();
+            animator.SetBool("IsRun", !agent.isStopped);
+        }
         switch (state)
         {
             case RatsState.Attack:
@@ -146,8 +151,6 @@ public class Rats : MonsterBase
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
                 break;
         }
-        //var a = FindObjectsOfType<Transform>().OrderByDescending(x => x.position.magnitude).First();
-        //Debug.Log(a);
 
     }
 
@@ -219,8 +222,9 @@ public class Rats : MonsterBase
     {
         SetDestinationToPosition(NestPosition);
         Move(destination);
+        //Debug.LogError(Vector3.Distance(transform.position, destination));
         //agent.avoidancePriority
-        if(Vector3.Distance(transform.position, destination) < 0.5f)
+        if(Vector3.Distance(transform.position, destination) < 0.6f)
         {
             //if(targetItem != null)
             //    Debug.Log(targetItem.CurUnit);
@@ -245,7 +249,6 @@ public class Rats : MonsterBase
             isArrive = false;
             curIndex = Random.Range(0, waypoints.Count);
         }
-        Debug.Log(curIndex);
         if(!SetDestinationToPosition(waypoints[curIndex], true))
         {
             return NodeState.Failure;
@@ -269,7 +272,7 @@ public class Rats : MonsterBase
 
     private NodeState GoToItem()
     {
-        if(targetItem.CurUnit != null)
+        if(targetItem != null && targetItem.CurUnit != null)
         {
             targetItem = null;
             state = RatsState.Idle;

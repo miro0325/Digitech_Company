@@ -5,6 +5,7 @@ using UnityEngine;
 using BehaviorTree;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.AI;
+using Photon.Pun;
 
 
 
@@ -22,6 +23,7 @@ public class Spider : MonsterBase
         tree = new BehaviorTree.Tree(new Sequence(new List<Node>
         {
             new Action(() => CheckDeath()),
+            new Action(() => DetectDoor()),
             new Selector(new List<Node>
             {
                 new Sequence(new List<Node>
@@ -30,7 +32,7 @@ public class Spider : MonsterBase
                     new Action(() => FollowTarget()),
                     new Action(() => AttackTarget())
                 }),
-                new Patrol(this,waypoints.ToArray())
+                //new Patrol(this,waypoints.ToArray())
             })
         }));
     }
@@ -48,9 +50,13 @@ public class Spider : MonsterBase
 
     protected override void Update()
     {
-        base.Update();
-        Debug.LogError(transform.position);
-        Debug.LogError(agent.enabled);
+        if (photonView.IsMine)
+        {
+            base.Update();
+        }
+        
+        //Debug.LogError(transform.position);
+        //Debug.LogError(agent.enabled);
     }
 
     private NodeState CheckPlayerInFOV()
@@ -135,6 +141,17 @@ public class Spider : MonsterBase
             leg.enabled = false;
         }
         base.Death();
+    }
+
+    [PunRPC]
+    protected override void DeathRPC()
+    {
+        rigBuilder.enabled = false;
+        foreach (var leg in legs)
+        {
+            leg.enabled = false;
+        }
+        base.DeathRPC();
     }
 
     public override void Move(Vector3 targetPos)

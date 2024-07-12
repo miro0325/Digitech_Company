@@ -15,7 +15,7 @@ public class TestNavMesh : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.LogError(IsNavMeshBaked(GetComponent<NavMeshSurface>()));
+        //Debug.LogError(IsNavMeshBaked(GetComponent<NavMeshSurface>()));
     }
 
     bool IsNavMeshBaked(NavMeshSurface surface)

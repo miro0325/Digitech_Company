@@ -68,6 +68,12 @@ public abstract class UnitBase : NetworkObject,IDamagable
 
     protected virtual void Death()
     {
-
+        photonView.RPC(nameof(DeathRPC), RpcTarget.Others);
     } 
+
+    [PunRPC]
+    protected virtual void DeathRPC()
+    {
+
+    }
 }

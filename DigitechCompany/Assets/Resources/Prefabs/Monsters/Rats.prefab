@@ -1033,7 +1033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewRadius: 3
-  viewRange: 175.55
+  viewRange: 170
   viewCooldown: 0.2
   targetMask:
     serializedVersion: 2
@@ -1114,6 +1114,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3697752146121768884}
   - {fileID: 3697752146121768873}
+  - {fileID: 2520911418076543993}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

@@ -116,7 +116,7 @@ Material:
     - _EnvironmentReflections: 1
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1
-    - _FresnelSmooth: 0
+    - _FresnelSmooth: 0.136
     - _FresnelThreshold: 0.126
     - _GlossMapScale: 0
     - _Glossiness: 0

@@ -713,8 +713,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46cf6323d29df4c49ab1093c1f6f1a56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 3.56
-  viewRange: 225.61
+  viewRadius: 4
+  viewRange: 360
   viewCooldown: 0.2
   targetMask:
     serializedVersion: 2
@@ -1610,7 +1610,7 @@ MonoBehaviour:
   body: {fileID: 4533226164529577585}
   agent: {fileID: 4533226164529577590}
   target: {fileID: 8307488113327284788}
-  footSpacing: 0.3
+  footSpacing: 0.6
   stepDistance: 0.8
   stepHeight: 0.2
   stepSpeed: 6
@@ -1828,7 +1828,7 @@ MonoBehaviour:
   body: {fileID: 4533226164529577585}
   agent: {fileID: 4533226164529577590}
   target: {fileID: 8307488114728654799}
-  footSpacing: 0.7
+  footSpacing: 0.2
   stepDistance: 0.8
   stepHeight: 0.2
   stepSpeed: 6
@@ -1914,7 +1914,7 @@ MonoBehaviour:
   body: {fileID: 4533226164529577585}
   agent: {fileID: 4533226164529577590}
   target: {fileID: 8307488113729461749}
-  footSpacing: 0.5
+  footSpacing: 0.4
   stepDistance: 0.8
   stepHeight: 0.2
   stepSpeed: 6
@@ -2495,7 +2495,7 @@ MonoBehaviour:
   body: {fileID: 4533226164529577585}
   agent: {fileID: 4533226164529577590}
   target: {fileID: 8307488113278004138}
-  footSpacing: 0.1
+  footSpacing: 0.7
   stepDistance: 0.8
   stepHeight: 0.2
   stepSpeed: 6

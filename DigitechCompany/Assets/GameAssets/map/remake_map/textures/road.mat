@@ -63,6 +63,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _EmissionTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 3f93e2aa830306046aa08ce301743211, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -112,7 +116,7 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.134
+    - _FresnelThreshold: 0.657
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossinessSource: 0

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Photon.Pun;
 
 public class TestSpawner : MonoBehaviourPun, IService
@@ -21,6 +22,42 @@ public class TestSpawner : MonoBehaviourPun, IService
             var m = NetworkObject.Instantiate($"Prefabs/Monsters/{key}", new Vector3(-4.3261f, 1f, 16.69641f), Quaternion.identity) as MonsterBase;
             m.Inititalize(waypoints);
             curMonsters.Add(m);
+        }
+    }
+
+    public void SpawnMonsters(int difficulty,Bounds[] spawnAreas)
+    {
+        foreach (var monster in curMonsters)
+        {
+            NetworkObject.Destory(monster.photonView.ViewID);
+        }
+        curMonsters.Clear();
+        int wholeMonsterAmount = 35 * difficulty;
+        int averageMonsterAmount = Mathf.Max(wholeMonsterAmount / spawnAreas.Length, 2);
+
+        foreach (var area in spawnAreas)
+        {
+            int spawnItemAmount = Random.Range(0, averageMonsterAmount * 2);
+
+            for (int i = 0; i < spawnItemAmount; i++)
+            {
+                var randomPos =
+                    new Vector3
+                    (
+                        Random.Range(area.min.x, area.max.x),
+                        Random.Range(area.center.y - 1, area.center.y + 2),
+                        Random.Range(area.min.z, area.max.z)
+                    );
+
+                if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                {
+                   
+                    var randomMonsterKey = monsters[Random.Range(0, monsters.Count)];
+                    var monster = NetworkObject.Instantiate($"Prefabs/Monsters/{randomMonsterKey}",     hit.position, Quaternion.identity) as MonsterBase;
+                    monster.Inititalize(waypoints);
+                    curMonsters.Add(monster);
+                }
+            }
         }
     }
 

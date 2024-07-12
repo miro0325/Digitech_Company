@@ -123,7 +123,16 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     protected override void Death()
     {
+        base.Death();
         animator.SetTrigger(Animator_DeathHash);
+        agent.isStopped = true;
+        isDeath = true;
+    }
+
+    [PunRPC]
+    protected override void DeathRPC()
+    {
+        //animator.SetTrigger(Animator_DeathHash);
         agent.isStopped = true;
         isDeath = true;
     }
@@ -164,6 +173,23 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         if (isDeath) state = reverse ? NodeState.Succes : NodeState.Failure;
         else state = reverse ? NodeState.Failure : NodeState.Succes;
         return state;
+    }
+
+    protected virtual NodeState DetectDoor()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, 1.5f,LayerMask.GetMask("Door"));
+        foreach(Collider c in hits)
+        {
+            if(c.TryGetComponent(out Door door))
+            {
+                if(!door.IsOpen)
+                {
+                    door.OnInteract(this);
+                    return NodeState.Succes;
+                }
+            }
+        }
+        return NodeState.Running;
     }
 
     public override void Damage(float damage,UnitBase attacker)
