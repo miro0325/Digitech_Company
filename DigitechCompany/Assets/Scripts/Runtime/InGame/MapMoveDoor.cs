@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestDoor : MonoBehaviour, IInteractable
+public class MapMoveDoor : MonoBehaviour, IInteractable
 {
-    [SerializeField] private Vector3 position;
+    public Vector3 position;
+
+    public event Action<InGamePlayer> OnMove;
 
     public string GetInteractionExplain(UnitBase unit)
     {
@@ -29,6 +32,10 @@ public class TestDoor : MonoBehaviour, IInteractable
     public void OnInteract(UnitBase unit)
     {
         var player = unit as InGamePlayer;
-        if(player) player.transform.position = position;
+        if(player)
+        {
+            player.transform.position = position;
+            OnMove?.Invoke(player);
+        }
     }
 }
