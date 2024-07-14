@@ -5,6 +5,7 @@ using System.Linq;
 public class InMap : MonoBehaviour
 {
     [SerializeField] private MapMoveDoor toGround;
+    [SerializeField] private Transform[] wayPoints;
     [SerializeField] private Bounds[] mapBounds;
 
     public MapMoveDoor ToGround => toGround;
