@@ -113,6 +113,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
         collider = GetComponent<Collider>();
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
+        
+        // DisableRender();
 
         ownUnitViewId
             .Subscribe(viewId =>

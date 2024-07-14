@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 var players = DictionaryJsonUtility.FromJson<int, PlayerData>(data);
                 foreach (var player in players)
                     playerDatas.Add(player.Key, player.Value);
-                Debug.Log(playerDatas.Count);
+                Debug.Log(players.Count);
                 foreach (var kvp in playerDatas)
                 {
                     if (kvp.Value.viewID != 0)
@@ -282,7 +282,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => gameStartSign);
 
             state = GameState.Load;
-            InitializeGameAndRequestLoad();
+            await InitializeGameAndRequestLoad();   
 
             //Wait until all player sync complete
             await UniTask.WaitUntil(() =>
@@ -326,22 +326,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         }
     }
 
-    private void InitializeGameAndRequestLoad()
+    private async UniTask InitializeGameAndRequestLoad()
     {
-        // var map = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity);
-        // var rooms = map.GetComponentsInChildren<MeshRenderer>().Where(m => m.CompareTag("Room")).Select(mesh => mesh.bounds).ToArray();
+        var inmap = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity).GetComponent<InMap>();
+        var outmap = PhotonNetwork.InstantiateRoomObject("Prefabs/OutMaps/OutMap1", new Vector3(0, 0, 0), Quaternion.identity).GetComponent<OutMap>();
 
-        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;
+        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
-        // surface.BuildNavMesh();
+        FindObjectsOfType<Door>(true).For((_, ele) => ele.gameObject.SetActive(false));
+        await UniTask.WaitForSeconds(0.25f);
+        surface.BuildNavMesh();
+        await UniTask.WaitForSeconds(0.25f);
+        FindObjectsOfType<Door>(true).For((_, ele) => ele.gameObject.SetActive(true));
+
+
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, null);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         Debug.Log(rooms.Length);
-        itemManager.SpawnItem(1, rooms.Select(m => m.bounds).ToArray());
+        itemManager.SpawnItem(1, inmap.MapBounds);
         //testSpawner.SpawnMonsters();
-        testSpawner.SpawnMonsters(1, rooms.Select(m => m.bounds).ToArray());
+        // testSpawner.SpawnMonsters(1, rooms);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
     }

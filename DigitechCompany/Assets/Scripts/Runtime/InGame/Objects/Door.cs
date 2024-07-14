@@ -19,6 +19,7 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
             return doorState == DoorState.Open;
         }
     }
+
     [SerializeField] private Transform door;
     [SerializeField] private DoorState doorState = DoorState.Close;
     [SerializeField] private float openDelay;
@@ -29,8 +30,16 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 
     private Quaternion openRot;
     private Quaternion closeRot = Quaternion.Euler(0, 0, 0);
+    
+    private MeshRenderer[] meshRenderers;
 
     //private bool isMovingDoor = false;
+
+    private void Start()
+    {
+        meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        // DisableRender();
+    }
 
     void Update()
     {
