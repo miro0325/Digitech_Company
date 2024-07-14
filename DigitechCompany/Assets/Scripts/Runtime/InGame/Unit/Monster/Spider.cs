@@ -53,8 +53,10 @@ public class Spider : MonsterBase
         if (photonView.IsMine)
         {
             base.Update();
+        } else
+        {
+            FixTransform();
         }
-        
         //Debug.LogError(transform.position);
         //Debug.LogError(agent.enabled);
     }
@@ -114,15 +116,24 @@ public class Spider : MonsterBase
     {
         isAttacking = true;
         animator.SetTrigger(Animator_AttackHash);
+        base.Attack();
+    }
+
+    [PunRPC]
+    protected override void AttackRPC()
+    {
+        isAttacking = true;
+        animator.SetTrigger(Animator_AttackHash);
     }
 
     public void OnAttack()
     {
+        if (!photonView.IsMine) return;
         Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player"));
         foreach (Collider hit in hits)
         {
             var player = hit.GetComponent<InGamePlayer>();
-            player.Damage(attackDamage,this);
+            player?.Damage(attackDamage,this);
             break;
         }
     }

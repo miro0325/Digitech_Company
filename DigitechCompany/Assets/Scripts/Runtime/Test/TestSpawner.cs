@@ -32,7 +32,7 @@ public class TestSpawner : MonoBehaviourPun, IService
             NetworkObject.Destory(monster.photonView.ViewID);
         }
         curMonsters.Clear();
-        int wholeMonsterAmount = 35 * difficulty;
+        int wholeMonsterAmount = 8 * difficulty;
         int averageMonsterAmount = Mathf.Max(wholeMonsterAmount / spawnAreas.Length, 2);
 
         foreach (var area in spawnAreas)

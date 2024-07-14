@@ -141,11 +141,17 @@ public class Rats : MonsterBase
         {
             base.Update();
             animator.SetBool("IsRun", !agent.isStopped);
+        } else
+        {
+            FixTransform();
         }
         switch (state)
         {
             case RatsState.Attack:
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
+                break;
+            case RatsState.Protect:
+                agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
                 break;
             default:
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
@@ -404,14 +410,24 @@ public class Rats : MonsterBase
         isAttacking = true;
         animator.SetInteger("AttackState", Random.Range(1, 4));
         animator.SetTrigger(Animator_AttackHash);
+        base.Attack();
+    }
+
+    [PunRPC]
+    protected override void AttackRPC()
+    {
+        isAttacking = true;
+        animator.SetInteger("AttackState", Random.Range(1, 4));
+        animator.SetTrigger(Animator_AttackHash);
     }
 
     public void OnAttack()
     {
+        if (!photonView.IsMine) return;
         if (TargetPlayer == null) return;
         if (Vector3.Distance(transform.position, TargetPlayer.transform.position) < 1.25f)
         {
-            TargetPlayer.Damage(attackDamage, this);
+            TargetPlayer?.Damage(attackDamage, this);
         }
     }
 
@@ -424,7 +440,7 @@ public class Rats : MonsterBase
 
     private bool PickItem()
     {
-        photonView.RPC(nameof(DropItemRPC), RpcTarget.Others);
+        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, targetItem.photonView.ViewID);
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
             originItemSize = targetItem.transform.localScale;
@@ -439,16 +455,20 @@ public class Rats : MonsterBase
     }
 
     [PunRPC]
-    private void PickItemRPC()
+    private void PickItemRPC(int viewId)
     {
-        if (Vector3.Distance(transform.position, targetPos) < 0.7f)
+        if(PhotonView.Find(viewId).TryGetComponent(out ItemBase item))
         {
-            originItemSize = targetItem.transform.localScale;
-            targetItem.OnInteract(this);
-            targetItem.transform.localPosition = Vector3.zero;
-            targetItem.transform.localScale *= itemHolder.localScale.x;
-            weapon.gameObject.SetActive(false);
+            targetItem = item;
+            if (Vector3.Distance(transform.position, targetPos) < 0.7f)
+            {
+                originItemSize = targetItem.transform.localScale;
+                targetItem.transform.localPosition = Vector3.zero;
+                targetItem.transform.localScale *= itemHolder.localScale.x;
+                weapon.gameObject.SetActive(false);
+            }
         }
+        
     }
 
     private bool DropItem()
@@ -474,7 +494,6 @@ public class Rats : MonsterBase
         if (targetItem.CurUnit.gameObject.Equals(gameObject))
         {
             itemsInNest.Add(targetItem);
-            targetItem.OnDiscard();
             targetItem.transform.localScale = originItemSize;
             targetItem = null;
             weapon.gameObject.SetActive(true);
@@ -497,8 +516,6 @@ public class Rats : MonsterBase
         }
         return false;
     }
-
-    [PunRPC]
 
     public override void Damage(float damage, UnitBase attacker)
     {

@@ -12,6 +12,9 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected static int Animator_DamagedHash = Animator.StringToHash("Damaged");
     protected static int Animator_DeathHash = Animator.StringToHash("Death");
 
+    public override Stats BaseStats => testBaseStat;
+    public NavMeshAgent Agent => agent;
+
     [Header("Monstar Basic Setting"),Space(20)]
     [SerializeField]
     protected FieldOfView fov;
@@ -28,6 +31,8 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     [SerializeField] protected float attackRange;
     [Space(5)][SerializeField] protected float attackDamage;
  
+    public int curIndex = -1;
+
     protected NavMeshAgent agent;
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
@@ -35,18 +40,23 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected Vector3 destination;
     protected Vector3 receivePos;
     protected Quaternion receiveRot;
+    protected Quaternion lastRotation;
+    protected float rotationThreshold = 0.1f;
     protected bool isAttacking = false;
     protected bool isDeath = false;
-    public int curIndex = -1;
-
-    public override Stats BaseStats => testBaseStat;
-    public NavMeshAgent Agent => agent;
 
     protected virtual void Start()
     {
+        
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = tempSpeed;
-        //if(!photonView.IsMine) agent.enabled = false;
+        if (!photonView.IsMine)
+        {
+            agent.enabled = false;
+        }
+        else
+        {
+            agent.speed = tempSpeed;
+        }
         if(animator == null)
         {
             animator = GetComponent<Animator>();
@@ -77,13 +87,13 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         //if (!photonView.IsMine) return;
         tree.Update();
-        //FixTransform();
     }
 
     protected void FixTransform()
     {
         if(!photonView.IsMine)
         {
+            Debug.Log(receivePos);
             transform.position = Vector3.Lerp(transform.position, receivePos, 10 * Time.deltaTime);
             transform.rotation = Quaternion.Lerp(transform.rotation, receiveRot, 10 * Time.deltaTime);
         }
@@ -118,15 +128,29 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         if (SetDestinationToPosition(targetPos, true))
         {
-            if (RotateToDir(destination))
+            if (DetectRotation())
             {
-                agent.SetDestination(destination);
+                tempSpeed = agent.speed;
+                agent.speed = 0;
+                Debug.Log("Rotating");
             }
+            else
+            {
+                agent.speed = tempSpeed;
+            }
+            agent.SetDestination(destination);
+            
         }
         
     }
 
-    protected abstract void Attack();
+    protected virtual void Attack()
+    {
+        //photonView.RPC(nameof(AttackRPC), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    protected abstract void AttackRPC();
 
     protected override void Death()
     {
@@ -208,19 +232,39 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         
     }
 
+    protected bool DetectRotation()
+    {
+        Quaternion deltaRotation = transform.rotation * Quaternion.Inverse(lastRotation);
+        //  lastRotation = transform.rotation;
+        float angle;
+        Vector3 axis;
+        deltaRotation.ToAngleAxis(out angle, out axis);
+
+        float angularSpeed = angle / Time.deltaTime;
+
+        if (angularSpeed > rotationThreshold)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        //if (stream.IsWriting)
-        //{
-        //    stream.SendNext(transform.position);
-        //    stream.SendNext(transform.rotation);
-        //}
-        //else
-        //{
-        //    receivePos = (Vector3)stream.ReceiveNext();
-        //    receiveRot = (Quaternion)stream.ReceiveNext();
-        //    //transform.position = (Vector3)stream.ReceiveNext();
-        //    //transform.rotation = (Quaternion)stream.ReceiveNext();
-        //}
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            receivePos = (Vector3)stream.ReceiveNext();
+            receiveRot = (Quaternion)stream.ReceiveNext();
+            //transform.position = (Vector3)stream.ReceiveNext();
+            //transform.rotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 }
