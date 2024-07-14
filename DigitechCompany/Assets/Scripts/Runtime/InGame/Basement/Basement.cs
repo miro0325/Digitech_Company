@@ -58,6 +58,7 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
     
     private void Awake()
     {
+        Debug.Log("test");
         ServiceLocator.For(this).Register(this);
     }
 
@@ -138,18 +139,24 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
         transform.position = Vector3.Lerp(transform.position, position, 8 * Time.deltaTime);
     }
 
+    //문 조작 함수
     public void InteractDoor()
     {
+        photonView.RPC(nameof(InteractDoorRPC), RpcTarget.All);
+    }
 
+    [PunRPC]
+    private void InteractDoorRPC()
+    {
         doorMoveSequence.Kill();
         isOpenDoor = !isOpenDoor;
         if (isOpenDoor)
             CloseDoor();
         else
             OpenDoor();
-
     }
 
+    //기지 문 열기 함수
     private void OpenDoor()
     {
         isMovingDoor = true;
@@ -160,6 +167,7 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
         doorMoveSequence.Append(backDoor.DOLocalRotate(doorOpenTrans.localEulerAngles, openDelay));
     }
 
+    //기지 문 닫기 함수
     private void CloseDoor()
     {
         isMovingDoor = true;

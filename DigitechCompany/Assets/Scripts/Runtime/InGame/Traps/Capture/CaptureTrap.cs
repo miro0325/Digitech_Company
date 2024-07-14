@@ -69,7 +69,7 @@ public class CaptureTrap : NetworkObject
                         capturePlayerDamageTime = 1;
                         state = State.Capture;
 
-                        if(photonView.IsMine) CapturedPlayer.Damage(20);
+                        if(photonView.IsMine) CapturedPlayer.Damage(20,null);
                         Debug.Log("Captured!");
                     }
                 }
@@ -79,13 +79,18 @@ public class CaptureTrap : NetworkObject
 
                 if (photonView.IsMine)
                 {
+                    if(CapturedPlayer.IsDie)
+                    {
+                        photonView.RPC(nameof(ExitRpc), RpcTarget.All);
+                    }
+
                     if (capturePlayerDamageTime > 0)
                     {
                         capturePlayerDamageTime -= Time.deltaTime;
                     }
                     else
                     {
-                        CapturedPlayer.Damage(1);
+                        CapturedPlayer.Damage(1,null);
                         capturePlayerDamageTime = 1;
                     }
                 }

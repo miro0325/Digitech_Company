@@ -10,21 +10,26 @@ public class InventoryWholeWeightUI : MonoBehaviour
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
 
     private TextMeshProUGUI text;
-    
+
     private void Start()
     {
         text = GetComponent<TextMeshProUGUI>();
+        ServiceLocator
+            .For(this)
+            .Get<GameManager>()
+            .OnLoadComplete += () =>
+            {
+                player
+                    .ObserveEveryValueChanged(p => p.Inventory.WholeWeight)
+                    .Subscribe(x => text.text = $"{x}/{player.MaxStats.GetStat(Stats.Key.Weight)} kg");
 
-        player
-            .ObserveEveryValueChanged(p => p.Inventory.WholeWeight)
-            .Subscribe(x => text.text = $"{x}/{player.MaxStats.GetStat(Stats.Key.Weight)} kg");
-        
-        player.MaxStats.OnStatChanged += (key, _, @new) =>
-        {
-            if(key == Stats.Key.Weight)
-                text.text = $"{player.Inventory.WholeWeight}/{@new} kg";
-        };
+                player.MaxStats.OnStatChanged += (key, _, @new) =>
+                {
+                    if (key == Stats.Key.Weight)
+                        text.text = $"{player.Inventory.WholeWeight}/{@new} kg";
+                };
 
-        text.text = $"0/{player.MaxStats.GetStat(Stats.Key.Weight)} kg";
+                text.text = $"0/{player.MaxStats.GetStat(Stats.Key.Weight)} kg";
+            };
     }
 }

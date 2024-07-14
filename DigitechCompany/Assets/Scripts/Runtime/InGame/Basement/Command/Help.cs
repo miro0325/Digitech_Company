@@ -10,7 +10,6 @@ namespace TerminalCommand
     {
         public override string Activate(string cmd, string[] args)
         {
-
             return GetExplainText(cmd, args);
         }
 

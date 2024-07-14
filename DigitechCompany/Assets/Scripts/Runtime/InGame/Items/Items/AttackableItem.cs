@@ -12,6 +12,10 @@ public class AttackableItem : ItemBase, IInteractable
     private static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
 
     //field
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float atkDamage;
+    [SerializeField] private float attackRadius;
+
     private ReactiveProperty<bool> isUsePressed = new();
     private float delayTime;
     private Animator animator;
@@ -96,6 +100,28 @@ public class AttackableItem : ItemBase, IInteractable
         else
         {
             isUsePressed.Value = (bool)stream.ReceiveNext();
+        }
+    }
+
+    public virtual void OnAttack()
+    {
+        Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
+        //Debug.Log("Attack!" + hits.Length);
+        foreach (Collider hit in hits)
+        {
+            var entity = hit.GetComponent<IDamagable>();
+            if(OwnUnit.gameObject == entity.OwnObject) continue;
+            if (entity.IsInvulnerable) continue;
+            Debug.Log(entity.OwnObject.name);
+            if(entity is InGamePlayer)
+            {
+                hit.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
+            }
+            else
+            {
+                entity.Damage(atkDamage, OwnUnit);
+            }
+            break;
         }
     }
 

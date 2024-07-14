@@ -5,18 +5,21 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LobbyMultiplayView : UIView, ILobbyCallbacks
+public class LobbyMultiplayView : UIView
 {
+    private LobbyPunCallbackReceiver _callbackReceiver;
+    private LobbyPunCallbackReceiver callbackReceiver => _callbackReceiver ??= ServiceLocator.For(this).Get<LobbyPunCallbackReceiver>();
+
     [SerializeField] private RectTransform roomSlotParent;
     [SerializeField] private LobbyRoomSlot roomSlotPrefab;
-    [SerializeField] private Button testButton;
+    [SerializeField] private Button createRoom;
+    [SerializeField] private MultiplayCreateRoomPopup createRoomPopup;
 
     private List<LobbyRoomSlot> roomSlots = new();
 
     private void Awake()
     {
         uiManager.RegisterView(this);
-        gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -31,36 +34,32 @@ public class LobbyMultiplayView : UIView, ILobbyCallbacks
 
     private void Start()
     {
-        testButton.onClick.AddListener(() =>
-        {
-            Debug.Log("Create Room");
-            PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 4 });
-        });
-    }
+        createRoom.onClick.AddListener(() => createRoomPopup.Open());
 
-    public void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        Debug.Log("Room Updated");
-        foreach(var info in roomList)
+        callbackReceiver.onRoomListUpdate += roomList =>
         {
-            Debug.LogError(info.Name);
-        }
-        // if(roomSlots.Count > roomList.Count)
-        // {
-        //     for(int i = 0; i < roomSlots.Count - roomList.Count; i++)
-        //     {
-        //         Destroy(roomSlots[^1]);
-        //         roomSlots.RemoveAt(roomSlots.Count - 1);
-        //     }
-        // }
-        // else
-        // {
-        //     for(int i = 0; i < roomList.Count - roomSlots.Count; i++)
-        //         roomSlots.Add(Instantiate(roomSlotPrefab, roomSlotParent));
-        // }
+            while (roomSlots.Count != roomList.Count)
+            {
+                if (roomSlots.Count > roomList.Count)
+                {
+                    for (int i = 0; i < roomSlots.Count - roomList.Count; i++)
+                    {
+                        Destroy(roomSlots[^1]);
+                        roomSlots.RemoveAt(roomSlots.Count - 1);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < roomList.Count - roomSlots.Count; i++)
+                        roomSlots.Add(Instantiate(roomSlotPrefab, roomSlotParent));
+                }
+            }
 
-        // for(int i = 0; i < roomList.Count; i++)
-        //     roomSlots[i].Initialize(, );
+            for (int i = 0; i < roomList.Count; i++)
+                roomSlots[i].Initialize(roomList[i]);
+        };
+
+        gameObject.SetActive(false);
     }
 
     public override void Close()
@@ -72,8 +71,4 @@ public class LobbyMultiplayView : UIView, ILobbyCallbacks
     {
         gameObject.SetActive(true);
     }
-
-    public void OnJoinedLobby() { }
-    public void OnLeftLobby() { }
-    public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }
 }

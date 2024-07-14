@@ -9,8 +9,14 @@ public class SpectateUI : MonoBehaviour
     {
         ServiceLocator
             .For(this)
-            .Get<InGamePlayer>()
-            .ObserveEveryValueChanged(p => p.IsDie)
-            .Subscribe(active => view.SetActive(active));
+            .Get<GameManager>()
+            .OnLoadComplete += () =>
+            {
+                ServiceLocator
+                    .For(this)
+                    .Get<InGamePlayer>()
+                    .ObserveEveryValueChanged(p => p.IsDie)
+                    .Subscribe(active => view.SetActive(active));
+            };
     }
 }

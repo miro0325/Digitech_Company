@@ -78,25 +78,20 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public bool IsCrouch => isCrouch;
     public bool IsGround => isGround;
     public bool IsJump => isJump;
-    public bool IsDie => isDie;
+    public new bool IsDie => isDie;
     public Vector2 MoveInput => moveInput;
     public float[] InteractRequireTimes => interactRequireTimes;
     public IInteractable LookInteractable => lookInteractable;
     public ScanData ScanData => scanData;
     public Transform ItemHolderCamera => itemHolderCamera;
+    public Transform CameraHolder => camHolder;
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
 
-    public void Damage(float damage)
+    public override void Damage(float damage, UnitBase attacker)
     {
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
-    }
-
-    [PunRPC]
-    private void SendDamageToOwnerRpc(float damage)
-    {
-        curStats.SetStat(Stats.Key.Hp, x => x - damage);
     }
 
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
@@ -119,22 +114,33 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(SendReviveToOwnerRpc), photonView.Owner);
+        photonView.RPC(nameof(SendReviveToAllRpc), photonView.Owner);
     }
 
     [PunRPC]
-    private void SendReviveToOwnerRpc()
+    private void SendReviveToAllRpc()
     {
-        animator.SetActiveArmModel(true);
-        animator.SetActivePlayerModel(false);
+        if (photonView.IsMine)
+        {
+            animator.SetActiveArmModel(true);
+            animator.SetActivePlayerModel(false);
+            animator.SetEnableRagDoll(false);
 
-        input.Player.Enable();
-        gameObject.SetActive(true);
-        curStats.ChangeFrom(maxStats);
-        gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
-        SetCamera();
-        cc.enabled = true;
+            input.Player.Enable();
+            gameObject.SetActive(true);
+            curStats.ChangeFrom(maxStats);
+            gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, true);
+            SetCamera();
+            cc.enabled = true;
+            isDie = false;
+
+            return;
+        }
+
         isDie = false;
+        animator.SetEnableRagDoll(false);
+        animator.SetActivePlayerModel(true);
+        gameObject.SetActive(true);
     }
 
     public override void OnCreate()
@@ -199,10 +205,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     private void Start()
     {
+        Debug.Log(gameObject.scene.name);
         this
             .ObserveEveryValueChanged(t => t.isInBasement)
             .Subscribe(x =>
             {
+                Debug.Log(basement);
                 if (isInBasement) transform.SetParent(basement.transform);
                 else transform.SetParent(null);
             });
@@ -233,15 +241,27 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         if (!isDie && curStats.GetStat(Stats.Key.Hp) <= 0)
         {
-            Debug.LogError("Die");
             isDie = true;
+            photonView.RPC(nameof(SendDieToAllRpc), RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void SendDieToAllRpc()
+    {
+        isDie = true;
+        animator.SetEnableRagDoll(true);
+        animator.SetActivePlayerModel(true);
+        
+        if(photonView.IsMine)
+        {
             input.Player.Disable();
-            animator.SetActivePlayerModel(true);
             animator.SetActiveArmModel(false);
             cc.enabled = false;
             this.Invoke(() => gameManager.SendPlayerState(PhotonNetwork.LocalPlayer, false), 1.5f);
         }
     }
+
     private void DoScan()
     {
         if (isDie) return;
@@ -521,12 +541,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (stream.IsWriting)
         {
+            stream.SendNext(isDie);
             stream.SendNext(isInBasement);
             stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
+            isDie = (bool)stream.ReceiveNext();
             isInBasement = (bool)stream.ReceiveNext();
             gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();

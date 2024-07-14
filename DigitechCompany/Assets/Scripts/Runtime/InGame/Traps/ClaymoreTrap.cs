@@ -29,10 +29,10 @@ public class ClaymoreTrap : NetworkObject
         while (repeat)
         {
             lr.SetPosition(0, ray.position);
-            Debug.DrawRay(ray.position, ray.forward, Color.cyan);
+            //Debug.DrawRay(ray.position, ray.forward, Color.cyan);
             if (Physics.Raycast(ray.position, ray.forward, out var hit, detectDistance))
             {
-                Debug.Log(hit.collider.name);
+                //Debug.Log(hit.collider.name);
                 lr.SetPosition(1, ray.transform.position + ray.forward * hit.distance);
                 if (hit.collider.TryGetComponent<InGamePlayer>(out _))
                 {
@@ -53,15 +53,16 @@ public class ClaymoreTrap : NetworkObject
     {
         await UniTask.WaitForSeconds(0.5f);
 
-        var explosionHits =
-                Physics.SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
-                .Where(col => col.collider is CharacterController);
+        var explosionHits = 
+                Physics
+                    .SphereCastAll(transform.position, explosionRange, Vector3.up, explosionRange, LayerMask.GetMask("Player"))
+                    .Where(col => col.collider is CharacterController);
 
         foreach (var explosion in explosionHits)
         {
             var distanceRatio = explosion.distance / explosionRange;
             var damageFactor = distanceRatio < 0.5f ? 1 : distanceRatio * 2;
-            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor);
+            explosion.collider.GetComponent<InGamePlayer>().Damage(explosionDamage * damageFactor,null);
         }
         GetComponent<MeshRenderer>().enabled = false;
         lr.enabled = false;

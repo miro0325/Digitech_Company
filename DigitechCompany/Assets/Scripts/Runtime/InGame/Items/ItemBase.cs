@@ -40,6 +40,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.loadData.itemDatas[key];
     public MeshRenderer MeshRenderer => meshRenderer;
+    public UnitBase CurUnit => OwnUnit;
 
     //method
     public virtual void Initialize(string key)
@@ -116,6 +117,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
         ownUnitViewId
             .Subscribe(viewId =>
             {
+                //Debug.Log($"View ID : {viewId}");
                 if (viewId == 0)
                 {
                     OwnUnit = null;

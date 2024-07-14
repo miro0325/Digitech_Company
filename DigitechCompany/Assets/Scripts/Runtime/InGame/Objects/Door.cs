@@ -11,6 +11,14 @@ public enum DoorState
 
 public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 {
+    
+    public bool IsOpen
+    {
+        get 
+        {
+            return doorState == DoorState.Open;
+        }
+    }
     [SerializeField] private Transform door;
     [SerializeField] private DoorState doorState = DoorState.Close;
     [SerializeField] private float openDelay;
@@ -21,6 +29,8 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 
     private Quaternion openRot;
     private Quaternion closeRot = Quaternion.Euler(0, 0, 0);
+
+    //private bool isMovingDoor = false;
 
     void Update()
     {
@@ -106,6 +116,7 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
 
     public void OnInteract(UnitBase unit)
     {
+        if (unit.IsDie) return;
         switch (doorState)
         {
             case DoorState.Lock:

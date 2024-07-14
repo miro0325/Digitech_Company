@@ -1,7 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 
-public abstract class UnitBase : NetworkObject
+public abstract class UnitBase : NetworkObject,IDamagable
 {
     [Header("BaseUnit")]
     [SerializeField] protected Transform itemHolder;
@@ -16,8 +16,24 @@ public abstract class UnitBase : NetworkObject
     public Stats CurStats => curStats;
     public Stats.Modifier Modifier => modifier;
     public Inventory Inventory => inventory;
+    public virtual bool IsDie
+    {
+        get 
+        {
+            if (curStats == null) return true;
+            if(curStats.GetStat(Stats.Key.Hp) <= 0)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
 
     public abstract Stats BaseStats { get; }
+
+    public GameObject OwnObject => this.gameObject;
+
+    public bool IsInvulnerable => IsDie;
 
     public override void OnCreate()
     {
@@ -31,5 +47,33 @@ public abstract class UnitBase : NetworkObject
             var diff = cur - old;
             curStats.SetStat(key, x => x + diff);
         };
+    }
+    
+    public virtual void Damage(float damage, UnitBase attacker)
+    {
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
+        photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
+    }
+
+    [PunRPC]
+    protected void SendDamageToOwnerRpc(float damage)
+    {
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
+        curStats.SetStat(Stats.Key.Hp, x => x - damage);
+        if (curStats.GetStat(Stats.Key.Hp) <= 0)
+        {
+            Death();
+        }
+    }
+
+    protected virtual void Death()
+    {
+        photonView.RPC(nameof(DeathRPC), RpcTarget.Others);
+    } 
+
+    [PunRPC]
+    protected virtual void DeathRPC()
+    {
+
     }
 }

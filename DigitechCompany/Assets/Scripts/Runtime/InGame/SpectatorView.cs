@@ -9,8 +9,6 @@ public class SpectatorView : MonoBehaviour, IService
 {
     private DataContainer _dataContainer;
     private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
-    private GameManager _gameManager;
-    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
     private InGamePlayer _player;
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
     private UserInput input => UserInput.input;
@@ -21,13 +19,14 @@ public class SpectatorView : MonoBehaviour, IService
     [SerializeField] private float camCollisionRadius;
     [SerializeField] private LayerMask ignoreCamCollisionLayer;
 
-    private int targetIndex;
-    private float remainTime;
-    private float camXRotate;
-    private float camDistance;
-    private float curMaxDistance;
-    private List<InGamePlayer> alivePlayers = new();
-    private Camera cam;
+    [Header("Private")]
+    [SerializeField] private int targetIndex;
+    [SerializeField] private float remainTime;
+    [SerializeField] private float camXRotate;
+    [SerializeField] private float camDistance;
+    [SerializeField] private float curMaxDistance;
+    [SerializeField] private List<InGamePlayer> alivePlayers = new();
+    [SerializeField] private Camera cam;
 
     public void UpdateAlivePlayerList(List<InGamePlayer> players)
     {
@@ -45,32 +44,40 @@ public class SpectatorView : MonoBehaviour, IService
     {
         cam = Camera.main;
 
-        player
-            .ObserveEveryValueChanged(p => p.IsDie)
-            .Subscribe(isDie =>
+        ServiceLocator
+            .For(this)
+            .Get<GameManager>()
+            .OnLoadComplete += () =>
             {
-                //initialize
-                if (isDie)
-                {
-                    Debug.LogError("Set camera to spectate");
-                    targetIndex = 0;
-                    input.Spectator.Enable();
-                    cam.transform.SetParent(camHolder);
-                    cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
-                    camDistance = camDistanceClamp;
-                    remainTime = 1.5f;
-                }
-                else
-                {
-                    Debug.LogError("Set camera to play");
-                    targetIndex = -1;
-                    input.Spectator.Disable();
-                }
-            });
+                player
+                    .ObserveEveryValueChanged(p => p.IsDie)
+                    .Subscribe(isDie =>
+                    {
+                        //initialize
+                        if (isDie)
+                        {
+                            Debug.LogError("Set camera to spectate");
+                            targetIndex = 0;
+                            input.Spectator.Enable();
+                            cam.transform.SetParent(camHolder);
+                            cam.transform.SetLocalPositionAndRotation(new Vector3(0, 0, -camDistanceClamp), Quaternion.Euler(0, 0, 0));
+                            camDistance = camDistanceClamp;
+                            remainTime = 1.5f;
+                        }
+                        else
+                        {
+                            Debug.LogError("Set camera to play");
+                            targetIndex = -1;
+                            input.Spectator.Disable();
+                        }
+                    });
+            };
     }
 
     private void Update()
     {
+        if (ReferenceEquals(player, null)) return;
+
         if (!player.IsDie) return;
         if (targetIndex == -1) return;
         if (alivePlayers.Count == 0) return;
@@ -105,7 +112,7 @@ public class SpectatorView : MonoBehaviour, IService
         //cam collision
         curMaxDistance += input.Spectator.MouseWheel.ReadValue<float>() * 0.01f;
         curMaxDistance = Mathf.Clamp(curMaxDistance, 0, camDistanceClamp);
-        
+
         if (Physics.Linecast(transform.position, cam.transform.position - cam.transform.forward * camCollisionRadius, out var hit, ~ignoreCamCollisionLayer)) camDistance = hit.distance;
         else camDistance = camDistanceClamp;
         camDistance = Mathf.Clamp(camDistance, 0, camDistanceClamp);

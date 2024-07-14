@@ -71,10 +71,10 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
         shovel.Initialize("Mask");
         items.Add(shovel.photonView.ViewID, shovel);
 
-        var networkItemData = new NetworkItemData[items.Count];
+        var networkItemDatas = new NetworkItemData[items.Count];
         var count = 0;
         foreach(var kvp in items)
-            networkItemData[count++] = new()
+            networkItemDatas[count++] = new()
             {
                 viewId = kvp.Key,
                 key = kvp.Value.Key,
@@ -82,8 +82,16 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                 layRotation = kvp.Value.LayRotation
             };
 
-        var json = networkItemData.ToJson();
-        itemDataJson = json;
+        itemDataJson = networkItemDatas.ToJson();
+    }
+
+    public void SpawnItem(Vector3 spawnPos,string key)
+    {
+        if (!resourceLoader.itemPrefabs.ContainsKey(key)) return;
+        var item = NetworkObject.Instantiate($"Prefabs/Items/{key}", spawnPos + Vector3.up, Quaternion.identity) as ItemBase;
+        item.SetLayRotation(Random.Range(0, 360));
+        item.Initialize(key);
+        items.Add(item.photonView.ViewID, item);
     }
 
     /// <summary>
@@ -94,11 +102,14 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// <returns>Items data</returns>
     public void SyncItem(string networkItemDataJson)
     {
+        if(string.IsNullOrEmpty(networkItemDataJson)) return;
+
         var datas = JsonSerializer.JsonToArray<NetworkItemData>(networkItemDataJson);
+        
         for (int i = 0; i < datas.Length; i++)
         {
             var data = datas[i];
-            var item = NetworkObject.Sync( $"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
+            var item = NetworkObject.Sync($"Prefabs/Items/{data.key}", data.viewId) as ItemBase;
             item.Initialize(data.key);
             item.transform.position = data.position;
             item.SetLayRotation(data.layRotation);

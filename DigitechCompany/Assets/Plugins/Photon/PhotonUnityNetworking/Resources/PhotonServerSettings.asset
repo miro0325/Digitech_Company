@@ -110,6 +110,22 @@ MonoBehaviour:
   - ReviveRpc
   - SendReviveToOwnerRpc
   - SetPositionAndRotationRpc
+  - SendReviveToOtherRpc
+  - SendGameLoadToClientRpc
+  - SendGameDataRequestToOwnerRpc
+  - SendJoinLoadDataToClientRpc
+  - SendJoinLoadToOwnerRpc
+  - SendLoadCompleteToOwnerRpc
+  - SendRequestGameStateToOwnerRpc
+  - Damage
+  - DropItemRPC
+  - InitRPC
+  - InteractDoorRPC
+  - MakeAngryRPC
+  - PickItemRPC
+  - SendDieToAllRpc
+  - SendReviveToAllRpc
+  - DeathRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
