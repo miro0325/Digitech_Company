@@ -88,7 +88,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
-
+    
     public override void Damage(float damage, UnitBase attacker)
     {
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
@@ -228,11 +228,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         DoInteract();
         DoMovement();
         DoRotation();
-    }
 
-    private void FixedUpdate()
-    {
-        cc.Move(velocity * Time.fixedDeltaTime);
+        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoLife()
