@@ -55,7 +55,7 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
                         Random.Range(area.min.z, area.max.z)
                     );
 
-                if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                if (NavMesh.SamplePosition(new Vector3(0, -50, 0) + randomPos, out var hit, 3, LayerMask.NameToLayer("Ground"))) //~0 is all layer 
                 {
                     var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];

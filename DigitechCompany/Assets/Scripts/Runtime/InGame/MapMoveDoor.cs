@@ -11,7 +11,7 @@ public class MapMoveDoor : MonoBehaviour, IInteractable
 
     public string GetInteractionExplain(UnitBase unit)
     {
-        return "ÁøÀÔ";
+        return "??";
     }
 
     public float GetInteractRequireTime(UnitBase unit)
