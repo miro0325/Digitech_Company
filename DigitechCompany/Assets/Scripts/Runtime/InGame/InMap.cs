@@ -1,6 +1,9 @@
 using UnityEngine;
 using NaughtyAttributes;
 using System.Linq;
+using Unity.AI.Navigation;
+using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class InMap : MonoBehaviour
 {

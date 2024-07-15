@@ -2,6 +2,15 @@ using UnityEngine;
 
 public class OutMap : MonoBehaviour
 {
+    [System.Serializable]
+    public class EnvironmentSetting
+    {
+        public Color morning;
+        public Color midnight;
+        public Color night;
+    }
+
+    [SerializeField] private EnvironmentSetting environmentSetting;
     [SerializeField] private MapMoveDoor toMap;
     [SerializeField] private Transform enterPoint;
     [SerializeField] private Transform deliveryPoint;
