@@ -328,7 +328,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private async UniTask InitializeGameAndRequestLoad()
     {
-        var inmap = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/Map1", new Vector3(0, -50, 0), Quaternion.identity).GetComponent<InMap>();
+        var inmap = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/InMap1", new Vector3(0, -50, 0), Quaternion.identity).GetComponent<InMap>();
         var outmap = PhotonNetwork.InstantiateRoomObject("Prefabs/OutMaps/OutMap1", new Vector3(0, 0, 0), Quaternion.identity).GetComponent<OutMap>();
 
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;

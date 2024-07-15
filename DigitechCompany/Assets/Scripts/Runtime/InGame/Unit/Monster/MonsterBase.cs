@@ -39,11 +39,15 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected Stats testBaseStat = new();
     protected Vector3 destination;
     protected Vector3 receivePos;
+    protected Vector3 targetPos;
     protected Quaternion receiveRot;
     protected Quaternion lastRotation;
     protected float rotationThreshold = 0.1f;
+    protected float delayTime;
+    protected float curDelayTime = 0;
     protected bool isAttacking = false;
     protected bool isDeath = false;
+    protected bool isCalled = false;
 
     protected virtual void Start()
     {
@@ -128,16 +132,16 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         if (SetDestinationToPosition(targetPos, true))
         {
-            if (DetectRotation())
-            {
-                tempSpeed = agent.speed;
-                agent.speed = 0;
-                Debug.Log("Rotating");
-            }
-            else
-            {
-                agent.speed = tempSpeed;
-            }
+            //if (DetectRotation())
+            //{
+            //    tempSpeed = agent.speed;
+            //    agent.speed = 0;
+            //    Debug.Log("Rotating");
+            //}
+            //else
+            //{
+            //    agent.speed = tempSpeed;
+            //}
             agent.SetDestination(destination);
             
         }
@@ -206,6 +210,33 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         return state;
     }
 
+    protected NodeState IsCalled()
+    {
+        return (isCalled) ? NodeState.Succes : NodeState.Failure;
+    } 
+
+    protected virtual NodeState GoToCalledPos()
+    {
+        Vector3 finalPos;
+        while(true)
+        {
+            if(SetRandomPosition(targetPos, out finalPos, 3))
+            {
+                break;
+            }
+        }
+        if(Vector3.Distance(transform.position,finalPos) > 0.6f)
+        {
+            if (SetDestinationToPosition(finalPos))
+            {
+                Move(destination);
+            }
+            return NodeState.Running;
+        }
+        return NodeState.Succes;
+    }
+
+    //문 발견 시 문을 연다
     protected virtual NodeState DetectDoor()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, 1.5f,LayerMask.GetMask("Door"));
@@ -232,25 +263,51 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         
     }
 
-    protected bool DetectRotation()
+    //몬스터를 특정 위치로 이동시킨다
+    public virtual void CallMonsterToPos(Vector3 pos, InGamePlayer targetPlayer = null)
     {
-        Quaternion deltaRotation = transform.rotation * Quaternion.Inverse(lastRotation);
-        //  lastRotation = transform.rotation;
-        float angle;
-        Vector3 axis;
-        deltaRotation.ToAngleAxis(out angle, out axis);
+        targetPos = pos;
+        isCalled = true;
+        delayTime = Random.Range(1.5f, 4.5f);
+        curDelayTime = 0;
+    }
 
-        float angularSpeed = angle / Time.deltaTime;
+    //랜덤 NavMesh 위치를 구한다
+    protected bool SetRandomPosition(Vector3 pos, out Vector3 finalPosition, float radius, int layerMask = -1)
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * radius;
+        randomDirection += transform.position;
 
-        if (angularSpeed > rotationThreshold)
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomDirection, out hit, radius, layerMask))
         {
+            finalPosition = hit.position;
+            agent.SetDestination(finalPosition);
             return true;
         }
-        else
-        {
-            return false;
-        }
+        finalPosition = transform.position;
+        return false;
     }
+
+    //protected bool DetectRotation()
+    //{
+    //    Quaternion deltaRotation = transform.rotation * Quaternion.Inverse(lastRotation);
+    //    //  lastRotation = transform.rotation;
+    //    float angle;
+    //    Vector3 axis;
+    //    deltaRotation.ToAngleAxis(out angle, out axis);
+
+    //    float angularSpeed = angle / Time.deltaTime;
+
+    //    if (angularSpeed > rotationThreshold)
+    //    {
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
 
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -263,8 +320,6 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         {
             receivePos = (Vector3)stream.ReceiveNext();
             receiveRot = (Quaternion)stream.ReceiveNext();
-            //transform.position = (Vector3)stream.ReceiveNext();
-            //transform.rotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }

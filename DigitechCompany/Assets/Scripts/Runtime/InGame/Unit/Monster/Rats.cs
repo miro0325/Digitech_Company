@@ -41,7 +41,6 @@ public class Rats : MonsterBase
 
     private bool isArrive = true;
     private bool isAlreadySetRandomPoint = false;
-    private Vector3 targetPos = Vector3.zero;
     private Vector3 originItemSize = Vector3.zero;
     private ItemBase targetItem = null;
 
@@ -278,6 +277,11 @@ public class Rats : MonsterBase
 
     private NodeState GoToItem()
     {
+        if(targetItem == null)
+        {
+            state = RatsState.Idle;
+            return NodeState.Failure;
+        }
         if(targetItem != null && targetItem.CurUnit != null)
         {
             targetItem = null;
@@ -317,15 +321,17 @@ public class Rats : MonsterBase
         if(TargetPlayer == null || (TargetPlayer != null && TargetPlayer.IsDie))
         {
             ChangeTexture(false);
+            TargetPlayer = null;
             if (DetectItem())
             {
                 isArrive = true;
                 curSearchCount = 0;
                 state = RatsState.Bring;
-                return NodeState.Failure;
             }
             else
             {
+                isArrive = true;
+                curSearchCount = 0;
                 state = RatsState.Idle;
             }
             return NodeState.Failure;
@@ -386,25 +392,6 @@ public class Rats : MonsterBase
         return NodeState.Running;
     }
 
-    //private void AvoidOtherMonsters()
-    //{
-    //    Collider[] nearbyMonsters = Physics.OverlapSphere(transform.position, transform.localScale.x * 1.5f, LayerMask.GetMask("Monster"));
-    //    Vector3 avoidDir = Vector3.zero;
-    //    foreach (Collider collider in nearbyMonsters)
-    //    {
-    //        if (collider.gameObject != gameObject)
-    //        {
-    //            Vector3 directionAwayFromOther = (transform.position - collider.transform.position).normalized;
-    //            avoidDir += directionAwayFromOther;
-    //        }
-    //    }
-    //    if(SetDestinationToPosition(avoidDir * tempSpeed * Time.deltaTime))
-    //    {
-    //        Debug.Log("Move");
-    //        Move(destination);
-    //    }
-    //}
-
     protected override void Attack()
     {
         isAttacking = true;
@@ -440,7 +427,7 @@ public class Rats : MonsterBase
 
     private bool PickItem()
     {
-        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, targetItem.photonView.ViewID);
+        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, (TargetPlayer == null) ? 0 : targetItem.photonView.ViewID);
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
             originItemSize = targetItem.transform.localScale;
@@ -557,6 +544,11 @@ public class Rats : MonsterBase
             TargetPlayer = PhotonView.Find(playerViewId).GetComponent<InGamePlayer>();
             state = RatsState.Attack;
         }
+    }
+
+    public override void CallMonsterToPos(Vector3 pos, InGamePlayer targetPlayer = null)
+    {
+        return;
     }
 
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

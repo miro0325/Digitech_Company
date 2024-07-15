@@ -34,7 +34,8 @@ Shader "Custom/StylizedPBR"
         _OcclusionMap("Occlusion", 2D) = "white" {}
 
         [HDR] _EmissionColor("Color", Color) = (0,0,0)
-        _EmissionMap("Emission", 2D) = "white" {}
+        [HideInInspector] _EmissionMap("Emission", 2D) = "white" {}
+        _EmissionTex("EmissionTex", 2D) = "white" {}
 
         _DetailMask("Detail Mask", 2D) = "white" {}
         _DetailAlbedoMapScale("Scale", Range(0.0, 2.0)) = 1.0
@@ -128,6 +129,7 @@ Shader "Custom/StylizedPBR"
             #pragma fragment frag noshadow
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "StylizedLitInput.hlsl"
             
             struct appdata
             {
@@ -140,10 +142,6 @@ Shader "Custom/StylizedPBR"
                 float4 vertex : SV_POSITION;
                 float4 color : COLOR;
             };
-
-            
-            float _Outline_Bold;
-            float4 _Outline_Color;
 
             v2f vert (appdata v)
             {
@@ -470,8 +468,8 @@ Shader "Custom/StylizedPBR"
             #endif
                 MixRealtimeAndBakedGI(mainLight,inputData.normalWS,inputData.bakedGI,half4(0,0,0,0));
                 half3 color = StylizedGlobalIllumination(brdfData,radiance,inputData.bakedGI,occlusion,inputData.normalWS,inputData.viewDirectionWS,metallic);
+                color.rgb += (SAMPLE_TEXTURE2D(_EmissionTex, sampler_EmissionTex, uv).rgb * _EmissionColor); 
                 color += LightingStylizedPhysicallyBased(brdfData,radiance,mainLight.color,mainLight.direction,mainLight.distanceAttenuation,inputData.normalWS,inputData.viewDirectionWS,false);
-
                 //Additional Lights
                 LightingData lightingData = CreateLightingData(inputData, surfaceData);
 
