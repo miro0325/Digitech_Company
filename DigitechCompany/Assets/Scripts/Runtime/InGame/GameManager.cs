@@ -377,8 +377,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     itemManager.SyncItem(datas);
                     break;
                 case SyncTarget.Map:
-                    var inmap = PhotonNetwork.InstantiateRoomObject("Prefabs/Maps/InMap1", new Vector3(0, -50, 0), Quaternion.identity).GetComponent<InMap>();
-                    var outmap = PhotonNetwork.InstantiateRoomObject("Prefabs/OutMaps/OutMap1", new Vector3(0, 0, 0), Quaternion.identity).GetComponent<OutMap>();
+                    var inmap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
+                    var outmap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
 
                     inmap.ToGround.position = outmap.EnterPoint.position;
                     outmap.ToMap.position = inmap.EnterPoint.position;
