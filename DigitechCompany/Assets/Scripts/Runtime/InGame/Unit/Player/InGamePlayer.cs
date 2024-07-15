@@ -56,7 +56,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private bool isGround;
     private bool isJump;
     private bool isDie = true;
-    private bool isInBasement;
+    private bool isInBasement = true;
     private float velocityY;
     private float camRotateX;
     private float scanWaitTime;
