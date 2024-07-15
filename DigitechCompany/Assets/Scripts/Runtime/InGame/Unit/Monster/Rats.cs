@@ -225,11 +225,9 @@ public class Rats : MonsterBase
 
     protected NodeState ReturnToNest()
     {
-        SetDestinationToPosition(NestPosition);
-        Move(destination);
-        //Debug.LogError(Vector3.Distance(transform.position, destination));
-        //agent.avoidancePriority
-        if(Vector3.Distance(transform.position, destination) < 0.6f)
+        if (agent.isStopped) agent.isStopped = false;
+        Move(NestPosition);
+        if(Vector3.Distance(transform.position, GetNavMeshPosition(NestPosition)) < 0.6f)
         {
             //if(targetItem != null)
             //    Debug.Log(targetItem.CurUnit);
@@ -254,22 +252,24 @@ public class Rats : MonsterBase
             isArrive = false;
             curIndex = Random.Range(0, waypoints.Count);
         }
-        if(!SetDestinationToPosition(waypoints[curIndex], true))
+        if (!SetDestinationToPosition(waypoints[curIndex]))
         {
+            Debug.LogError($"Can't go this waypoint {waypoints[curIndex]}");
             return NodeState.Failure;
         }
-        if(agent.isStopped) agent.isStopped = false;
+        if (agent.isStopped) agent.isStopped = false;
         Move(destination);
-        if(DetectItem())
+        if (DetectItem())
         {
             isArrive = true;
             curSearchCount = 0;
             state = RatsState.Bring;
             return NodeState.Succes;
         }
-        if (Vector3.Distance(transform.position, destination) < 1f) {
+        if (Vector3.Distance(transform.position, destination) < 1f)
+        {
             curSearchCount++;
-            
+
             isArrive = true;
         }
         return NodeState.Running;
@@ -310,7 +310,7 @@ public class Rats : MonsterBase
         } 
         else
         {
-            agent.isStopped = true;
+            agent.isStopped = false;
             state = RatsState.Searching;
             return NodeState.Failure;
         }
@@ -369,6 +369,7 @@ public class Rats : MonsterBase
     {
         if (Vector3.Distance(transform.position, NestPosition) < 2.5f)
         {
+            Debug.Log("Protecting");
             DropItem();
             agent.isStopped = true;
             //AvoidOtherMonsters();
@@ -377,17 +378,19 @@ public class Rats : MonsterBase
             if(players.Length == 0)
             {
                 agent.isStopped = false;
-                state = RatsState.Idle;
+                state = RatsState.Idle; 
                 return NodeState.Succes;
             }
             else if(players.Length > 0)
             {
+                Debug.Log("Looking");
                 RotateToDir(players[0].transform.position);
             }
         } else
         {
-            SetDestinationToPosition(NestPosition);
-            Move(destination);
+            agent.isStopped = false;
+            Debug.Log("Going To Protect");
+            Move(NestPosition);
         }
         return NodeState.Running;
     }
@@ -572,5 +575,11 @@ public class Rats : MonsterBase
             isArrive = (bool)stream.ReceiveNext();
             curIndex = (int)stream.ReceiveNext();
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(255,0,0,0.4f);
+        Gizmos.DrawSphere(destination, 0.5f);
     }
 }

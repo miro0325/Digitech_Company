@@ -28,4 +28,9 @@ public class InMap : MonoBehaviour
 
         doors = GetComponentsInChildren<Door>();
     }
+
+    public Transform[] GetWayPoints()
+    {
+        return wayPoints;
+    }
 }

@@ -60,6 +60,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         else
         {
             agent.speed = tempSpeed;
+            path = new NavMeshPath();
         }
         if(animator == null)
         {
@@ -130,22 +131,14 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     public virtual void Move(Vector3 targetPos)
     {
-        if (SetDestinationToPosition(targetPos, true))
+        if (SetDestinationToPosition(targetPos))
         {
-            //if (DetectRotation())
-            //{
-            //    tempSpeed = agent.speed;
-            //    agent.speed = 0;
-            //    Debug.Log("Rotating");
-            //}
-            //else
-            //{
-            //    agent.speed = tempSpeed;
-            //}
             agent.SetDestination(destination);
-            
         }
-        
+        else
+        {
+            Debug.LogError($"Can't Go To Destination");
+        }
     }
 
     protected virtual void Attack()
@@ -187,7 +180,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         if (checkForPath)
         {
             position = GetNavMeshPosition(position, hit, 1.75f);
-            path = new NavMeshPath();
+            path.ClearCorners();
             if (!agent.CalculatePath(position, path))
             {
                 return false;

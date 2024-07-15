@@ -25,7 +25,7 @@ public class TestSpawner : MonoBehaviourPun, IService
         }
     }
 
-    public void SpawnMonsters(int difficulty,Bounds[] spawnAreas)
+    public void SpawnMonsters(int difficulty,Bounds[] spawnAreas,Transform[] waypoints)
     {
         foreach (var monster in curMonsters)
         {
@@ -33,12 +33,11 @@ public class TestSpawner : MonoBehaviourPun, IService
         }
         curMonsters.Clear();
         int wholeMonsterAmount = 8 * difficulty;
-        int averageMonsterAmount = Mathf.Max(wholeMonsterAmount / spawnAreas.Length, 2);
-
+        int curMonsterAmount = 0;
         foreach (var area in spawnAreas)
         {
-            int spawnItemAmount = Random.Range(0, averageMonsterAmount * 2);
-
+            int spawnItemAmount = Random.Range(0,2);
+            if (curMonsterAmount > wholeMonsterAmount) break;
             for (int i = 0; i < spawnItemAmount; i++)
             {
                 var randomPos =
@@ -49,11 +48,12 @@ public class TestSpawner : MonoBehaviourPun, IService
                         Random.Range(area.min.z, area.max.z)
                     );
 
-                if (NavMesh.SamplePosition(randomPos, out var hit, 3, ~0)) //~0 is all layer 
+                if (NavMesh.SamplePosition(randomPos + Vector3.down * 50, out var hit, 3, ~0)) //~0 is all layer 
                 {
                    
                     var randomMonsterKey = monsters[Random.Range(0, monsters.Count)];
                     var monster = NetworkObject.Instantiate($"Prefabs/Monsters/{randomMonsterKey}",     hit.position, Quaternion.identity) as MonsterBase;
+                    curMonsterAmount++;
                     monster.Inititalize(waypoints);
                     curMonsters.Add(monster);
                 }
