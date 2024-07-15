@@ -126,6 +126,7 @@ MonoBehaviour:
   - SendDieToAllRpc
   - SendReviveToAllRpc
   - DeathRPC
+  - SetInMapRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -9,19 +9,8 @@ public class SkyProcessor : MonoBehaviour, IService
         ServiceLocator.For(this).Register(this);
     }
 
-    public void LerpSky(Material start, Material end, DateTimeType type, float curDateTime)
+    public void LerpSky(Material start, Material end, float lerp)
     {
-        float lerp = 0;
-        switch (type)
-        {
-            case DateTimeType.AM:
-                lerp = curDateTime / 100;
-                break;
-            case DateTimeType.PM:
-                lerp = (curDateTime - 100) / 200;
-                break;
-        }
-
         SetValue(
             Color.Lerp(start.GetColor("_SunDiscColor"), end.GetColor("_SunDiscColor"), lerp),
             Mathf.Lerp(start.GetFloat("_SunDiscMultiplier"), end.GetFloat("_SunDiscMultiplier"), lerp),
@@ -39,6 +28,12 @@ public class SkyProcessor : MonoBehaviour, IService
             Color.Lerp(start.GetColor("_SkyGradientBottom"), end.GetColor("_SkyGradientBottom"), lerp),
             Mathf.Lerp(start.GetFloat("_SkyGradientExponent"), end.GetFloat("_SkyGradientExponent"), lerp)
         );
+    }
+
+    public void SetFogValue(Color color, float density)
+    {
+        RenderSettings.fogColor = color;
+        RenderSettings.fogDensity = density;
     }
 
     private void SetValue(
@@ -74,5 +69,7 @@ public class SkyProcessor : MonoBehaviour, IService
         skyMaterial.SetColor("_SkyGradientTop", _SkyGradientTop);
         skyMaterial.SetColor("_SkyGradientBottom", _SkyGradientBottom);
         skyMaterial.SetFloat("_SkyGradientExponent", _SkyGradientExponent);
+
+        SetFogValue(_SkyGradientBottom, 0.05f);
     }
 }

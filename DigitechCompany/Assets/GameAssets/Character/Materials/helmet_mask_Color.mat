@@ -7,16 +7,16 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: eb3c6fb598ded4c71b8968e1c40a3b4d, type: 3}
+  m_Name: helmet_mask_Color
+  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_ValidKeywords: []
-  m_InvalidKeywords:
-  - _SUNDISK_SIMPLE
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -65,10 +65,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Tex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -84,7 +80,6 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _AtmosphereThickness: 0.87
     - _Blend: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
@@ -95,30 +90,18 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _Exposure: 2
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HorizonLineContribution: 0
-    - _HorizonLineExponent: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Rotation: 0
-    - _SkyGradientExponent: 2.5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SunDiscExponent: 250000
-    - _SunDiscMultiplier: 500
-    - _SunDisk: 1
-    - _SunHaloContribution: 0.244
-    - _SunHaloExponent: 198.21
-    - _SunSize: 0.169
-    - _SunSizeConvergence: 10
     - _Surface: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
@@ -126,17 +109,9 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
-    - _HorizonLineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SkyGradientBottom: {r: 0.1610893, g: 0.17112198, b: 0.18867919, a: 1}
-    - _SkyGradientTop: {r: 0.07760767, g: 0.10649746, b: 0.15094337, a: 1}
-    - _SkyTint: {r: 0.745283, g: 0.53677076, b: 0.33397114, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SunDiscColor: {r: 0.6286764, g: 0.7428499, b: 0.83823526, a: 1}
-    - _SunHaloColor: {r: 0.4900518, g: 0.5582597, b: 0.75735295, a: 1}
-    - _Tint: {r: 0.36044857, g: 0.52491987, b: 0.5660378, a: 0.5}
   m_BuildTextureStacks: []
---- !u!114 &1799637092922750725
+--- !u!114 &8133706254385762599
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
