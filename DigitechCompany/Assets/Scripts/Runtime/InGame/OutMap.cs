@@ -5,9 +5,9 @@ public class OutMap : MonoBehaviour
     [System.Serializable]
     public class EnvironmentSetting
     {
-        public Color morning;
-        public Color midnight;
-        public Color night;
+        public Material morning;
+        public Material midnight;
+        public Material night;
     }
 
     [SerializeField] private EnvironmentSetting environmentSetting;
@@ -19,4 +19,5 @@ public class OutMap : MonoBehaviour
     public MapMoveDoor ToMap => toMap;
     public Transform EnterPoint => enterPoint;
     public Transform ArrivePoint => arrivePoint;
+    public EnvironmentSetting EnvirSetting => environmentSetting;
 }

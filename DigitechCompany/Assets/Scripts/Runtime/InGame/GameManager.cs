@@ -27,6 +27,12 @@ public enum GameState
     DisplayResult
 }
 
+public enum DateTimeType
+{
+    AM,
+    PM
+}
+
 public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 {
     [Serializable]
@@ -92,16 +98,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
     private Basement _basement;
     private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
+    private SkyProcessor _skyProcessor;
+    private SkyProcessor skyProcessor => _skyProcessor ??= ServiceLocator.For(this).Get<SkyProcessor>();
 
     //inspector
     [SerializeField] private NavMeshSurface surface;
     [SerializeField] private MeshRenderer[] rooms;
 
     //field
+    private float dateTime;
     private int inGamePlayerViewId;
     private bool gameEndSign;
     private bool gameStartSign;
     private GameState state;
+    private OutMap outMap;
+    private InMap inMap;
     [SerializeField] private bool[] joinSyncCompleted = new bool[(int)SyncTarget.End];
     [SerializeField] private SerializableDictionary<int, PlayerData> playerDatas = new();
 
@@ -334,26 +345,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
         //Map
-        var inmap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-        var outmap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
+        outMap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
 
-        inmap.ToGround.position = outmap.EnterPoint.position;
-        outmap.ToMap.position = inmap.EnterPoint.position;
+        inMap.ToGround.position = outMap.EnterPoint.position;
+        outMap.ToMap.position = inMap.EnterPoint.position;
 
-        basement.transform.SetParent(outmap.ArrivePoint);
+        basement.transform.SetParent(outMap.ArrivePoint);
 
-        inmap.Doors.For((_, door) => door.gameObject.SetActive(false));
+        inMap.Doors.For((_, door) => door.gameObject.SetActive(false));
         await UniTask.NextFrame();
         surface.BuildNavMesh();
         await UniTask.NextFrame();
-        inmap.Doors.For((_, door) => door.gameObject.SetActive(true));
+        inMap.Doors.For((_, door) => door.gameObject.SetActive(true));
 
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, null);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         //Item
         Debug.Log(rooms.Length);
-        itemManager.SpawnItem(1, inmap.MapBounds);
+        itemManager.SpawnItem(1, inMap.MapBounds);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
         /* -------------------------- */
@@ -396,6 +407,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         }
     }
 
+    private void Update()
+    {
+        if(state == GameState.Process)
+        {
+            dateTime += Time.deltaTime;
+
+            if(dateTime < 100)
+            {
+                skyProcessor.LerpSky(outMap.EnvirSetting.morning, outMap.EnvirSetting.midnight, DateTimeType.AM, dateTime);
+            }
+            else
+            {
+                skyProcessor.LerpSky(outMap.EnvirSetting.midnight, outMap.EnvirSetting.night, DateTimeType.AM, dateTime);
+            }
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
