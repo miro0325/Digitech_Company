@@ -62,6 +62,7 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 
     public void SetActivePlayerModel(bool active)
     {
+        Debug.LogError($"Set Player Model Active: {active}");
         playerModelRenderers?.For((i, ele) => ele.shadowCastingMode = active ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly);
     }
 

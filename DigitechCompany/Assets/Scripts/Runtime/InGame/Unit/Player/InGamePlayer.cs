@@ -127,7 +127,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(SendReviveToAllRpc), photonView.Owner);
+        photonView.RPC(nameof(SendReviveToAllRpc), RpcTarget.All);
     }
 
     [PunRPC]
@@ -241,8 +241,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         DoInteract();
         DoMovement();
         DoRotation();
-
-        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoLife()
@@ -521,6 +519,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         velocity.y = velocityY;
+
+        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoRotation()

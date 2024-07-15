@@ -18,6 +18,8 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     //service
     private ResourceLoader _resourceLoader;
     private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
+    private DataContainer _dataContainer;
+    private DataContainer dataContainer => _dataContainer ??= ServiceLocator.ForGlobal().Get<DataContainer>();
     private Basement _basement;
     private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
 
@@ -38,38 +40,41 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
     /// <returns>Items data</returns>
     public void SpawnItem(int difficulty, Bounds[] spawnAreas)
     {
-        int wholeItemAmount = 35 * difficulty;
-        int averageItemAmount = Mathf.Max(wholeItemAmount / spawnAreas.Length, 2);
+        int maxItemCountInMap = 35 * difficulty;
+        int maxItemCountPerRoom = 6;
+        int expectRandomRoomCount = maxItemCountInMap / maxItemCountPerRoom;
 
-        foreach (var area in spawnAreas)
+        int targetRandomRoomCount = (int)Random.Range(expectRandomRoomCount * 1.25f, expectRandomRoomCount * 1.25f);
+
+        List<Bounds> bounds = spawnAreas.ToList();
+        for(int i = 0; i < targetRandomRoomCount; i++)
         {
-            int spawnItemAmount = Random.Range(0, averageItemAmount * 2);
-
-            for (int i = 0; i < spawnItemAmount; i++)
+            int targetRoomIndex = Random.Range(0, bounds.Count);
+            var randomRoom = bounds[targetRoomIndex];
+            bounds.RemoveAt(targetRoomIndex);
+            
+            int targetItemCount = Random.Range(3, maxItemCountPerRoom + 1);
+            for (int j = 0; j < targetItemCount; j++)
             {
                 var randomPos =
                     new Vector3
                     (
-                        Random.Range(area.min.x, area.max.x),
-                        Random.Range(area.center.y - 1, area.center.y + 2),
-                        Random.Range(area.min.z, area.max.z)
-                    );
+                        Random.Range(randomRoom.min.x, randomRoom.max.x),
+                        Random.Range(randomRoom.center.y, randomRoom.center.y),
+                        Random.Range(randomRoom.min.z, randomRoom.max.z)
+                    ) * 0.8f;
 
                 if (NavMesh.SamplePosition(new Vector3(0, -50, 0) + randomPos, out var hit, 3, LayerMask.NameToLayer("Ground"))) //~0 is all layer 
                 {
-                    var itemKeys = resourceLoader.itemPrefabs.Keys.ToArray();
+                    var itemKeys = dataContainer.loadData.itemDatas
+                        .Where(item => item.Value.isAvailable && item.Value.type == ItemType.Sell)
+                        .Select(item => item.Key)
+                        .ToArray();
                     var randomItemKey = itemKeys[Random.Range(0, itemKeys.Length)];
-                    var item = NetworkObject.Instantiate($"Prefabs/Items/{randomItemKey}", hit.position + Vector3.up, Quaternion.identity) as ItemBase;
-                    item.SetLayRotation(Random.Range(0, 360));
-                    item.Initialize(randomItemKey);
-                    items.Add(item.photonView.ViewID, item);
+                    SpawnItem(hit.position, randomItemKey);
                 }
             }
         }
-
-        var shovel = NetworkObject.Instantiate("Prefabs/Items/Mask", new Vector3(0, -8, 0)) as ItemBase;
-        shovel.Initialize("Mask");
-        items.Add(shovel.photonView.ViewID, shovel);
 
         var networkItemDatas = new NetworkItemData[items.Count];
         var count = 0;

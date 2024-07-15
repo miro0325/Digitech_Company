@@ -16,6 +16,7 @@ public class ItemData
     public bool isTwoHand;
     public ItemType type;
     public string explain;
+    public bool isAvailable;
 
     public static ItemData Parse(string tsvRow)
     {
@@ -31,6 +32,7 @@ public class ItemData
         bool.TryParse(split[count++], out data.isTwoHand);
         Enum.TryParse(split[count++], out data.type);
         data.explain = split[count++];
+        bool.TryParse(split[count++], out data.isAvailable);
         return data;
     }
 }

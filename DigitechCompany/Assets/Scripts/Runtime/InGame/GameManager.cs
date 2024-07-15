@@ -197,9 +197,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                         NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID);
                 }
                 break;
-            case SyncTarget.Map:
-                // surface.BuildNavMesh();
-                break;
         }
 
         joinSyncCompleted[syncTarget] = true;
@@ -350,11 +347,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
         basement.transform.SetParent(outMap.ArrivePoint);
 
-        inMap.Doors.For((_, door) => door.gameObject.SetActive(false));
-        await UniTask.NextFrame();
         surface.BuildNavMesh();
         await UniTask.NextFrame();
-        inMap.Doors.For((_, door) => door.gameObject.SetActive(true));
 
         var viewids = inMap.ReAllocateDoors();
 
@@ -363,10 +357,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
         //==================Item==================//
         Debug.Log(rooms.Length);
-        itemManager.SpawnItem(1, inMap.MapBounds);
+        itemManager.SpawnItem(3, inMap.MapBounds);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
-        
+
         //==================Monster==================//
         //testSpawner.SpawnMonsters();
         // testSpawner.SpawnMonsters(1, rooms);
@@ -387,21 +381,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     itemManager.SyncItem(datas);
                     break;
                 case SyncTarget.Map:
-                    var inmap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-                    var outmap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+                    inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
+                    outMap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
 
-                    inmap.ToGround.position = outmap.EnterPoint.position;
-                    outmap.ToMap.position = inmap.EnterPoint.position;
+                    inMap.ToGround.position = outMap.EnterPoint.position;
+                    outMap.ToMap.position = inMap.EnterPoint.position;
 
-                    basement.transform.SetParent(outmap.ArrivePoint);
+                    basement.transform.SetParent(outMap.ArrivePoint);
 
-                    inmap.Doors.For((_, door) => door.gameObject.SetActive(false));
-                    await UniTask.NextFrame();
                     surface.BuildNavMesh();
                     await UniTask.NextFrame();
-                    inmap.Doors.For((_, door) => door.gameObject.SetActive(true));
 
-                    inmap.ReBindDoors(datas.ToList<int>());
+                    inMap.ReBindDoors(datas.ToList<int>());
                     break;
             }
             photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);
@@ -410,26 +401,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private void Update()
     {
-        if(state == GameState.Process)
+        if (state == GameState.Process)
+        {
             dateTime += Time.deltaTime;
 
-        if(player.IsInMap)
-        {
-            skyProcessor.SetFogValue(Color.black, 0.1f);
-        }
-        else
-        {
-            var midnightTime = 10;
-            var endTime = 30;
-            if(dateTime < midnightTime)
+            if (player.IsInMap)
             {
-                var lerp = dateTime / midnightTime;
-                skyProcessor.LerpSky(outMap.EnvirSetting.morning, outMap.EnvirSetting.midnight, lerp);
+                skyProcessor.SetFogValue(Color.black, 0.1f);
             }
             else
             {
-                var lerp = (dateTime - midnightTime) / (endTime - midnightTime);
-                skyProcessor.LerpSky(outMap.EnvirSetting.midnight, outMap.EnvirSetting.night, lerp);
+                var midnightTime = 10;
+                var endTime = 30;
+                if (dateTime < midnightTime)
+                {
+                    var lerp = dateTime / midnightTime;
+                    skyProcessor.LerpSky(outMap.EnvirSetting.morning, outMap.EnvirSetting.midnight, lerp);
+                }
+                else
+                {
+                    var lerp = (dateTime - midnightTime) / (endTime - midnightTime);
+                    skyProcessor.LerpSky(outMap.EnvirSetting.midnight, outMap.EnvirSetting.night, lerp);
+                }
             }
         }
     }

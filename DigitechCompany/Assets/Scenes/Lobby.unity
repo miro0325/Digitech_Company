@@ -1165,6 +1165,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI-Lobby
       objectReference: {fileID: 0}
+    - target: {fileID: 1354950479263320295, guid: 99667fae569bd3d48b9f9db67289465e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1354950479450604127, guid: 99667fae569bd3d48b9f9db67289465e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1334,6 +1339,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI-Multiplay
       objectReference: {fileID: 0}
+    - target: {fileID: 2131200777517184797, guid: acdf4c453b1f9fa40beba15b1fc5f8d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2131200777568138484, guid: acdf4c453b1f9fa40beba15b1fc5f8d5,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1463,6 +1473,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4239181648152911248, guid: 9069175d5efc5594b8d01f89c4805d81,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9069175d5efc5594b8d01f89c4805d81, type: 3}
 --- !u!1001 &5348858906747818172
@@ -1521,6 +1536,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UI-MultiplayOptionMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348858908566369409, guid: 50c958587b8055041aca5f673265d5b7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5348858908566369534, guid: 50c958587b8055041aca5f673265d5b7,
         type: 3}
