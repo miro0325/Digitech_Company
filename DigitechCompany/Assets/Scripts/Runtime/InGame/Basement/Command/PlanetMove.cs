@@ -14,6 +14,7 @@ public class PlanetMove : Command
 
     public override void Init()
     {
+        
     }
 
     protected override string GetExplainText(string cmd, string[] args)

@@ -99,7 +99,6 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         if(!photonView.IsMine)
         {
-            Debug.Log(receivePos);
             transform.position = Vector3.Lerp(transform.position, receivePos, 10 * Time.deltaTime);
             transform.rotation = Quaternion.Lerp(transform.rotation, receiveRot, 10 * Time.deltaTime);
         }

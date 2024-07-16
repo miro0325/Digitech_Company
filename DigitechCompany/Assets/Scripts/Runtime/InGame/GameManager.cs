@@ -473,6 +473,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        Debug.LogError($"Player: {otherPlayer} left room");
         playerDatas.Remove(otherPlayer);
     }
 }
