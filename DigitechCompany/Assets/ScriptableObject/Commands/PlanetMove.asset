@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bb32a268728cf04c9733f7eb88d0cc1, type: 3}
   m_Name: PlanetMove
   m_EditorClassIdentifier: 
-  command: 
-  aliases:
-  - Digitech
-  - Company
-  isMultipleCommand: 0
+  commands:
+  - cmd: Digitech
+    aliases:
+    - digitech
   explain: 

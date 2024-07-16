@@ -46,13 +46,13 @@ namespace Basements
             cam = Camera.main.transform;
             foreach(var command in commands)
             {
-                command.Init();
-                if(!command.IsMultiple)
-                    commandDic.Add(command.Cmd, command);
-                foreach(var aliases in command.Aliases)
-                {
-                    commandDic.Add(aliases,command);
-                }
+                // command.Init();
+                // if(!command.IsMultiple)
+                //     commandDic.Add(command.Cmd, command);
+                // foreach(var aliases in command.Aliases)
+                // {
+                //     commandDic.Add(aliases,command);
+                // }
             }
             //consoleInput.onEndEdit.AddListener(delegate { SendConsoleCommand(); });
             // consoleInput.onSubmit.AddListener(delegate { SendConsoleCommand(); });

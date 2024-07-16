@@ -13,11 +13,6 @@ namespace TerminalCommand
             return GetExplainText(cmd, args);
         }
 
-        public override void Init()
-        {
-
-        }
-
         protected override string GetExplainText(string cmd, string[] args)
         {
             string txt = explain;

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1f268def73fb114cb16d10c8c9372a6, type: 3}
   m_Name: Help
   m_EditorClassIdentifier: 
-  command: help
-  aliases:
-  - h
-  isMultipleCommand: 0
+  commands:
+  - cmd: help
+    aliases:
+    - h
   explain: '>MOONS
 
     Call Moon List here

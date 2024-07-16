@@ -37,12 +37,10 @@ public class Purchase : Command
         var items = loadData.itemDatas
             .Where(item => item.Value.isAvailable && item.Value.type == ItemType.Buy)
             .Select(item => item.Key)
-            .Except(aliases)
+            .Where(item => !commands.Select(c => c.cmd).Contains(item))
+            .Select(item => new CmdData() { cmd = item})
             .ToArray();
-        var added = aliases.ToList();
-        added.AddRange(items);
-
-        aliases = added.ToArray();
+        commands.AddRange(items);
     }
 
     public override string Activate(string cmd, string[] args)
@@ -71,10 +69,6 @@ public class Purchase : Command
         }
         // Delivary.Instance.AddDelivaryItems(list);
         return GetExplainText(cmd,args);
-    }
-
-    public override void Init()
-    {
     }
 
     protected override string GetExplainText(string cmd, string[] args)

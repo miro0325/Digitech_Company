@@ -90,6 +90,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
+    public InGamePlayerAnimator Animator => animator;
 
     public void SetInMap(bool @in)
     {

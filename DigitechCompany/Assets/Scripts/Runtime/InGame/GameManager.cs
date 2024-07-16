@@ -205,7 +205,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 foreach (var kvp in playerDatas)
                 {
                     if (kvp.Value.viewID != 0)
-                        NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID);
+                    {
+                        var player = NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID) as InGamePlayer;
+                        if(!kvp.Value.isAlive)
+                            player.Animator.SetEnableRagDoll(false);
+                    }
                 }
                 break;
         }
@@ -297,6 +301,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => gameStartSign);
 
             state = GameState.Load;
+            await UniTask.WaitForSeconds(0.25f);
             await InitializeGameAndRequestLoad();
 
             //Wait until all player sync complete
