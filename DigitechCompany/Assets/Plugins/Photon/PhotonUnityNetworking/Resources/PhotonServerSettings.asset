@@ -130,6 +130,8 @@ MonoBehaviour:
   - DestoryMaps
   - AttackRPC
   - SendChangePlanetToAllRpc
+  - ChangeHeadRPC
+  - ReturnOriginTextureRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
