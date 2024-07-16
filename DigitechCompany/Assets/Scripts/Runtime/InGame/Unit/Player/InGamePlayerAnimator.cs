@@ -21,6 +21,8 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
     [Header("IK")]
     [SerializeField] private InGamePlayerIKHandler bodyHandIK;
     [SerializeField] private InGamePlayerIKHandler camHandIK;
+    [Header("Transform")]
+    [SerializeField] private Transform hip;
 
     private InGamePlayer player;
     private bool isGround;
@@ -57,6 +59,7 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
 
     public void SetEnableRagDoll(bool enabled)
     {
+        hip.transform.localPosition = Vector3.zero;
         playerModelRigidbodys?.For((i, ele) => ele.isKinematic = !enabled);
     }
 
