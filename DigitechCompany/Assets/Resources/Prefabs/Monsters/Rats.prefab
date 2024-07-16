@@ -1014,6 +1014,9 @@ MonoBehaviour:
   curIndex: -1
   weapon: {fileID: 7510127010037814660}
   state: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 9
   maxSearchCount: 3
   itemDetectRange: 3
   renderer: {fileID: 4290093288329407412}
@@ -1114,7 +1117,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3697752146121768884}
   - {fileID: 3697752146121768873}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

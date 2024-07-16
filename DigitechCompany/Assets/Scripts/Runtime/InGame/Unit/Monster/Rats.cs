@@ -23,6 +23,8 @@ public class Rats : MonsterBase
     private Weapon weapon;
     [SerializeField]
     private RatsState state = RatsState.Idle;
+    [SerializeField]
+    private LayerMask obstacleLayer;
     private int targetPlayerViewId = 0;
 
     [SerializeField]
@@ -139,6 +141,7 @@ public class Rats : MonsterBase
         if(photonView.IsMine)
         {
             base.Update();
+            Debug.Log($"Agent Stop {agent.isStopped} + {gameObject.name}");
             animator.SetBool("IsRun", !agent.isStopped);
         } else
         {
@@ -211,7 +214,7 @@ public class Rats : MonsterBase
 
     private NodeState CheckPlayerFromNest()
     {
-        if (state.Equals(RatsState.Attack) || itemsInNest.Count == 0 ) return NodeState.Failure;
+        if (state.Equals(RatsState.Attack) || state.Equals(RatsState.Idle) || itemsInNest.Count == 0 ) return NodeState.Failure;
         if(itemsInNest.Count == 0) return NodeState.Failure;    
         Collider[] hits = Physics.OverlapBox(NestPosition, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Player"));
         var players = hits.Select(x => x.GetComponent<InGamePlayer>()).ToArray();
@@ -223,14 +226,14 @@ public class Rats : MonsterBase
         return NodeState.Failure;
     }
 
+    //µ’¡ˆ∑Œ ±Õ»Ø
     protected NodeState ReturnToNest()
     {
         if (agent.isStopped) agent.isStopped = false;
         Move(NestPosition);
         if(Vector3.Distance(transform.position, GetNavMeshPosition(NestPosition)) < 0.6f)
         {
-            //if(targetItem != null)
-            //    Debug.Log(targetItem.CurUnit);
+            
             DropItem();
             Debug.Log(targetItem != null);
             state = RatsState.Searching;
@@ -247,6 +250,7 @@ public class Rats : MonsterBase
             state = RatsState.Idle;
             return NodeState.Succes;
         }
+        Debug.Log($"Current Search Count {curSearchCount}");
         if(isArrive)
         {
             isArrive = false;
@@ -498,9 +502,15 @@ public class Rats : MonsterBase
         {
             if (targetItem == null)
             {
-                targetItem = items[0];
-                targetPos = GetNavMeshPosition(targetItem.transform.position, default(NavMeshHit));
-                return true;
+                foreach(var item in items)
+                {
+                    if (Vector3.Distance(transform.position, item.transform.position) <= itemDetectRange && !Physics.Linecast(transform.position, item.transform.position, obstacleLayer))
+                    {
+                        targetItem = item;
+                        targetPos = GetNavMeshPosition(targetItem.transform.position, default(NavMeshHit));
+                        return true;
+                    }
+                }
             }
             return false;
         }

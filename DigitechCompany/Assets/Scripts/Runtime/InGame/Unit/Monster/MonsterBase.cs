@@ -48,6 +48,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected bool isAttacking = false;
     protected bool isDeath = false;
     protected bool isCalled = false;
+    protected bool isCalculatePath = false;
 
     protected virtual void Start()
     {
@@ -179,6 +180,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         NavMeshHit hit = default;
         if (checkForPath)
         {
+            if (isCalculatePath) return false;
             position = GetNavMeshPosition(position, hit, 1.75f);
             path.ClearCorners();
             if (!agent.CalculatePath(position, path))
