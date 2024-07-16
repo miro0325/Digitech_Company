@@ -55,8 +55,11 @@ namespace Basements
                 }
             }
             //consoleInput.onEndEdit.AddListener(delegate { SendConsoleCommand(); });
-            consoleInput.onSubmit.AddListener(delegate { SendConsoleCommand(); });
-            consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
+            // consoleInput.onSubmit.AddListener(delegate { SendConsoleCommand(); });
+            // consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
+
+            consoleInput.onSubmit.AddListener(_ => SendConsoleCommand());
+            consoleInput.onValueChanged.AddListener(_ => LimitWordCount());
         }
 
         private void Update()
@@ -71,6 +74,9 @@ namespace Basements
                 isConnectTerminal = false;
                 DisconnectTerminal();
             }
+
+            if(isConnectTerminal && Input.GetKeyDown(KeyCode.Return))
+                SendConsoleCommand();
         }
 
         private void ConnectTerminal()

@@ -9,13 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e17ee6068069de54e9326c4c526d6d43, type: 3}
-  m_Name: Purchase
+  m_Script: {fileID: 11500000, guid: 8bb32a268728cf04c9733f7eb88d0cc1, type: 3}
+  m_Name: PlanetMove
   m_EditorClassIdentifier: 
   command: 
   aliases:
-  - shovel
-  - sh
-  isMultipleCommand: 1
-  explain: Purcahse <args[0]> <cmd>
-  loadData: {fileID: 11400000, guid: be26cdf156ef6284abc158b46d88db43, type: 2}
+  - Digitech
+  - Company
+  isMultipleCommand: 0
+  explain: 

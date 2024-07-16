@@ -104,6 +104,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private int inGamePlayerViewId;
     private bool gameEndSign;
     private bool gameStartSign;
+    private string planet = "Digitech";
     private GameState state;
     private OutMap outMap;
     private InMap inMap;
@@ -116,6 +117,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     public bool HasAlivePlayer => playerDatas.Where(p => p.Value.isAlive).Any();
 
     public event Action OnLoadComplete;
+
+    public void ChangePlanet(string planet)
+    {
+        photonView.RPC(nameof(SendChangePlanetToAllRpc), RpcTarget.All, planet);
+    }
+
+    private void SendChangePlanetToAllRpc(string planet)
+    {
+        this.planet = planet;
+    }
 
     private void Awake()
     {
@@ -271,6 +282,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         while (true)
         {
             state = GameState.StartWait;
+
+            Destroy(inMap.gameObject);
+            Destroy(outMap.gameObject);
+
             foreach (var data in playerDatas)
             {
                 var player = PhotonView.Find(data.Value.viewID).GetComponent<InGamePlayer>();
@@ -336,8 +351,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
         //==================Map==================//
-        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-        outMap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
+        outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
         inMap.ToGround.position = outMap.EnterPoint.position;
         inMap.ToGround.OnMove += player => player.SetInMap(false);
@@ -381,8 +396,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     itemManager.SyncItem(datas);
                     break;
                 case SyncTarget.Map:
-                    inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-                    outMap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+                    inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
+                    outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
                     inMap.ToGround.position = outMap.EnterPoint.position;
                     outMap.ToMap.position = inMap.EnterPoint.position;
