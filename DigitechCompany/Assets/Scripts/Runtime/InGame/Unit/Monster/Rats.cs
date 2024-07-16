@@ -47,7 +47,6 @@ public class Rats : MonsterBase
     private ItemBase targetItem = null;
 
     private InGamePlayer TargetPlayer;
-    
 
     protected override void Death()
     {
@@ -120,20 +119,16 @@ public class Rats : MonsterBase
     {
         base.Start();
         var itemManager = ServiceLocator.For(this).Get<ItemManager>();
-        //itemManager?.SpawnItem(waypoints[0], "Shovel");
 
-        //this
-        //    .ObserveEveryValueChanged(t => targetPlayerViewId)
-        //    .Subscribe(viewid =>
-        //    {
-        //        if(viewid == 0)
-        //        {
-        //            TargetPlayer = null;
-        //            return;
-        //        }
-
-        //        TargetPlayer = PhotonView.Find(viewid).GetComponent<InGamePlayer>();
-        //    });
+        this
+            .ObserveEveryValueChanged(t => t.state)
+            .Subscribe(state =>
+            {
+                if(photonView.IsMine)
+                {
+                    agent.speed = tempSpeed;
+                }
+            });
     }
 
     protected override void Update()
