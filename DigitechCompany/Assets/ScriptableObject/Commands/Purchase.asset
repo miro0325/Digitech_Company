@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e17ee6068069de54e9326c4c526d6d43, type: 3}
   m_Name: Purchase
   m_EditorClassIdentifier: 
-  commands:
+  commandDatas:
   - cmd: Shovel
     aliases:
     - shovel

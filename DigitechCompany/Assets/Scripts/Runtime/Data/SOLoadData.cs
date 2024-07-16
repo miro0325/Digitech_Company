@@ -32,6 +32,8 @@ public class SOLoadData : ScriptableObject
                 for (int i = 1; i < split.Length; i++)
                 {
                     var itemData = ItemData.Parse(split[i]);
+                    if(string.IsNullOrEmpty(itemData.key)) break;
+
                     itemDatas.Add(itemData.key, itemData);
                 }
             }

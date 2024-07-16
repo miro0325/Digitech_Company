@@ -37,10 +37,10 @@ public class Purchase : Command
         var items = loadData.itemDatas
             .Where(item => item.Value.isAvailable && item.Value.type == ItemType.Buy)
             .Select(item => item.Key)
-            .Where(item => !commands.Select(c => c.cmd).Contains(item))
+            .Where(item => !commandDatas.Select(c => c.cmd).Contains(item))
             .Select(item => new CmdData() { cmd = item})
             .ToArray();
-        commands.AddRange(items);
+        commandDatas.AddRange(items);
     }
 
     public override string Activate(string cmd, string[] args)

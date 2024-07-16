@@ -70,6 +70,6 @@ public class SkyProcessor : MonoBehaviour, IService
         skyMaterial.SetColor("_SkyGradientBottom", _SkyGradientBottom);
         skyMaterial.SetFloat("_SkyGradientExponent", _SkyGradientExponent);
 
-        SetFogValue(_SkyGradientBottom, 0.05f);
+        SetFogValue(_SkyGradientBottom, 0.02f);
     }
 }

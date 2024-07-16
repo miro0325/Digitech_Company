@@ -3,11 +3,11 @@ using UnityEngine;
 [CreateAssetMenu(menuName ="Command/PlanetMove")]
 public class PlanetMove : Command
 {
-    private GameManager _gameManager;
-    private GameManager gameManager => _gameManager ??= ServiceLocator.ForActiveScene().Get<GameManager>();
+    private GameManager gameManager => ServiceLocator.ForSceneOf("InGame").Get<GameManager>();
 
     public override string Activate(string cmd, string[] args = null)
     {
+        Debug.Log(gameManager);
         gameManager.ChangePlanet(cmd);
         return GetExplainText(cmd, args);
     }

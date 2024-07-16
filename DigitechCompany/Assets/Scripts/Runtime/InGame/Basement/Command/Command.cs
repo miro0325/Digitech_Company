@@ -14,8 +14,10 @@ public abstract class Command : ScriptableObject
     
     protected Regex regax = new Regex(@"(?<=\<)(.*?)(?=\>)");
 
-    [SerializeField] protected List<CmdData> commands;
+    [SerializeField] protected List<CmdData> commandDatas;
     [SerializeField,TextArea(10,50)] protected string explain;
+
+    public List<CmdData> CommandDatas => commandDatas;
 
     public abstract string Activate(string cmd, string[] args = null);
     protected abstract string GetExplainText(string cmd, string[] args);

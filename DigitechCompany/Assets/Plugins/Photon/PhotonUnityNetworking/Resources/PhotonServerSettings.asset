@@ -129,6 +129,7 @@ MonoBehaviour:
   - SetInMapRpc
   - DestoryMaps
   - AttackRPC
+  - SendChangePlanetToAllRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
