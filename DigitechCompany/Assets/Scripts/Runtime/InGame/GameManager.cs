@@ -380,6 +380,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         Debug.Log(rooms.Length);
         testSpawner.SpawnMonsters(1, inMap.MapBounds,inMap.WayPoints);
         itemManager.SpawnItem(1, inMap.MapBounds);
+        itemManager.SpawnItem(player.transform.position, "RailGun");
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 

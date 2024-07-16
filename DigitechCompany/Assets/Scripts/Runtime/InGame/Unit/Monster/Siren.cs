@@ -71,6 +71,7 @@ public class Siren : MonsterBase
                     switch(state)
                     {
                         case SirenState.Searching:
+                            agent.speed = tempSpeed;
                             animator.SetBool("isRun", false);
                             animator.SetBool("isAlert", false);
                             break;
@@ -78,6 +79,9 @@ public class Siren : MonsterBase
                             agent.speed = tempSpeed * 1.6f;
                             animator.SetBool("isRun", true);
                             animator.SetBool("isAlert", false);
+                            break;
+                        default:
+                            agent.speed = tempSpeed;
                             break;
                     }
                 }

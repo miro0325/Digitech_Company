@@ -8,17 +8,17 @@ using System;
 public class AttackableItem : ItemBase, IInteractable
 {
     //static
-    private static int Animator_AttackHash = Animator.StringToHash("attack");
-    private static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
+    protected static int Animator_AttackHash = Animator.StringToHash("attack");
+    protected static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
 
     //field
-    [SerializeField] private Transform attackPoint;
-    [SerializeField] private float atkDamage;
-    [SerializeField] private float attackRadius;
+    [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected float atkDamage;
+    [SerializeField] protected float attackRadius;
 
-    private ReactiveProperty<bool> isUsePressed = new();
-    private float delayTime;
-    private Animator animator;
+    protected ReactiveProperty<bool> isUsePressed = new();
+    protected float delayTime;
+    protected Animator animator;
 
     //function
     public override void OnCreate()
@@ -26,10 +26,15 @@ public class AttackableItem : ItemBase, IInteractable
         base.OnCreate();
         
         animator = GetComponent<Animator>();
+        SubscribeEvent();
+    }
+
+    protected virtual void SubscribeEvent()
+    {
         isUsePressed
             .Subscribe(b =>
             {
-                if(b)
+                if (b)
                     animator.SetTrigger(Animator_AttackHash);
                 animator.SetBool(Animator_AttackPressedHash, b);
             });
