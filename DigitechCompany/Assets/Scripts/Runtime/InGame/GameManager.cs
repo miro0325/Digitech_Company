@@ -339,6 +339,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
             state = GameState.DisplayResult;
             itemManager.DestoryItems(true);
+            photonView.RPC(nameof(DestoryMaps), RpcTarget.All);
 
             await UniTask.WaitForSeconds(3f);
         }
@@ -347,8 +348,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     [PunRPC]
     private void DestoryMaps()
     {
-        if(inMap) Destroy(inMap);
-        if(outMap) Destroy(outMap);
+        basement.transform.SetParent(null);
+        if(inMap) Destroy(inMap.gameObject);
+        if(outMap) Destroy(outMap.gameObject);
     }
 
     private async UniTask InitializeGameAndRequestLoad()
