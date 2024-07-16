@@ -315,6 +315,7 @@ public class Rats : MonsterBase
         else
         {
             agent.isStopped = false;
+            agent.speed = tempSpeed;
             state = RatsState.Searching;
             return NodeState.Failure;
         }
@@ -382,6 +383,7 @@ public class Rats : MonsterBase
             if(players.Length == 0)
             {
                 agent.isStopped = false;
+                agent.speed = tempSpeed;
                 state = RatsState.Idle; 
                 return NodeState.Succes;
             }
