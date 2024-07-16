@@ -13,11 +13,28 @@ public class InMap : MonoBehaviour
     [SerializeField] private Door[] doors;
     [SerializeField] private Transform[] wayPoints;
     [SerializeField] private Bounds[] mapBounds;
+    [SerializeField, HideInInspector] private Transform wayPointParent;
 
     public MapMoveDoor ToGround => toGround;
     public Transform EnterPoint => enterPoint;
     public Door[] Doors => doors;
     public Bounds[] MapBounds => mapBounds;
+    public Transform[] WayPoints => wayPoints;
+
+    // [Button]
+    // private  void PreBuildWayPoint()
+    // {
+    //     List<Transform> points = new();
+    //     foreach(var mapbound in mapBounds)
+    //     {
+    //         var point = new GameObject("WayPoint").transform;
+    //         point.transform.SetParent(wayPointParent);
+    //         if(NavMesh.SamplePosition(mapbound.center, out var hit, 3, LayerMask.NameToLayer("Ground")))
+    //             point.transform.position = hit.position;
+    //         points.Add(point);
+    //     }
+    //     wayPoints = points.ToArray();
+    // }
 
     [Button]
     private void PreBuildMap()
