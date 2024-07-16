@@ -736,7 +736,7 @@ GameObject:
   - component: {fileID: 1451083508}
   - component: {fileID: 1451083507}
   m_Layer: 0
-  m_Name: TestSpawner
+  m_Name: MonsterManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -766,6 +766,8 @@ MonoBehaviour:
   - Spider
   - Rats
   - Rats
+  - Siren
+  curMonsters: []
 --- !u!4 &1451083508
 Transform:
   m_ObjectHideFlags: 0
@@ -1139,6 +1141,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2817919579980405062, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919579980405062, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919579980405062, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919579980405062, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919581183441516, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919581183441516, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919581183441516, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817919581183441516, guid: a3cbe414f6cc1d84d96cc2581813591b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7126231968912681449, guid: a3cbe414f6cc1d84d96cc2581813591b,
         type: 3}
       propertyPath: m_RootOrder

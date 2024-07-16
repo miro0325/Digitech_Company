@@ -21,7 +21,6 @@ public class Spider : MonsterBase
     [SerializeField] private RigBuilder rigBuilder;
     [SerializeField] private SpiderState state = SpiderState.Idle;
 
-    private InGamePlayer targetPlayer;
     private Vector3 nestPosition;
     
     protected override void Spawn()
@@ -38,7 +37,8 @@ public class Spider : MonsterBase
                 new Sequence(new List<Node>
                 {
                     new Action(() => IsCalled()),
-                    new Action(() => GoToCalledPos())
+                    new Action(() => GoToCalledPos()),
+                    new Action(() => CheckPlayerInFOV(false)),
                 }),
                 new Sequence(new List<Node>
                 {
@@ -79,20 +79,22 @@ public class Spider : MonsterBase
 
     protected override NodeState GoToCalledPos()
     {
-        Vector3 finalPos;
-        while (true)
+        Vector3 finalPos = transform.position;
+        if(!isSetRandomPos)
         {
-            if (SetRandomPosition(targetPos, out finalPos, 3))
+            while (true)
             {
-                break;
+                if (SetRandomPosition(targetPos, out finalPos, 3))
+                {
+                    isSetRandomPos = true;
+                    targetPos = finalPos;
+                    break;
+                }
             }
         }
-        if (Vector3.Distance(transform.position, finalPos) > 0.6f)
+        if (Vector3.Distance(transform.position, targetPos) > 0.6f)
         {
-            if (SetDestinationToPosition(finalPos))
-            {
-                Move(destination);
-            }
+            Move(targetPos);
             return NodeState.Running;
         }
         
@@ -100,6 +102,8 @@ public class Spider : MonsterBase
         {
             curDelayTime += Time.deltaTime;
         }
+        isCalled = false;
+        isSetRandomPos = false;
         state = SpiderState.Idle;
         return NodeState.Succes;
     }
@@ -121,7 +125,7 @@ public class Spider : MonsterBase
         return NodeState.Succes;
     }
 
-    private NodeState CheckPlayerInFOV()
+    private NodeState CheckPlayerInFOV(bool isEnd = true)
     {
         if (targetPlayer != null)
         {
@@ -143,7 +147,7 @@ public class Spider : MonsterBase
             targetPlayer = targetUnits[0];
             return NodeState.Succes;
         }
-        return NodeState.Failure;
+        return (isEnd) ? NodeState.Failure : NodeState.Running;
     }
 
     private NodeState FollowTarget()
@@ -213,6 +217,19 @@ public class Spider : MonsterBase
             leg.enabled = false;
         }
         base.Death();
+    }
+
+    public override void Damage(float damage, UnitBase attacker)
+    {
+        base.Damage(damage, attacker);
+        if (targetPlayer == null) return;
+        if(attacker is InGamePlayer)
+        {
+            if(attacker.gameObject.Equals(targetPlayer.gameObject))
+            {
+                targetPlayer = attacker as InGamePlayer;
+            }
+        }
     }
 
     [PunRPC]

@@ -115,6 +115,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AdditionalLightStrength: 10
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -140,7 +141,7 @@ Material:
     - _FlatnessExtra: 1
     - _FresnelIntensity: 1
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.848
+    - _FresnelThreshold: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -155,7 +156,7 @@ Material:
     - _LightmapDirectionYaw: 88
     - _MedBrushStrength: 0
     - _MedSmooth: 0
-    - _MedThreshold: 0.7
+    - _MedThreshold: 0.786
     - _MetalReflectProbeIntensity: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -179,7 +180,7 @@ Material:
     - _ShadowEdgeSize: 0.026
     - _ShadowEdgeSizeExtra: 0
     - _ShadowSmooth: 0
-    - _ShadowThreshold: 0.626
+    - _ShadowThreshold: 0.699
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularEnabled: 1

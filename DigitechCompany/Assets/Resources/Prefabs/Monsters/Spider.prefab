@@ -720,7 +720,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 513
 --- !u!114 &4533226164529577591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -734,6 +734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 0}
+  eyeLocation: {fileID: 0}
   fov: {fileID: 4533226164529577588}
   waypoints: []
   tempSpeed: 3
@@ -753,6 +754,7 @@ MonoBehaviour:
   - {fileID: 8307488113305371974}
   - {fileID: 8307488114960557876}
   rigBuilder: {fileID: 4533226164529577584}
+  state: 0
 --- !u!195 &4533226164529577590
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1599,7 +1601,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488113327284789
 GameObject:
@@ -1817,7 +1819,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488113850838454
 GameObject:
@@ -1903,7 +1905,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114009400496
 GameObject:
@@ -1989,7 +1991,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114179188163
 GameObject:
@@ -2044,7 +2046,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114572816958
 GameObject:
@@ -2374,7 +2376,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114922925099
 GameObject:
@@ -2429,7 +2431,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114960557874
 GameObject:
@@ -2484,7 +2486,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488115021629156
 GameObject:

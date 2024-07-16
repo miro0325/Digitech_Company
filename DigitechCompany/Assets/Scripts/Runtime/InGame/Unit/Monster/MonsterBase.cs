@@ -36,6 +36,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected NavMeshAgent agent;
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
+    protected InGamePlayer targetPlayer;
     protected Stats testBaseStat = new();
     protected Vector3 destination;
     protected Vector3 receivePos;
@@ -49,6 +50,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected bool isDeath = false;
     protected bool isCalled = false;
     protected bool isCalculatePath = false;
+    protected bool isSetRandomPos = false;
 
     protected virtual void Start()
     {
@@ -70,7 +72,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         Spawn();
     }
 
-    public virtual void Inititalize(Transform[] waypoints)
+    public virtual void Inititalize(Transform[] waypoints, bool isSpawnInPlaying = false)
     {
         this.waypoints = waypoints.Select(x => x.position).ToList();
         if (!photonView.IsMine) return;
@@ -281,6 +283,22 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         }
         finalPosition = transform.position;
         return false;
+    }
+
+    protected int GetFareastWaypoint()
+    {
+        float fareastDist = 0;
+        int fareastIndex = Random.Range(0,waypoints.Count);
+        for(int i = 0; i < waypoints.Count; i++)
+        {
+            float dist = Vector3.Distance(transform.position, waypoints[i]);
+            if(dist > fareastDist)
+            {
+                fareastDist = dist;
+                fareastIndex = i;
+            }
+        }
+        return fareastIndex;
     }
 
     //protected bool DetectRotation()

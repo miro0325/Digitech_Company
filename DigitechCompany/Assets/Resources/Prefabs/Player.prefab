@@ -311,6 +311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 5628984937424643411}
+  eyeLocation: {fileID: 5628984937875474231}
   gravity: 9.8
   jumpScale: 4
   camRotateXClamp: 85

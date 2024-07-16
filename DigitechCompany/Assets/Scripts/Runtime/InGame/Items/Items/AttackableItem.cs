@@ -105,17 +105,16 @@ public class AttackableItem : ItemBase, IInteractable
 
     public virtual void OnAttack()
     {
-        Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
-        //Debug.Log("Attack!" + hits.Length);
-        foreach (Collider hit in hits)
+        RaycastHit[] hits = Physics.BoxCastAll(OwnUnit.EyeLocation.position, new Vector3(0.5f,0.5f,0.5f),OwnUnit.EyeLocation.forward,OwnUnit.EyeLocation.rotation,attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
+        foreach (var hit in hits)
         {
-            var entity = hit.GetComponent<IDamagable>();
+            var entity = hit.collider.GetComponent<IDamagable>();
             if(OwnUnit.gameObject == entity.OwnObject) continue;
             if (entity.IsInvulnerable) continue;
             Debug.Log(entity.OwnObject.name);
             if(entity is InGamePlayer)
             {
-                hit.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
+                hit.collider.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
             }
             else
             {

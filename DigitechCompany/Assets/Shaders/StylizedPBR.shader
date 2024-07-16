@@ -101,6 +101,7 @@ Shader "Custom/StylizedPBR"
         _ReflectProbeIntensity("Reflect Probe Intensity",float) = 0
         _MetalReflectProbeIntensity("Metal Reflect Probe Intensity",float) = 0
         _ReflectProbeRotation("Reflect Probe Rotation",float) = 0
+        _AdditionalLightStrength("Additional Light Strength",float) = 10
         
         _MedBrushStrength("Med Brush Strength",Range(0,1)) = 0
         _ShadowBrushStrength("Shadow Brush Strength",Range(0,1)) = 0
@@ -299,6 +300,8 @@ Shader "Custom/StylizedPBR"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
+            float _AdditionalLightStrength;
+
             void InitializeInputData(Varyings input, half3 normalTS, out InputData inputData)
             {
                 inputData = (InputData)0;
@@ -385,7 +388,7 @@ Shader "Custom/StylizedPBR"
                 half smoothReflect = LinearStep(_ReflectThreshold - _ReflectSmooth, _ReflectThreshold + _ReflectSmooth,halfLambertReflect);
                 half3 ReflectColor = lerp(_ReflectColor.rgb, ShadowColor, smoothReflect);
                 
-                half3 radiance = light.color * ReflectColor ; 
+                half3 radiance = light.color * ReflectColor; 
                 //half3 radiance = light.color * (light.attenuation * NdotL);
                 return radiance;
             }
@@ -497,7 +500,7 @@ Shader "Custom/StylizedPBR"
                         //float3 radiance = CalculateRadiance(light, inputData.normalWS);
                         float3 extraRadiance = CalculateRadiance(light, inputData.normalWS,0.5, float3(0,0,0));
                     #endif
-                        color += LightingStylizedPhysicallyBased(brdfData,extraRadiance,light.color,light.direction,light.distanceAttenuation * light.shadowAttenuation,inputData.normalWS,inputData.viewDirectionWS,true);
+                        color += LightingStylizedPhysicallyBased(brdfData,extraRadiance,light.color,light.direction,light.distanceAttenuation * light.shadowAttenuation,inputData.normalWS,inputData.viewDirectionWS,true) * _AdditionalLightStrength;
                     }
                 }
                 //return CalculateStyFinalColor(lightingData, surfaceData.alpha);

@@ -46,11 +46,22 @@ public class Rats : MonsterBase
     private Vector3 originItemSize = Vector3.zero;
     private ItemBase targetItem = null;
 
-    private InGamePlayer TargetPlayer;
-
     protected override void Death()
     {
         base.Death();
+    }
+
+    public override void Inititalize(Transform[] waypoints,bool isSpawnInPlaying = false)
+    {
+        base.Inititalize(waypoints,isSpawnInPlaying);
+        if (isSpawnInPlaying) return;
+        NestPosition = Vector3.zero;
+        itemsInNest.Clear();
+        targetPlayer = null;
+        if (NestPosition == Vector3.zero)
+        {
+            NestPosition = transform.position;
+        }
     }
 
     protected override void Spawn()
@@ -58,22 +69,17 @@ public class Rats : MonsterBase
         testBaseStat.SetStat(Stats.Key.Hp, x => 100);
         maxStats.ChangeFrom(testBaseStat);
         weapon.Initialize(this);
-        if (NestPosition == Vector3.zero)
-        {
-            NestPosition = transform.position;
-        }
+        
         tree = new BehaviorTree.Tree(new Loop(new List<Node> {
             new Action(() => CheckItemInNest()),
             new Action(() => CheckPlayerFromNest()),
-            new Action(() => DetectDoor()),
             new Sequence(new List<Node>
             {
                 new Action(() => CheckDeath()),
-                
+                new Action(() => DetectDoor()),
                 new Selector(
                     new List<Node>
                     {
-
                         new Sequence(new List<Node>
                         {
                             new Action(() => CheckState(RatsState.Idle)),
@@ -176,7 +182,6 @@ public class Rats : MonsterBase
     private NodeState CheckState(RatsState _state,bool reverse = false)
     {
         if (state != _state) return reverse ? NodeState.Succes : NodeState.Failure;
-        //Debug.Log(_state);
         return reverse ? NodeState.Failure : NodeState.Succes;
     }
 
@@ -188,15 +193,14 @@ public class Rats : MonsterBase
 
     private NodeState CheckItemInNest()
     {
-        if(TargetPlayer != null && !TargetPlayer.IsDie) return NodeState.Succes;
+        if(targetPlayer != null && !targetPlayer.IsDie) return NodeState.Succes;
         ItemBase stolenItem = null;
         foreach(var item in itemsInNest)
         {
             if(item.CurUnit is InGamePlayer)
             {
                 stolenItem = item;
-                TargetPlayer = item.CurUnit as InGamePlayer;
-                //targetPlayerViewId = TargetPlayer.photonView.ViewID;
+                targetPlayer = item.CurUnit as InGamePlayer;
                 ChangeTexture(true);
                 state = RatsState.Attack;
                 return NodeState.Succes;
@@ -221,16 +225,14 @@ public class Rats : MonsterBase
         return NodeState.Failure;
     }
 
-    //????·? ±???
+    //둥지로 귀환
     protected NodeState ReturnToNest()
     {
         if (agent.isStopped) agent.isStopped = false;
         Move(NestPosition);
         if(Vector3.Distance(transform.position, GetNavMeshPosition(NestPosition)) < 0.6f)
         {
-            
             DropItem();
-            Debug.Log(targetItem != null);
             state = RatsState.Searching;
             curSearchCount = 0;
             return NodeState.Succes;
@@ -245,7 +247,6 @@ public class Rats : MonsterBase
             state = RatsState.Idle;
             return NodeState.Succes;
         }
-        Debug.Log($"Current Search Count {curSearchCount}");
         if(isArrive)
         {
             isArrive = false;
@@ -274,6 +275,7 @@ public class Rats : MonsterBase
         return NodeState.Running;
     }
 
+    //목표 아이템으로 이동
     private NodeState GoToItem()
     {
         if(targetItem == null)
@@ -297,6 +299,8 @@ public class Rats : MonsterBase
         return NodeState.Running;
     }
 
+
+    //플레이어 경계
     private NodeState GuardFromPlayer()
     {
         var targetPlayers = fov.TargetUnits.Where(x => x is InGamePlayer).Select(x => x as InGamePlayer).Where(x => !x.IsDie).ToArray();
@@ -318,10 +322,11 @@ public class Rats : MonsterBase
 
     private NodeState CheckTarget()
     {
-        if(TargetPlayer == null || (TargetPlayer != null && TargetPlayer.IsDie))
+        if(targetPlayer == null || (targetPlayer != null && targetPlayer.IsDie))
         {
             ChangeTexture(false);
-            TargetPlayer = null;
+            photonView.RPC(nameof(ReturnOriginTextureRPC), RpcTarget.Others);
+            targetPlayer = null;
             if (DetectItem())
             {
                 isArrive = true;
@@ -341,15 +346,23 @@ public class Rats : MonsterBase
         }
     }
 
+    [PunRPC]
+    private void ReturnOriginTextureRPC()
+    {
+        renderer.material.SetTexture("_BaseMap", baseTexture);
+        renderer.material.SetTexture("_EmissionTex", null);
+        renderer.material.SetColor("_EmissionColor", Color.black);
+    }
+
     private NodeState FollowTarget()
     {
         DropItem();
         if (isAttacking) return NodeState.Failure;
-        if (SetDestinationToPosition(TargetPlayer.transform.position))
+        if (SetDestinationToPosition(targetPlayer.transform.position))
         {
             if (agent.isStopped) agent.isStopped = false;
             Move(destination);
-            if (Vector3.Distance(transform.position, TargetPlayer.transform.position) < 0.6f)
+            if (Vector3.Distance(transform.position, targetPlayer.transform.position) < 0.6f)
             {
                 return NodeState.Succes;
             }
@@ -369,10 +382,8 @@ public class Rats : MonsterBase
     {
         if (Vector3.Distance(transform.position, NestPosition) < 2.5f)
         {
-            Debug.Log("Protecting");
             DropItem();
             agent.isStopped = true;
-            //AvoidOtherMonsters();
             Collider[] hits = Physics.OverlapBox(NestPosition, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Player"));
             var players = hits.Select(x => x.GetComponent<InGamePlayer>()).ToArray();
             if(players.Length == 0)
@@ -384,13 +395,12 @@ public class Rats : MonsterBase
             }
             else if(players.Length > 0)
             {
-                Debug.Log("Looking");
                 RotateToDir(players[0].transform.position);
             }
         } else
         {
+            agent.speed = tempSpeed;
             agent.isStopped = false;
-            Debug.Log("Going To Protect");
             Move(NestPosition);
         }
         return NodeState.Running;
@@ -415,10 +425,10 @@ public class Rats : MonsterBase
     public void OnAttack()
     {
         if (!photonView.IsMine) return;
-        if (TargetPlayer == null) return;
-        if (Vector3.Distance(transform.position, TargetPlayer.transform.position) < 1.25f)
+        if (targetPlayer == null) return;
+        if (Vector3.Distance(transform.position, targetPlayer.transform.position) < 1.25f)
         {
-            TargetPlayer?.Damage(attackDamage, this);
+            targetPlayer?.Damage(attackDamage, this);
         }
     }
 
@@ -431,7 +441,7 @@ public class Rats : MonsterBase
 
     private bool PickItem()
     {
-        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, (TargetPlayer == null) ? -1 : targetItem.photonView.ViewID);
+        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, (targetPlayer == null) ? -1 : targetItem.photonView.ViewID);
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
             originItemSize = targetItem.transform.localScale;
@@ -529,7 +539,7 @@ public class Rats : MonsterBase
                     rat.MakeAngry(attacker as InGamePlayer);
                 }
             }
-            TargetPlayer = attacker as InGamePlayer;
+            targetPlayer = attacker as InGamePlayer;
             state = RatsState.Attack;
         }
         base.Damage(damage, attacker);
@@ -540,7 +550,7 @@ public class Rats : MonsterBase
         if (state != RatsState.Attack)
         {
             ChangeTexture(true);
-            TargetPlayer = player;
+            targetPlayer = player;
             state = RatsState.Attack;
         }
         photonView.RPC(nameof(MakeAngryRPC), RpcTarget.Others, player.photonView.ViewID);
@@ -552,7 +562,7 @@ public class Rats : MonsterBase
         if (state != RatsState.Attack)
         {
             ChangeTexture(true);
-            TargetPlayer = PhotonView.Find(playerViewId).GetComponent<InGamePlayer>();
+            targetPlayer = PhotonView.Find(playerViewId).GetComponent<InGamePlayer>();
             state = RatsState.Attack;
         }
     }
