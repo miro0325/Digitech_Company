@@ -84,8 +84,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //service
     private ItemManager _itemManager;
     private ItemManager itemManager => _itemManager ??= ServiceLocator.For(this).Get<ItemManager>();
-    private TestSpawner _testSpawner;
-    private TestSpawner testSpawner => _testSpawner ??= ServiceLocator.For(this).Get<TestSpawner>();
+    private MonsterManager _testSpawner;
+    private MonsterManager testSpawner => _testSpawner ??= ServiceLocator.For(this).Get<MonsterManager>();
     private SpectatorView _spectatorView;
     private SpectatorView spectatorView => _spectatorView ??= ServiceLocator.For(this).Get<SpectatorView>();
     private InGamePlayer _player;

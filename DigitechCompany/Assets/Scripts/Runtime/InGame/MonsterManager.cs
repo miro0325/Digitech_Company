@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using Photon.Pun;
 
-public class TestSpawner : MonoBehaviourPun, IService
+public class MonsterManager : MonoBehaviourPun, IService
 {
     [SerializeField] Transform[] waypoints;
     [SerializeField] List<string> monsters = new List<string>();
-    private List<MonsterBase> curMonsters = new();
+    public List<MonsterBase> curMonsters = new();
     
     public void SpawnMonsters()
     {

@@ -25,7 +25,7 @@ public class Rats : MonsterBase
     private RatsState state = RatsState.Idle;
     [SerializeField]
     private LayerMask obstacleLayer;
-    private int targetPlayerViewId = 0;
+    private int targetPlayerViewId = -1;
 
     [SerializeField]
     private int maxSearchCount = 3;
@@ -431,7 +431,7 @@ public class Rats : MonsterBase
 
     private bool PickItem()
     {
-        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, (TargetPlayer == null) ? 0 : targetItem.photonView.ViewID);
+        photonView.RPC(nameof(PickItemRPC), RpcTarget.Others, (TargetPlayer == null) ? -1 : targetItem.photonView.ViewID);
         if (Vector3.Distance(transform.position, targetPos) < 0.7f)
         {
             originItemSize = targetItem.transform.localScale;
@@ -448,6 +448,7 @@ public class Rats : MonsterBase
     [PunRPC]
     private void PickItemRPC(int viewId)
     {
+        if (viewId == -1) return;
         if(PhotonView.Find(viewId).TryGetComponent(out ItemBase item))
         {
             targetItem = item;
