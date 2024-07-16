@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Purchase
   m_EditorClassIdentifier: 
   command: 
-  aliases: []
+  aliases:
+  - shovel
+  - sh
   isMultipleCommand: 1
   explain: Purcahse <args[0]> <cmd>
-  itemList:
-  - {fileID: 867504399257358494, guid: 817c4cdbb68c89a4091597ff17b80b80, type: 3}
+  loadData: {fileID: 11400000, guid: be26cdf156ef6284abc158b46d88db43, type: 2}

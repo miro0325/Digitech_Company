@@ -57,6 +57,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private bool isJump;
     private bool isDie = true;
     private bool isInBasement = true;
+    private bool isInMap;
     private float velocityY;
     private float camRotateX;
     private float scanWaitTime;
@@ -78,6 +79,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public bool IsCrouch => isCrouch;
     public bool IsGround => isGround;
     public bool IsJump => isJump;
+    public bool IsInMap => isInMap;
     public new bool IsDie => isDie;
     public Vector2 MoveInput => moveInput;
     public float[] InteractRequireTimes => interactRequireTimes;
@@ -88,6 +90,17 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
+
+    public void SetInMap(bool @in)
+    {
+        photonView.RPC(nameof(SetInMapRpc), RpcTarget.All, @in);
+    }
+
+    [PunRPC]
+    private void SetInMapRpc(bool @in)
+    {
+        isInMap = @in;
+    }
     
     public override void Damage(float damage, UnitBase attacker)
     {
@@ -114,7 +127,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(SendReviveToAllRpc), photonView.Owner);
+        photonView.RPC(nameof(SendReviveToAllRpc), RpcTarget.All);
     }
 
     [PunRPC]
@@ -228,8 +241,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         DoInteract();
         DoMovement();
         DoRotation();
-
-        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoLife()
@@ -508,6 +519,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         velocity.y = velocityY;
+
+        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoRotation()

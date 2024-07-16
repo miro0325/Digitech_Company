@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NaughtyAttributes;
 
 [CreateAssetMenu(menuName ="Command/Purchase")]
 public class Purchase : Command
 {
-    
+    private ResourceLoader _resourceLoader;
+    private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
     
     // public override string[] Aliases
     // {
@@ -27,8 +29,21 @@ public class Purchase : Command
 
     // }
 
-    [SerializeField] ItemBase[] itemList; 
-    private Dictionary<string, ItemBase> itemDict = new();
+    [SerializeField] private SOLoadData loadData;
+
+    [Button]
+    private void GetItems()
+    {
+        var items = loadData.itemDatas
+            .Where(item => item.Value.isAvailable && item.Value.type == ItemType.Buy)
+            .Select(item => item.Key)
+            .Except(aliases)
+            .ToArray();
+        var added = aliases.ToList();
+        added.AddRange(items);
+
+        aliases = added.ToArray();
+    }
 
     public override string Activate(string cmd, string[] args)
     {
@@ -38,18 +53,20 @@ public class Purchase : Command
             args[0] = "1";
         }
         List<ItemBase> list;
-        int count = 0;
-        if(int.TryParse(args[0], out count))
+        if(int.TryParse(args[0], out int count))
         {
             list = new List<ItemBase>(count);
             for (int i = 0; i < count; i++)
             {
-                list.Add(GetItem(cmd));
+                if(TryGetItem(cmd, out var item))
+                    list.Add(item);
             }
-        } else
+        }
+        else //if args are not currect
         {
             list = new List<ItemBase>(1);
-            list.Add(GetItem(cmd));
+            if(TryGetItem(cmd, out var item))
+                list.Add(item);
             args[0] = "1";
         }
         // Delivary.Instance.AddDelivaryItems(list);
@@ -83,13 +100,9 @@ public class Purchase : Command
         return txt;
     }
 
-    private ItemBase GetItem(string key)
+    private bool TryGetItem(string key, out ItemBase item)
     {
-        if(itemDict.TryGetValue(key, out var item))
-        {
-            return item;
-        }
-        return null;
+        return resourceLoader.itemPrefabs.TryGetValue(key, out item);
     }
 
 }

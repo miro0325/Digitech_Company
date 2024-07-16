@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         public int viewID;
         public bool isAlive;
         public bool[] sync = new bool[(int)SyncTarget.End];
-        public string playerName = "ÇÃ·¹ÀÌ¾î";
+        public string playerName = "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½";
         public float gainDamage;
         public float fearAmount;
         public bool isGainMaxDamage;
@@ -92,16 +92,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
     private Basement _basement;
     private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
+    private SkyProcessor _skyProcessor;
+    private SkyProcessor skyProcessor => _skyProcessor ??= ServiceLocator.For(this).Get<SkyProcessor>();
 
     //inspector
     [SerializeField] private NavMeshSurface surface;
     [SerializeField] private MeshRenderer[] rooms;
 
     //field
+    private float dateTime;
     private int inGamePlayerViewId;
     private bool gameEndSign;
     private bool gameStartSign;
+    private string planet = "Digitech";
     private GameState state;
+    private OutMap outMap;
+    private InMap inMap;
     [SerializeField] private bool[] joinSyncCompleted = new bool[(int)SyncTarget.End];
     [SerializeField] private SerializableDictionary<int, PlayerData> playerDatas = new();
 
@@ -111,6 +117,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     public bool HasAlivePlayer => playerDatas.Where(p => p.Value.isAlive).Any();
 
     public event Action OnLoadComplete;
+
+    public void ChangePlanet(string planet)
+    {
+        photonView.RPC(nameof(SendChangePlanetToAllRpc), RpcTarget.All, planet);
+    }
+
+    private void SendChangePlanetToAllRpc(string planet)
+    {
+        this.planet = planet;
+    }
 
     private void Awake()
     {
@@ -192,9 +208,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                         NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID);
                 }
                 break;
-            case SyncTarget.Map:
-                // surface.BuildNavMesh();
-                break;
         }
 
         joinSyncCompleted[syncTarget] = true;
@@ -269,6 +282,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         while (true)
         {
             state = GameState.StartWait;
+
+            Destroy(inMap.gameObject);
+            Destroy(outMap.gameObject);
+
             foreach (var data in playerDatas)
             {
                 var player = PhotonView.Find(data.Value.viewID).GetComponent<InGamePlayer>();
@@ -329,36 +346,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private async UniTask InitializeGameAndRequestLoad()
     {
-        //Player
+        //==================Player==================//
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Player] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
-        //Map
-        var inmap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-        var outmap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+        //==================Map==================//
+        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
+        outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
-        inmap.ToGround.position = outmap.EnterPoint.position;
-        outmap.ToMap.position = inmap.EnterPoint.position;
+        inMap.ToGround.position = outMap.EnterPoint.position;
+        inMap.ToGround.OnMove += player => player.SetInMap(false);
 
-        basement.transform.SetParent(outmap.ArrivePoint);
+        outMap.ToMap.position = inMap.EnterPoint.position;
+        outMap.ToMap.OnMove += player => player.SetInMap(true);
 
-        inmap.Doors.For((_, door) => door.gameObject.SetActive(false));
-        await UniTask.NextFrame();
+        basement.transform.SetParent(outMap.ArrivePoint);
+
         surface.BuildNavMesh();
         await UniTask.NextFrame();
-        inmap.Doors.For((_, door) => door.gameObject.SetActive(true));
 
-        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, null);
+        var viewids = inMap.ReAllocateDoors();
+
+        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, viewids.ToJson());
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
-        //Item
+        //==================Item==================//
         Debug.Log(rooms.Length);
         testSpawner.SpawnMonsters(1, inmap.MapBounds,inmap.GetWayPoints());
         itemManager.SpawnItem(1, inmap.MapBounds);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
-        /* -------------------------- */
 
+        //==================Monster==================//
         //testSpawner.SpawnMonsters();
         // testSpawner.SpawnMonsters(1, rooms);
     }
@@ -378,25 +397,51 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     itemManager.SyncItem(datas);
                     break;
                 case SyncTarget.Map:
-                    var inmap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map1"), new Vector3(0, -50, 0), Quaternion.identity);
-                    var outmap = Instantiate(Resources.Load<OutMap>("Prefabs/Maps/Out/Map1"), new Vector3(0, 0, 0), Quaternion.identity);
+                    inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
+                    outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
-                    inmap.ToGround.position = outmap.EnterPoint.position;
-                    outmap.ToMap.position = inmap.EnterPoint.position;
+                    inMap.ToGround.position = outMap.EnterPoint.position;
+                    outMap.ToMap.position = inMap.EnterPoint.position;
 
-                    basement.transform.SetParent(outmap.ArrivePoint);
+                    basement.transform.SetParent(outMap.ArrivePoint);
 
-                    inmap.Doors.For((_, door) => door.gameObject.SetActive(false));
-                    await UniTask.NextFrame();
                     surface.BuildNavMesh();
                     await UniTask.NextFrame();
-                    inmap.Doors.For((_, door) => door.gameObject.SetActive(true));
+
+                    inMap.ReBindDoors(datas.ToList<int>());
                     break;
             }
             photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);
         }
     }
 
+    private void Update()
+    {
+        if (state == GameState.Process)
+        {
+            dateTime += Time.deltaTime;
+
+            if (player.IsInMap)
+            {
+                skyProcessor.SetFogValue(Color.black, 0.1f);
+            }
+            else
+            {
+                var midnightTime = 10;
+                var endTime = 30;
+                if (dateTime < midnightTime)
+                {
+                    var lerp = dateTime / midnightTime;
+                    skyProcessor.LerpSky(outMap.EnvirSetting.morning, outMap.EnvirSetting.midnight, lerp);
+                }
+                else
+                {
+                    var lerp = (dateTime - midnightTime) / (endTime - midnightTime);
+                    skyProcessor.LerpSky(outMap.EnvirSetting.midnight, outMap.EnvirSetting.night, lerp);
+                }
+            }
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
