@@ -283,7 +283,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             state = GameState.StartWait;
 
-            Destroy(inMap.gameObject);
+             Destroy(inMap.gameObject);
             Destroy(outMap.gameObject);
 
             foreach (var data in playerDatas)
@@ -342,6 +342,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
             await UniTask.WaitForSeconds(3f);
         }
+    }
+
+    [PunRPC]
+    private void DestoryMaps()
+    {
+        if(inMap) Destroy(inMap);
+        if(outMap) Destroy(outMap);
     }
 
     private async UniTask InitializeGameAndRequestLoad()
