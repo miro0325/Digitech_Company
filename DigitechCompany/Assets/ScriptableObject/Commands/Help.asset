@@ -12,21 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1f268def73fb114cb16d10c8c9372a6, type: 3}
   m_Name: Help
   m_EditorClassIdentifier: 
-  command: help
-  aliases:
-  - h
-  isMultipleCommand: 0
-  explain: '>MOONS
+  commandDatas:
+  - cmd: Help
+    aliases:
+    - help
+    - h
+  explain: '>Moons
 
     Call Moon List here
 
 
-    >STORE
+    >Shop
 
-    enter the shop and
-    show item list
-
-
-    >BESTIARY
-
-    test'
+    enter the shop and show
+    item list'

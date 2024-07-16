@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e17ee6068069de54e9326c4c526d6d43, type: 3}
   m_Name: Purchase
   m_EditorClassIdentifier: 
-  command: 
-  aliases:
-  - shovel
-  - sh
-  isMultipleCommand: 1
+  commandDatas:
+  - cmd: Shovel
+    aliases:
+    - shovel
+    - sh
   explain: Purcahse <args[0]> <cmd>
   loadData: {fileID: 11400000, guid: be26cdf156ef6284abc158b46d88db43, type: 2}

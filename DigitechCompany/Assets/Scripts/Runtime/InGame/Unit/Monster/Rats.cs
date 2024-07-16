@@ -385,7 +385,7 @@ public class Rats : MonsterBase
             DropItem();
             agent.isStopped = true;
             Collider[] hits = Physics.OverlapBox(NestPosition, Vector3.one * itemDetectRange, Quaternion.identity, LayerMask.GetMask("Player"));
-            var players = hits.Select(x => x.GetComponent<InGamePlayer>()).ToArray();
+            var players = hits.Select(x => x.GetComponent<InGamePlayer>()).Where(p => p != null).ToArray();
             if(players.Length == 0)
             {
                 agent.isStopped = false;

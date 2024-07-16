@@ -115,8 +115,8 @@ Material:
     - _SunDiscExponent: 250000
     - _SunDiscMultiplier: 500
     - _SunDisk: 1
-    - _SunHaloContribution: 0.244
-    - _SunHaloExponent: 198.21
+    - _SunHaloContribution: 0.5
+    - _SunHaloExponent: 50
     - _SunSize: 0.169
     - _SunSizeConvergence: 10
     - _Surface: 0
@@ -128,8 +128,8 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
     - _HorizonLineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SkyGradientBottom: {r: 0.1610893, g: 0.17112198, b: 0.18867919, a: 1}
-    - _SkyGradientTop: {r: 0.07760767, g: 0.10649746, b: 0.15094337, a: 1}
+    - _SkyGradientBottom: {r: 0.38039213, g: 0.47450978, b: 0.6156863, a: 1}
+    - _SkyGradientTop: {r: 0.11372546, g: 0.17647055, b: 0.26666665, a: 1}
     - _SkyTint: {r: 0.745283, g: 0.53677076, b: 0.33397114, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SunDiscColor: {r: 0.6286764, g: 0.7428499, b: 0.83823526, a: 1}

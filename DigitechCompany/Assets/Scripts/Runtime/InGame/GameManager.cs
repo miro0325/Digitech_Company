@@ -8,6 +8,7 @@ using Photon.Realtime;
 using MSLIMA.Serializer;
 using Sherbert.Framework.Generic;
 using Unity.AI.Navigation;
+using UnityEngine.AI;
 
 public enum SyncTarget
 {
@@ -123,6 +124,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SendChangePlanetToAllRpc), RpcTarget.All, planet);
     }
 
+    [PunRPC]
     private void SendChangePlanetToAllRpc(string planet)
     {
         this.planet = planet;
@@ -205,7 +207,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 foreach (var kvp in playerDatas)
                 {
                     if (kvp.Value.viewID != 0)
-                        NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID);
+                    {
+                        var player = NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID) as InGamePlayer;
+                        if (!kvp.Value.isAlive)
+                            player.Animator.SetEnableRagDoll(false);
+                    }
                 }
                 break;
         }
@@ -297,6 +303,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => gameStartSign);
 
             state = GameState.Load;
+            await UniTask.WaitForSeconds(0.25f);
             await InitializeGameAndRequestLoad();
 
             //Wait until all player sync complete
@@ -346,8 +353,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void DestoryMaps()
     {
         basement.transform.SetParent(null);
-        if(inMap) Destroy(inMap.gameObject);
-        if(outMap) Destroy(outMap.gameObject);
+        if (inMap) Destroy(inMap.gameObject);
+        if (outMap) Destroy(outMap.gameObject);
     }
 
     private async UniTask InitializeGameAndRequestLoad()
@@ -357,30 +364,41 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Player, null);
 
         //==================Map==================//
-        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
         outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
-        inMap.ToGround.position = outMap.EnterPoint.position;
-        inMap.ToGround.OnMove += player => player.SetInMap(false);
+        if (planet != "Company")
+        {
+            inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
 
-        outMap.ToMap.position = inMap.EnterPoint.position;
-        outMap.ToMap.OnMove += player => player.SetInMap(true);
+            inMap.ToGround.position = outMap.EnterPoint.position;
+            inMap.ToGround.OnMove += player => player.SetInMap(false);
+
+            outMap.ToMap.position = inMap.EnterPoint.position;
+            outMap.ToMap.OnMove += player => player.SetInMap(true);
+        }
 
         basement.transform.SetParent(outMap.ArrivePoint);
+        basement.transform.localEulerAngles = Vector3.zero;
 
-        surface.BuildNavMesh();
-        await UniTask.NextFrame();
+        List<int> doorViewIds = new();
+        if (planet != "Company")
+        {
+            surface.BuildNavMesh();
+            await UniTask.NextFrame();
+            doorViewIds = inMap.ReAllocateDoors();
+        }
 
-        var viewids = inMap.ReAllocateDoors();
-
-        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, viewids.ToJson());
+        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, doorViewIds.ToJson());
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         //==================Item==================//
         Debug.Log(rooms.Length);
-        testSpawner.SpawnMonsters(1, inMap.MapBounds,inMap.WayPoints);
-        itemManager.SpawnItem(1, inMap.MapBounds);
-        itemManager.SpawnItem(player.transform.position, "RailGun");
+
+        if (planet != "Company")
+        {
+            testSpawner.SpawnMonsters(1, inMap.MapBounds, inMap.WayPoints);
+            itemManager.SpawnItem(1, inMap.MapBounds);
+        }
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 
@@ -404,18 +422,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     itemManager.SyncItem(datas);
                     break;
                 case SyncTarget.Map:
-                    inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
                     outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
-                    inMap.ToGround.position = outMap.EnterPoint.position;
-                    outMap.ToMap.position = inMap.EnterPoint.position;
+                    if (planet != "Company")
+                    {
+                        inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
+
+                        inMap.ToGround.position = outMap.EnterPoint.position;
+                        inMap.ToGround.OnMove += player => player.SetInMap(false);
+
+                        outMap.ToMap.position = inMap.EnterPoint.position;
+                        outMap.ToMap.OnMove += player => player.SetInMap(true);
+                    }
 
                     basement.transform.SetParent(outMap.ArrivePoint);
+                    basement.transform.localEulerAngles = Vector3.zero;
 
-                    surface.BuildNavMesh();
-                    await UniTask.NextFrame();
+                    if (planet != "Company")
+                    {
+                        surface.BuildNavMesh();
+                        await UniTask.NextFrame();
 
-                    inMap.ReBindDoors(datas.ToList<int>());
+                        inMap.ReBindDoors(datas.ToList<int>());
+                    }
+
                     break;
             }
             photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);
