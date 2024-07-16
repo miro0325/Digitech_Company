@@ -99,8 +99,8 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HorizonLineContribution: 0.068206854
-    - _HorizonLineExponent: 2.1560483
+    - _HorizonLineContribution: 0.026508292
+    - _HorizonLineExponent: 1.4492931
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -112,11 +112,11 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SunDiscExponent: 201831.31
-    - _SunDiscMultiplier: 316.959
+    - _SunDiscExponent: 231279.45
+    - _SunDiscMultiplier: 428.86194
     - _SunDisk: 1
-    - _SunHaloContribution: 0.33494246
-    - _SunHaloExponent: 169.99857
+    - _SunHaloContribution: 0.27934438
+    - _SunHaloExponent: 187.24576
     - _SunSize: 0.169
     - _SunSizeConvergence: 10
     - _Surface: 0
@@ -127,13 +127,13 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
-    - _HorizonLineColor: {r: 0.30525723, g: 0.3355596, b: 0.34908128, a: 1}
-    - _SkyGradientBottom: {r: 0.39369264, g: 0.4195045, b: 0.44389665, a: 1}
-    - _SkyGradientTop: {r: 0.11419325, g: 0.28457898, b: 0.3602553, a: 1}
+    - _HorizonLineColor: {r: 0.11863687, g: 0.13041376, b: 0.13566889, a: 1}
+    - _SkyGradientBottom: {r: 0.25148955, g: 0.26765475, b: 0.28786832, a: 1}
+    - _SkyGradientTop: {r: 0.09182649, g: 0.17570806, b: 0.23229152, a: 1}
     - _SkyTint: {r: 0.745283, g: 0.53677076, b: 0.33397114, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SunDiscColor: {r: 0.77176577, g: 0.84194255, b: 0.9005712, a: 1}
-    - _SunHaloColor: {r: 0.64726955, g: 0.6642531, b: 0.72240704, a: 1}
+    - _SunDiscColor: {r: 0.6842874, g: 0.7813618, b: 0.86246186, a: 1}
+    - _SunHaloColor: {r: 0.5511538, g: 0.59945357, b: 0.7437714, a: 1}
     - _Tint: {r: 0.36044857, g: 0.52491987, b: 0.5660378, a: 0.5}
   m_BuildTextureStacks: []
 --- !u!114 &1799637092922750725

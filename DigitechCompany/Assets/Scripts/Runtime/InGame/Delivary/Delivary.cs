@@ -59,7 +59,7 @@ public class Delivary : MonoBehaviour, IService
 
     private void Awake()
     {
-        ServiceLocator.ForGlobal().Register(this);
+        ServiceLocator.For(this).Register(this);
     }
 
     private void Start()
@@ -116,11 +116,11 @@ public class Delivary : MonoBehaviour, IService
         var rot = transform.eulerAngles;
         rot.y = 0;
         Coroutine coroutine = StartCoroutine(Moving());
-        transform.DOMove(arriveTrans.position, moveDelay).SetEase(ease).OnComplete(
+        transform.DOLocalMove(arriveTrans.position, moveDelay).SetEase(ease).OnComplete(
             () =>
             {
                 StopCoroutine(coroutine);
-                transform.DORotate(rot, 0.3f);
+                transform.DOLocalRotate(rot, 0.3f);
                 RotateDelivaryObj().SetDelay(1.5f).SetEase(Ease.OutExpo).OnComplete(() => SeperateContainer());
                 Transformation();
                 BoostOnOff();

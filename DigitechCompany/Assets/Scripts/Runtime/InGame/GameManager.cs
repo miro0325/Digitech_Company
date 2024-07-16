@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         public int viewID;
         public bool isAlive;
         public bool[] sync = new bool[(int)SyncTarget.End];
-        public string playerName = "ÇÃ·¹ÀÌ¾î";
+        public string playerName = "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½";
         public float gainDamage;
         public float fearAmount;
         public bool isGainMaxDamage;
@@ -283,9 +283,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             state = GameState.StartWait;
 
-             Destroy(inMap.gameObject);
-            Destroy(outMap.gameObject);
-
             foreach (var data in playerDatas)
             {
                 var player = PhotonView.Find(data.Value.viewID).GetComponent<InGamePlayer>();
@@ -381,7 +378,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
         //==================Item==================//
         Debug.Log(rooms.Length);
-        itemManager.SpawnItem(3, inMap.MapBounds);
+        testSpawner.SpawnMonsters(1, inMap.MapBounds,inMap.WayPoints);
+        itemManager.SpawnItem(1, inMap.MapBounds);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
 

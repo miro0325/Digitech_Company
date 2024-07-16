@@ -965,7 +965,6 @@ GameObject:
   - component: {fileID: 3697752146121768872}
   - component: {fileID: 3697752146121768874}
   - component: {fileID: 3460338138072610868}
-  - component: {fileID: 2520911418076543993}
   m_Layer: 8
   m_Name: Rats
   m_TagString: Untagged
@@ -1012,8 +1011,12 @@ MonoBehaviour:
   attackRadius: 1
   attackRange: 1.2
   attackDamage: 5
+  curIndex: -1
   weapon: {fileID: 7510127010037814660}
   state: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 9
   maxSearchCount: 3
   itemDetectRange: 3
   renderer: {fileID: 4290093288329407412}
@@ -1114,7 +1117,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3697752146121768884}
   - {fileID: 3697752146121768873}
-  - {fileID: 2520911418076543993}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1153,22 +1155,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.88, z: 0}
---- !u!114 &2520911418076543993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4042786954871760151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4227238645846070774
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,13 +11,22 @@ using Photon.Pun;
 
 public class Spider : MonsterBase
 {
+    public enum SpiderState
+    {
+        Idle, Attack
+    }
+    
     [Header("Spider Setting")]
     [SerializeField] private ProceduralWalk[] legs;
     [SerializeField] private RigBuilder rigBuilder;
+    [SerializeField] private SpiderState state = SpiderState.Idle;
+
     private InGamePlayer targetPlayer;
+    private Vector3 nestPosition;
     
     protected override void Spawn()
     {
+        nestPosition = transform.position;
         testBaseStat.SetStat(Stats.Key.Hp, x => 100);
         maxStats.ChangeFrom(testBaseStat);
         tree = new BehaviorTree.Tree(new Sequence(new List<Node>
@@ -28,11 +37,21 @@ public class Spider : MonsterBase
             {
                 new Sequence(new List<Node>
                 {
+                    new Action(() => IsCalled()),
+                    new Action(() => GoToCalledPos())
+                }),
+                new Sequence(new List<Node>
+                {
                     new Action(() => CheckPlayerInFOV()),
+                    new Action(() => CheckState(SpiderState.Attack)),
                     new Action(() => FollowTarget()),
                     new Action(() => AttackTarget())
                 }),
-                //new Patrol(this,waypoints.ToArray())
+                new Sequence(new List<Node>
+                {
+                    new Action(() => CheckState(SpiderState.Idle)),
+                    new Action(() => ReturnToNest()),
+                })
             })
         }));
     }
@@ -43,7 +62,6 @@ public class Spider : MonsterBase
         
         Debug.Log(NavMesh.SamplePosition(transform.position, out var hit, 5, -1));
         agent.enabled = true;
-        // agent.Warp(hit.position);
         agent.SetDestination(hit.position);
         Spawn();
     }
@@ -53,10 +71,54 @@ public class Spider : MonsterBase
         if (photonView.IsMine)
         {
             base.Update();
+        } else
+        {
+            FixTransform();
+        }
+    }
+
+    protected override NodeState GoToCalledPos()
+    {
+        Vector3 finalPos;
+        while (true)
+        {
+            if (SetRandomPosition(targetPos, out finalPos, 3))
+            {
+                break;
+            }
+        }
+        if (Vector3.Distance(transform.position, finalPos) > 0.6f)
+        {
+            if (SetDestinationToPosition(finalPos))
+            {
+                Move(destination);
+            }
+            return NodeState.Running;
         }
         
-        //Debug.LogError(transform.position);
-        //Debug.LogError(agent.enabled);
+        while(curDelayTime < delayTime)
+        {
+            curDelayTime += Time.deltaTime;
+        }
+        state = SpiderState.Idle;
+        return NodeState.Succes;
+    }
+
+    private NodeState CheckState(SpiderState _state, bool reverse = false)
+    {
+        if (state != _state) return reverse ? NodeState.Succes : NodeState.Failure;
+        return reverse ? NodeState.Failure : NodeState.Succes;
+    }
+
+    private NodeState ReturnToNest()
+    {
+        if (Vector3.Distance(transform.position, destination) > 0.6f)
+        {
+            SetDestinationToPosition(nestPosition);
+            Move(destination);
+            return NodeState.Running;
+        }
+        return NodeState.Succes;
     }
 
     private NodeState CheckPlayerInFOV()
@@ -65,26 +127,27 @@ public class Spider : MonsterBase
         {
             if (targetPlayer.IsDie)
             {
+                state = SpiderState.Idle;
                 targetPlayer = null;
             }
             else
             {
+                state = SpiderState.Attack;
                 return NodeState.Succes;
             }
         }
         var targetUnits = fov.TargetUnits.Where(x => x is InGamePlayer).Select(x => x as InGamePlayer).Where(x => x != x.IsDie).ToList();
         if (targetUnits.Count > 0)
         {
+            state = SpiderState.Attack;
             targetPlayer = targetUnits[0];
             return NodeState.Succes;
         }
-        Debug.Log(targetPlayer != null);
         return NodeState.Failure;
     }
 
     private NodeState FollowTarget()
     {
-        //if (targetPlayer == null) return NodeState.Failure;
         SetDestinationToPosition(targetPlayer.transform.position);
         Move(destination);
         if (Vector3.Distance(transform.position, destination) < attackRange)
@@ -114,15 +177,24 @@ public class Spider : MonsterBase
     {
         isAttacking = true;
         animator.SetTrigger(Animator_AttackHash);
+        base.Attack();
+    }
+
+    [PunRPC]
+    protected override void AttackRPC()
+    {
+        isAttacking = true;
+        animator.SetTrigger(Animator_AttackHash);
     }
 
     public void OnAttack()
     {
+        if (!photonView.IsMine) return;
         Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player"));
         foreach (Collider hit in hits)
         {
             var player = hit.GetComponent<InGamePlayer>();
-            player.Damage(attackDamage,this);
+            player?.Damage(attackDamage,this);
             break;
         }
     }
