@@ -8,12 +8,12 @@ using Photon.Pun;
 
 public class InMap : MonoBehaviour, IPVReAllocatable
 {
+    [SerializeField] private PhotonView[] reAllocates;
     [SerializeField] private MapMoveDoor toGround;
     [SerializeField] private Transform enterPoint;
     [SerializeField] private Door[] doors;
     [SerializeField] private Transform[] wayPoints;
     [SerializeField] private Bounds[] mapBounds;
-    [SerializeField] private PhotonView[] reAllocates;
     [SerializeField, HideInInspector] private Transform wayPointParent;
 
     public MapMoveDoor ToGround => toGround;
