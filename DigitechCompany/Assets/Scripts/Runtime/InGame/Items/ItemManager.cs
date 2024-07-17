@@ -76,6 +76,20 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
             }
         }
 
+        BuildItemDataJson();
+    }
+
+    public void SpawnItem(Vector3 spawnPos,string key)
+    {
+        if (!resourceLoader.itemPrefabs.ContainsKey(key)) return;
+        var item = NetworkObject.Instantiate($"Prefabs/Items/{key}", spawnPos + Vector3.up, Quaternion.identity) as ItemBase;
+        item.SetLayRotation(Random.Range(0, 360));
+        item.Initialize(key);
+        items.Add(item.photonView.ViewID, item);
+    }
+
+    public void BuildItemDataJson()
+    {
         var networkItemDatas = new NetworkItemData[items.Count];
         var count = 0;
         foreach(var kvp in items)
@@ -88,15 +102,6 @@ public class ItemManager : MonoBehaviourPun, IService//, IPunObservable
             };
 
         itemDataJson = networkItemDatas.ToJson();
-    }
-
-    public void SpawnItem(Vector3 spawnPos,string key)
-    {
-        if (!resourceLoader.itemPrefabs.ContainsKey(key)) return;
-        var item = NetworkObject.Instantiate($"Prefabs/Items/{key}", spawnPos + Vector3.up, Quaternion.identity) as ItemBase;
-        item.SetLayRotation(Random.Range(0, 360));
-        item.Initialize(key);
-        items.Add(item.photonView.ViewID, item);
     }
 
     /// <summary>

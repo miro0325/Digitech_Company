@@ -33,6 +33,14 @@ public class CompanySellArea : MonoBehaviour, IInteractable
         if(!player) return;
 
         var item = player.DiscardCurrentItem();
-        //    item.transform.DOMove(area.bounds., 0.2f);
+        var layPosition =
+            // area.transform.position +
+            new Vector3(
+                Random.Range(area.bounds.min.x, area.bounds.max.x),
+                Random.Range(area.bounds.min.y, area.bounds.max.y),
+                Random.Range(area.bounds.min.z, area.bounds.max.z)
+            );
+
+        item.transform.DOMove(layPosition, 0.2f).SetEase(Ease.Unset);
     }
 }
