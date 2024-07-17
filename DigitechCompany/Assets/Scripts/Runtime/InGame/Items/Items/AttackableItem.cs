@@ -19,6 +19,7 @@ public class AttackableItem : ItemBase, IInteractable
     protected ReactiveProperty<bool> isUsePressed = new();
     protected float delayTime;
     protected Animator animator;
+    protected bool isUsing = false;
 
     //function
     public override void OnCreate()
@@ -42,6 +43,10 @@ public class AttackableItem : ItemBase, IInteractable
 
     public override bool IsUsable(InteractID id)
     {
+        if(UseBattery)
+        {
+            if (curBattery < requireBattery) return false;
+        }
         if(id == InteractID.ID2) return delayTime <= 0;
         return false;
     }
@@ -69,6 +74,7 @@ public class AttackableItem : ItemBase, IInteractable
         delayTime = 100f;
         animator.enabled = true;
         isUsePressed.Value = true;
+        isUsing = true;
     }
 
     public override void OnUseReleased()
@@ -129,9 +135,10 @@ public class AttackableItem : ItemBase, IInteractable
         }
     }
 
-    public void OnAttackAnimationEnd()
+    public virtual void OnAttackAnimationEnd()
     {
-        delayTime = 0.1f;
+        //delayTime = 0.1f;
         animator.enabled = false;
+        isUsing = false;
     }
 }

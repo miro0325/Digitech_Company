@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 130340790}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RightPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1623619749}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LeftPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1872744174}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 7351846130716983763}
   - component: {fileID: 7262856467827405027}
   - component: {fileID: 7263494996960439107}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EndCoreFlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4986,7 +4986,7 @@ GameObject:
   - component: {fileID: 7351844200613973981}
   - component: {fileID: 7262635220367480833}
   - component: {fileID: 7263088552829139091}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EndSparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9870,7 +9870,7 @@ GameObject:
   - component: {fileID: 7263260678559308709}
   - component: {fileID: 7434242247479092907}
   - component: {fileID: 7466962676480394597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Laser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14977,7 +14977,7 @@ GameObject:
   - component: {fileID: 7263215570020759473}
   - component: {fileID: 7460793886222093959}
   - component: {fileID: 4242460883485842546}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19959,7 +19959,7 @@ GameObject:
   - component: {fileID: 7351718126789444161}
   - component: {fileID: 7262066344648019755}
   - component: {fileID: 7263441711323735825}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24859,7 +24859,7 @@ GameObject:
   - component: {fileID: 7356988689640392721}
   - component: {fileID: 7262693507131494965}
   - component: {fileID: 7263444914087255105}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sparks2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29759,7 +29759,7 @@ GameObject:
   - component: {fileID: 7351852321032528221}
   - component: {fileID: 7262474712799611165}
   - component: {fileID: 7262958405590796579}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Circles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34641,7 +34641,7 @@ GameObject:
   - component: {fileID: 7351881457105284523}
   - component: {fileID: 7262141746774059967}
   - component: {fileID: 7263261470421322947}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RayWaves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39523,7 +39523,7 @@ GameObject:
   - component: {fileID: 7356684488907492573}
   - component: {fileID: 7257448107699912061}
   - component: {fileID: 7262964091507269381}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Smoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44405,7 +44405,7 @@ GameObject:
   - component: {fileID: 7357143564723136781}
   - component: {fileID: 7262553977628349583}
   - component: {fileID: 7263472342280205813}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LaserTrails
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49287,7 +49287,7 @@ GameObject:
   - component: {fileID: 7356898628458688635}
   - component: {fileID: 7262142487041127297}
   - component: {fileID: 7263379996723201449}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MuzzleFlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54169,7 +54169,7 @@ GameObject:
   - component: {fileID: 7356991820952900777}
   - component: {fileID: 7257439338269656013}
   - component: {fileID: 7263353651144671309}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LaserCore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59087,7 +59087,7 @@ GameObject:
   - component: {fileID: 7351990932257405437}
   - component: {fileID: 7262548060934632205}
   - component: {fileID: 7262952478074061387}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RayLightning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63969,7 +63969,7 @@ GameObject:
   - component: {fileID: 7357036216165788229}
   - component: {fileID: 7262774283144939849}
   - component: {fileID: 7263605096422095777}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rays
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68851,7 +68851,7 @@ GameObject:
   - component: {fileID: 7351972405309667621}
   - component: {fileID: 7262443728641303299}
   - component: {fileID: 7262919344789534819}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BackWaves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73742,7 +73742,7 @@ GameObject:
   - component: {fileID: 7356850149478669795}
   - component: {fileID: 7262393459171031525}
   - component: {fileID: 7263031669698428375}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BackWaves2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78684,7 +78684,11 @@ GameObject:
   - component: {fileID: 8586206584821694396}
   - component: {fileID: -2929468362774218006}
   - component: {fileID: 1165247033}
-  m_Layer: 0
+  - component: {fileID: 6198723082606952577}
+  - component: {fileID: 4441128441706443110}
+  - component: {fileID: 5569035867498821211}
+  - component: {fileID: 9111845469325122143}
+  m_Layer: 7
   m_Name: Railgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78779,6 +78783,9 @@ MonoBehaviour:
   camHoldRot: {x: 0, y: 0, z: 0}
   leftHandPoint: {fileID: 1623619749}
   rightHandPoint: {fileID: 130340790}
+  useBattery: 1
+  fullBattery: 100
+  requireBattery: 100
   attackPoint: {fileID: 1872744174}
   atkDamage: 200
   attackRadius: 15
@@ -78792,7 +78799,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7793665065085116009}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 1372d8e8c764b4a4e8d7bd42e8b21122, type: 2}
   m_CullingMode: 0
@@ -78805,6 +78812,75 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6198723082606952577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7793665065085116009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: -2929468362774218006}
+  - {fileID: 9111845469325122143}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!65 &4441128441706443110
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7793665065085116009}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.58, y: 0.76, z: 2.48}
+  m_Center: {x: 0, y: 0, z: 0.48135868}
+--- !u!54 &5569035867498821211
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7793665065085116009}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &9111845469325122143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7793665065085116009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 0
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &8111163682346875111
 GameObject:
   m_ObjectHideFlags: 0
@@ -78816,7 +78892,7 @@ GameObject:
   - component: {fileID: 8111163682346875110}
   - component: {fileID: 8111163682346875128}
   - component: {fileID: 8111163682346875129}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Lighting
   m_TagString: Untagged
   m_Icon: {fileID: 0}

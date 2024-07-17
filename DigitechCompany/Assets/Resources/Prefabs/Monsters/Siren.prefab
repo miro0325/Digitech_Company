@@ -708,7 +708,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 513
+    m_Bits: 520
 --- !u!136 &6121198176053118049
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -42,7 +42,7 @@ MonoBehaviour:
     - ChestPress
     - PowerStrip
     - Coffee
-    - RailGun
+    - Railgun
     values:
     - key: Shovel
       name: "\uC0BD"
@@ -330,7 +330,7 @@ MonoBehaviour:
         \uB3D9\uC548 \uC2A4\uD14C\uBBF8\uB098\uAC00 \uC18C\uBAA8\uB418\uC9C0 \uC54A\uB294\uB2E4.
         (1\uD68C\uC6A9)"
       isAvailable: 0
-    - key: RailGun
+    - key: Railgun
       name: "\uB808\uC77C\uAC74"
       weight: 60
       sellPriceMin: 0

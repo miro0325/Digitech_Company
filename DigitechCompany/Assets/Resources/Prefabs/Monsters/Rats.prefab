@@ -1044,7 +1044,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 513
+    m_Bits: 520
 --- !u!195 &3697752146121768886
 NavMeshAgent:
   m_ObjectHideFlags: 0
