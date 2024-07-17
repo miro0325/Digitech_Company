@@ -67,6 +67,11 @@ public class InMap : MonoBehaviour
         return viewids;
     }
 
+    public List<int> GetDoorViewIDs()
+    {
+        return doors.Select(door => door.photonView.ViewID).ToList();
+    }
+
     public void ReBindDoors(List<int> viewids)
     {
         var count = 0;
@@ -75,5 +80,10 @@ public class InMap : MonoBehaviour
             door.photonView.ViewID = viewids[count];
             count++;
         }
+    }
+
+    public void SetActiveDoors(bool active)
+    {
+        foreach(var door in doors) door.gameObject.SetActive(active);
     }
 }
