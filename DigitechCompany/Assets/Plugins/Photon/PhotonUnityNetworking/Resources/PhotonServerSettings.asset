@@ -132,6 +132,8 @@ MonoBehaviour:
   - SendChangePlanetToAllRpc
   - ChangeHeadRPC
   - ReturnOriginTextureRPC
+  - SetBatteryRPC
+  - SetFullBatteryRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
