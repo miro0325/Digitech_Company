@@ -347,7 +347,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         {
             curHandItemViewId.Value = item.photonView.ViewID;
 
-            if (input.Player.Interact.WasPressedThisFrame() && lookInteractable != null)
+            if (input.Player.Interact.WasPressedThisFrame())
             {
                 var interactId = (InteractID)(int)input.Player.Interact.ReadValue<float>();
                 if (item.IsUsable(interactId))
