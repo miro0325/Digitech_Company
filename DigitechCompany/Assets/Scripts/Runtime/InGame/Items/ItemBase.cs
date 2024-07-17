@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Photon.Pun;
 using UniRx;
 using UnityEngine;
@@ -24,7 +25,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     [SerializeField] protected float curBattery;
 
     //field
-
+    protected bool inSellArea;
     protected float layRotation;
     protected float sellPrice;
     protected string key;
@@ -37,6 +38,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     //property
     protected UnitBase OwnUnit { get; private set; }
 
+    public bool InSellArea => inSellArea;
     public bool InHand => ownUnitViewId.Value != 0;
     public bool UseBattery => useBattery;
     public virtual float SellPrice => sellPrice;
@@ -81,6 +83,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public virtual string GetInteractionExplain(UnitBase unit)
     {
+        if(inSellArea) return "";
+
         var player = unit as InGamePlayer;
         if (player)
         {
@@ -96,6 +100,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public virtual bool IsInteractable(UnitBase unit)
     {
+        if(inSellArea) return false;
+
         var player = unit as InGamePlayer;
         if (player)
         {

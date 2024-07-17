@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         photonView.RPC(nameof(SendJoinLoadDataToClientRpc), player, (int)SyncTarget.Player, DictionaryJsonUtility.ToJson(playerDatas));
         photonView.RPC(nameof(SendJoinLoadDataToClientRpc), player, (int)SyncTarget.Item, itemManager.ItemDataJson);
         if (state == GameState.StartWait) photonView.RPC(nameof(SendJoinLoadDataToClientRpc), player, (int)SyncTarget.Map, null);
-        else photonView.RPC(nameof(SendJoinLoadDataToClientRpc), player, (int)SyncTarget.Map, $"{planet}\'{inMap?.GetDoorViewIDs().ToJson()}");
+        else photonView.RPC(nameof(SendJoinLoadDataToClientRpc), player, (int)SyncTarget.Map, $"{planet}\'{inMap.GetReAllocatedData()}");
     }
 
     [PunRPC]
@@ -224,7 +224,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 if (split[0] != "Company")
                 {
                     inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
-                    inMap.ReBindDoors(split[1].ToList<int>());
+                    inMap.ReBindPhotonViews(data);
+
                     inMap.SetActiveDoors(false);
                     surface.BuildNavMesh();
                     inMap.SetActiveDoors(true);
@@ -382,7 +383,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         //==================Map==================//
         outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
 
-        List<int> doorViewIds = new();
+        string mapReAllocatedData = "";
         if (planet != "Company")
         {
             inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
@@ -397,13 +398,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             surface.BuildNavMesh();
             await UniTask.NextFrame();
             inMap.SetActiveDoors(true);
-            doorViewIds = inMap.ReAllocateDoors();
+            mapReAllocatedData = inMap.ReAllocatePhotonViews();
         }
 
         basement.transform.SetParent(outMap.ArrivePoint);
         basement.transform.localEulerAngles = Vector3.zero;
 
-        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, doorViewIds.ToJson());
+        photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, mapReAllocatedData);
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         //==================Item==================//
@@ -429,18 +430,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     }
 
     [PunRPC]
-    private void SendGameDataLoadToClientRpc(int syncTarget, string datas)
+    private void SendGameDataLoadToClientRpc(int syncTarget, string data)
     {
-        GameDataLoadTask((SyncTarget)syncTarget, datas).Forget();
+        GameDataLoadTask((SyncTarget)syncTarget, data).Forget();
 
-        async UniTask GameDataLoadTask(SyncTarget syncTarget, string datas)
+        async UniTask GameDataLoadTask(SyncTarget syncTarget, string data)
         {
             switch (syncTarget)
             {
                 case SyncTarget.Player:
                     break;
                 case SyncTarget.Item:
-                    itemManager.SyncItem(datas);
+                    itemManager.SyncItem(data);
                     break;
                 case SyncTarget.Map:
                     outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{planet}"), new Vector3(0, 0, 0), Quaternion.identity);
@@ -458,7 +459,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                         surface.BuildNavMesh();
                         await UniTask.NextFrame();
 
-                        inMap.ReBindDoors(datas.ToList<int>());
+                        inMap.ReBindPhotonViews(data);
                     }
 
                     basement.transform.SetParent(outMap.ArrivePoint);

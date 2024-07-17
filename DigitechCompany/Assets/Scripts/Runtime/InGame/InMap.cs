@@ -6,13 +6,14 @@ using UnityEngine.AI;
 using System.Collections.Generic;
 using Photon.Pun;
 
-public class InMap : MonoBehaviour
+public class InMap : MonoBehaviour, IPVReAllocatable
 {
     [SerializeField] private MapMoveDoor toGround;
     [SerializeField] private Transform enterPoint;
     [SerializeField] private Door[] doors;
     [SerializeField] private Transform[] wayPoints;
     [SerializeField] private Bounds[] mapBounds;
+    [SerializeField] private PhotonView[] reAllocates;
     [SerializeField, HideInInspector] private Transform wayPointParent;
 
     public MapMoveDoor ToGround => toGround;
@@ -45,26 +46,7 @@ public class InMap : MonoBehaviour
             .ToArray();
 
         doors = GetComponentsInChildren<Door>();
-    }
-
-    public List<int> ReAllocateDoors()
-    {
-        List<int> viewids = new();
-
-        var count = 0;
-        foreach(var door in doors)
-        {
-            door.photonView.ViewID = 0;
-            if(PhotonNetwork.AllocateViewID(door.photonView))
-                viewids.Add(door.photonView.ViewID);
-            else
-            {
-                viewids.Add(0);
-                Debug.LogError($"Index: {count} door cannot allocate view id. return value set 0");
-            }
-            count++;
-        }
-        return viewids;
+        reAllocates = GetComponentsInChildren<PhotonView>();
     }
 
     public List<int> GetDoorViewIDs()
@@ -72,18 +54,34 @@ public class InMap : MonoBehaviour
         return doors.Select(door => door.photonView.ViewID).ToList();
     }
 
-    public void ReBindDoors(List<int> viewids)
-    {
-        var count = 0;
-        foreach(var door in doors)
-        {
-            door.photonView.ViewID = viewids[count];
-            count++;
-        }
-    }
-
     public void SetActiveDoors(bool active)
     {
         foreach(var door in doors) door.gameObject.SetActive(active);
+    }
+
+    public string ReAllocatePhotonViews()
+    {
+        List<int> result = new();
+        foreach(var pv in reAllocates)
+        {
+            pv.ViewID = 0;
+            result.Add(PhotonNetwork.AllocateViewID(pv) ? pv.ViewID : 0);
+        }
+        return result.ToJson();
+    }
+
+    public void ReBindPhotonViews(string allocatedDate)
+    {
+        List<int> data = allocatedDate.ToList<int>();
+        for(int i = 0; i < data.Count; i++)
+            if(data[i] != 0) reAllocates[i].ViewID = data[i];
+    }
+
+    public string GetReAllocatedData()
+    {
+        List<int> result = new();
+        foreach(var pv in reAllocates)
+            result.Add(pv.ViewID);
+        return result.ToJson();
     }
 }
