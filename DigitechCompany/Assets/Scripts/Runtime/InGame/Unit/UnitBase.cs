@@ -1,7 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 
-public abstract class UnitBase : NetworkObject,IDamagable
+public abstract class UnitBase : NetworkObject, IDamagable
 {
     [Header("BaseUnit")]
     [SerializeField] protected Transform itemHolder;
@@ -53,7 +53,6 @@ public abstract class UnitBase : NetworkObject,IDamagable
     
     public virtual void Damage(float damage, UnitBase attacker)
     {
-        if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
         photonView.RPC(nameof(SendDamageToOwnerRpc), photonView.Owner, damage);
     }
 

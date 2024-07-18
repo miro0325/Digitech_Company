@@ -688,7 +688,7 @@ GameObject:
   - component: {fileID: 8257041835514284939}
   - component: {fileID: 8196030308073028018}
   - component: {fileID: 1697515027840199758}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1523,7 +1523,7 @@ GameObject:
   - component: {fileID: 271763973392353172}
   - component: {fileID: 8826081632293059463}
   - component: {fileID: 4520810393294778480}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LeftDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2193,7 +2193,7 @@ GameObject:
   - component: {fileID: 1702061421138190924}
   - component: {fileID: 1358251036226325864}
   - component: {fileID: 8268925028096885366}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: RightDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

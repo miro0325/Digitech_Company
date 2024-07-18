@@ -8,6 +8,8 @@ using MSLIMA.Serializer;
 using Sherbert.Framework.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
+using DG.Tweening;
+using UnityEngine.UI;
 
 public enum SyncTarget
 {
@@ -117,12 +119,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //inspector
     [SerializeField] private NavMeshSurface surface;
     [SerializeField] private MeshRenderer[] rooms;
+    [SerializeField] private InGameFadeInUI fade;
 
     //field
     private float targetEarn;
     private float curEarn;
-    private float curUsableMoney;
-    private int remainDay;
+    private float curUsableMoney = 300;
+    private int remainDay = 3;
     private float dateTime;
     private int inGamePlayerViewId;
     private bool gameEndSign;
@@ -132,16 +135,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private OutMap outMap;
     private InMap inMap;
     private EarnData earnedData;
-    [SerializeField] private bool[] joinSyncCompleted = new bool[(int)SyncTarget.End];
-    [SerializeField] private SerializableDictionary<int, PlayerData> playerDatas = new();
+    private bool[] joinSyncCompleted = new bool[(int)SyncTarget.End];
+    private SerializableDictionary<int, PlayerData> playerDatas = new();
 
     //property
     public GameState State => state;
     public SerializableDictionary<int, PlayerData> PlayerDatas => playerDatas;
     public bool HasAlivePlayer => playerDatas.Where(p => p.Value.isAlive).Any();
     public EarnData EarnedData => earnedData;
+    public float TargetEarn => targetEarn;
+    public float CurEarn => curEarn;
+    public float CurUsableMoney => curUsableMoney;
+    public int RemainDay => remainDay;
 
     public event System.Action OnLoadComplete;
+
+    public void Consume(float value)
+    {
+        photonView.RPC(nameof(ConsumeRpc), RpcTarget.All, value);
+    }
+
+    [PunRPC]
+    private void ConsumeRpc(float value)
+    {
+        curUsableMoney -= value;
+    }
 
     public void Earn(string viewIdListJson)
     {
@@ -367,18 +385,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             }
             else
             {
+                remainDay--;
                 if (remainDay == 0)
                 {
                     if (curEarn < targetEarn)
                     {
-                        //failed
+                        FailureTask().Forget();
+                        return;
                     }
                     targetEarn += Random.Range(targetEarn, targetEarn * 2);
                     remainDay = 3;
-                }
-                else
-                {
-                    remainDay--;
                 }
             }
 
@@ -446,6 +462,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void DestoryMaps()
     {
         basement.transform.SetParent(null);
+        delivery.transform.SetParent(null);
+
         if (inMap) Destroy(inMap.gameObject);
         if (outMap) Destroy(outMap.gameObject);
     }
@@ -493,17 +511,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             testSpawner.SpawnMonsters(1, inMap.MapBounds, inMap.WayPoints);
             itemManager.SpawnItem(1, inMap.MapBounds);
-            itemManager.SpawnItem(new Vector3(29, 0, 29), "Railgun");
-            itemManager.SpawnItem(new Vector3(28, 0, 28), "Drill");
             testSpawner.SpawnWalls(inMap.WallPoints);
-        }
-        else
-        {
-            for (int i = 0; i < 8; i++)
-                itemManager.SpawnItem(Vector3.up, "Mop");
-            itemManager.SpawnItem(Vector3.up, "Drill");
-            itemManager.SpawnItem(Vector3.up, "Railgun");
-            itemManager.BuildItemDataJson();
         }
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
@@ -586,6 +594,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         }
     }
 
+    private async UniTask FailureTask()
+    {
+        await UniTask.WaitForSeconds(3f);
+        basement.RotateLight();
+
+        await UniTask.WaitForSeconds(3f);
+        basement.Explosion();
+        foreach(var player in playerDatas.Values)
+        {
+            PhotonView.Find(player.viewID).transform.DOMove(Random.onUnitSphere * 50, 3f).SetEase(Ease.Unset);
+        }
+        fade.FadeOut();
+    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -599,6 +621,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             }
             stream.SendNext(targetEarn);
             stream.SendNext(curEarn);
+            stream.SendNext(curUsableMoney);
+            stream.SendNext(remainDay);
         }
         else
         {
@@ -609,6 +633,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 playerDatas.Add((int)stream.ReceiveNext(), (PlayerData)stream.ReceiveNext());
             targetEarn = (float)stream.ReceiveNext();
             curEarn = (float)stream.ReceiveNext();
+            curUsableMoney = (float)stream.ReceiveNext();
+            remainDay = (int)stream.ReceiveNext();
         }
     }
 

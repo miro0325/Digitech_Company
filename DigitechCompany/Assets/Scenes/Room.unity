@@ -1781,6 +1781,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Delivary
       objectReference: {fileID: 0}
+    - target: {fileID: 3150181075303963112, guid: 37d65b6b4e4658b459ffd394b09fa786,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237402919401353199, guid: 37d65b6b4e4658b459ffd394b09fa786,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 14
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37d65b6b4e4658b459ffd394b09fa786, type: 3}
 --- !u!1001 &692848902034810308

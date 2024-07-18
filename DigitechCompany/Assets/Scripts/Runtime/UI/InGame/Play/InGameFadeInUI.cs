@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using UniRx;
 
 public class InGameFadeInUI : MonoBehaviour
 {
@@ -17,5 +18,12 @@ public class InGameFadeInUI : MonoBehaviour
                     .DOColor(default, 2f)
                     .OnComplete(() => gameObject.SetActive(false));
             };
+    }
+
+    public void FadeOut()
+    {
+        gameObject.SetActive(true);
+        GetComponent<Image>()
+            .DOColor(Color.black, 2f);
     }
 }

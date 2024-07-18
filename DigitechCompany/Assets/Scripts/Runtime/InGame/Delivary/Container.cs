@@ -22,8 +22,9 @@ public class Container : MonoBehaviourPun
                     Random.Range(-holder.localScale.y / 2, holder.localScale.y / 2),
                     Random.Range(-holder.localScale.z / 2, holder.localScale.z / 2)
                 );
-            var pv = NetworkObject.Instantiate($"Prefabs/Items/{item}").photonView;
-            photonView.RPC(nameof(SetPositionRpc), RpcTarget.All, pv.ViewID, spawnPos);
+            var instance = NetworkObject.Instantiate($"Prefabs/Items/{item}") as ItemBase;
+            instance.Initialize(item);
+            photonView.RPC(nameof(SetPositionRpc), RpcTarget.All, instance.photonView.ViewID, spawnPos);
         }
     }
 

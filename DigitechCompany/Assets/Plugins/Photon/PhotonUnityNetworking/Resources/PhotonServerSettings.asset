@@ -139,6 +139,9 @@ MonoBehaviour:
   - EarnRpc
   - SetParentRpc
   - OrderRpc
+  - ExplosionRpc
+  - RotateLightRpc
+  - ConsumeRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

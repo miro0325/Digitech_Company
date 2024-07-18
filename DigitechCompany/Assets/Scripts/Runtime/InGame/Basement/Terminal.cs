@@ -19,6 +19,7 @@ namespace Basements
         private bool isMoving = false;
         
         [Header("Console Input")]
+        [SerializeField] private TextMeshProUGUI money;
         [SerializeField] private TMP_InputField consoleInput;
         [SerializeField] private TextMeshProUGUI explainText;
         [SerializeField] private bool isConnectTerminal = false;
@@ -60,6 +61,7 @@ namespace Basements
         private void Update()
         {
             InputKey();
+            money.text = $"${ServiceLocator.For(this).Get<GameManager>().CurUsableMoney}";
         }
 
         private void InputKey()

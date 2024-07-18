@@ -40,10 +40,13 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public bool InSellArea => inSellArea;
     public bool InHand => ownUnitViewId.Value != 0;
-    public bool UseBattery => useBattery;
     public virtual float SellPrice => sellPrice;
     public float LayRotation => layRotation;
     public string Key => key;
+    public bool UseBattery => useBattery;
+    public float FullBattery => fullBattery;
+    public float RequireBattery => requireBattery;
+    public float CurBattery => curBattery;
     public Transform LeftHandPoint => leftHandPoint;
     public Transform RightHandPoint => rightHandPoint;
     public ItemData ItemData => dataContainer.loadData.itemDatas[key];

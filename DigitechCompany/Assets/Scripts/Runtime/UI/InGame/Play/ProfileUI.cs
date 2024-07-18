@@ -20,5 +20,16 @@ public class ProfileUI : MonoBehaviour
 
         hp.color = new Color(1, 0, 0, DOVirtual.EasedValue(0, 0.75f, 1 - (player.CurStats.GetStat(Stats.Key.Hp) / player.MaxStats.GetStat(Stats.Key.Hp)), Ease.InQuad));
         stamina.fillAmount = player.CurStats.GetStat(Stats.Key.Stamina) / player.MaxStats.GetStat(Stats.Key.Stamina);
+        
+        var item = player.Inventory.GetCurrentSlotItem();
+        if(item != null && item.UseBattery)
+        {
+            itemBattery.gameObject.SetActive(true);
+            itemBattery.fillAmount = item.CurBattery / item.FullBattery;
+        }
+        else
+        {
+            itemBattery.gameObject.SetActive(false);
+        }
     }
 }

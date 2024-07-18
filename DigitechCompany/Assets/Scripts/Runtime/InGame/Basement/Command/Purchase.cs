@@ -10,6 +10,8 @@ public class Purchase : Command
 {
     private Delivery _delivery;
     private Delivery delivery => _delivery ??= ServiceLocator.ForSceneOf("InGame").Get<Delivery>();
+    private DataContainer dataContainer => ServiceLocator.GetEveryWhere<DataContainer>();
+    private GameManager gameManager => ServiceLocator.GetEveryWhere<GameManager>();
     
     // public override string[] Aliases
     // {
@@ -49,6 +51,8 @@ public class Purchase : Command
         int count = 1;
         if(int.TryParse(args[0], out int c))
             count = c;
+        
+        gameManager.Consume(dataContainer.loadData.itemDatas[cmd].buyPrice);
         delivery.Order(cmd, count);
         return GetExplainText(cmd,args);
     }

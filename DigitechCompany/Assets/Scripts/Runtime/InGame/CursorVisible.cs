@@ -13,12 +13,12 @@ public class CursorVisible : MonoBehaviour, IService
 
     private void Start()
     {
-        //input
-        //    .ObserveEveryValueChanged(i => i.Player.enabled)
-        //    .Subscribe(enabled => 
-        //    {
-        //        Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
-        //        Cursor.visible = !enabled;
-        //    });
+        input
+           .ObserveEveryValueChanged(i => i.Player.enabled)
+           .Subscribe(enabled => 
+           {
+               Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
+               Cursor.visible = !enabled;
+           });
     }
 }
