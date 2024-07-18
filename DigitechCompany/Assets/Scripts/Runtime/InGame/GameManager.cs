@@ -495,6 +495,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             itemManager.SpawnItem(1, inMap.MapBounds);
             itemManager.SpawnItem(new Vector3(29, 0, 29), "Railgun");
             itemManager.SpawnItem(new Vector3(28, 0, 28), "Drill");
+            itemManager.SpawnItem(new Vector3(27, 0, 27), "Flashlight");
             testSpawner.SpawnWalls(inMap.WallPoints);
         }
         else
@@ -503,6 +504,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 itemManager.SpawnItem(Vector3.up, "Mop");
             itemManager.SpawnItem(Vector3.up, "Drill");
             itemManager.SpawnItem(Vector3.up, "Railgun");
+            itemManager.SpawnItem(Vector3.up, "Flashlight");
             itemManager.BuildItemDataJson();
         }
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
