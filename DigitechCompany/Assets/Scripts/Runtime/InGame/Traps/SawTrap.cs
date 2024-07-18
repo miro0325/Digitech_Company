@@ -26,17 +26,17 @@ public class SawTrap : NetworkObject, IPunObservable
 
     private async UniTask MoveRoutine()
     {
-        while(true)
+        while (true)
         {
             transform.position = Vector3.MoveTowards(transform.position, points[curPointIndex], speed * Time.deltaTime);
 
-            if(Vector3.Distance(transform.position, points[curPointIndex]) < speed * Time.deltaTime * 1.1f)
+            if (Vector3.Distance(transform.position, points[curPointIndex]) < speed * Time.deltaTime * 1.1f)
             {
-                curPointIndex++; 
-                if(curPointIndex >= points.Length)
+                curPointIndex++;
+                if (curPointIndex >= points.Length)
                     curPointIndex = 0;
-                
-                await UniTask.WaitForSeconds(waitTime);
+
+                await UniTask.WaitForSeconds(waitTime, cancellationToken: this.GetCancellationTokenOnDestroy());
             }
             await UniTask.NextFrame();
         }
@@ -44,13 +44,13 @@ public class SawTrap : NetworkObject, IPunObservable
 
     private void OnDrawGizmosSelected()
     {
-        for(int i = 0; i < points.Length - 1; i++)
+        for (int i = 0; i < points.Length - 1; i++)
             DebugArrow.DrawGizmos(points[i], points[i + 1], Color.red);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if(stream.IsWriting)
+        if (stream.IsWriting)
         {
             stream.SendNext(curPointIndex);
         }

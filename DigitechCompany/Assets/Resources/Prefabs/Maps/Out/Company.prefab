@@ -827,6 +827,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e63b8857e5f59414e9d950c48e6f6ea1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  reAllocates:
+  - {fileID: 6317926141515170925}
   environmentSetting:
     morning: {fileID: 2100000, guid: 135a7036ca1a07b4e9e162d80e6b6e77, type: 2}
     midnight: {fileID: 2100000, guid: 135a7036ca1a07b4e9e162d80e6b6e77, type: 2}
