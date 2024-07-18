@@ -4,7 +4,9 @@ using UnityEngine;
 
 public enum Sound
 {
-
+    Drill_Attack,bus_bell,Gear_shift,lets_GO,Mop_Attack,Player_Run,Player_Walking,Railgun_Attack,Shovel_Attack,
+   Rats_Attack,Rats_Run,factory_vent_outside,factory_vent_inside,Siren_Attack,Spider_Attack,spider_steps,Bear_Trap,broken_wall,Craymore_Main
+    
 }
 
 public class SoundManager : MonoBehaviour, IService
