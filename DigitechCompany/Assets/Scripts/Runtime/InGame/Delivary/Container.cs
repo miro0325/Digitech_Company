@@ -54,7 +54,7 @@ public class Container : MonoBehaviourPun
 
     private void OnTriggerExit(Collider other)
     {
-        if (ReferenceEquals(other.transform.parent, holder))
+        if (other.transform.parent == transform)
         {
             other.transform.SetParent(null);
             if(other.TryGetComponent<InGamePlayer>(out var player))

@@ -8,6 +8,9 @@ using UniRx;
 
 public class Siren : MonsterBase
 {
+        private SoundManager soundManager => ServiceLocator.GetEveryWhere<SoundManager>();
+
+
     private enum SirenState
     {
         Searching, Attack, RunAway, Death
@@ -129,7 +132,7 @@ public class Siren : MonsterBase
             Color color = Color.white * 5;
             meshRenderer.materials[1].SetColor("_EmissionColor", color);
             head.gameObject.SetActive(true);
-
+            soundManager.PlaySound(Sound.Siren_Attack, transform.position, 1f);
         }
         else
         {

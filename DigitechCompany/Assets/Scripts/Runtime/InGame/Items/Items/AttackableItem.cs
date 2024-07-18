@@ -7,6 +7,8 @@ using System;
 
 public class AttackableItem : ItemBase, IInteractable
 {
+    private SoundManager soundManager => ServiceLocator.GetEveryWhere<SoundManager>();
+
     //static
     protected static int Animator_AttackHash = Animator.StringToHash("attack");
     protected static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
@@ -126,22 +128,15 @@ public class AttackableItem : ItemBase, IInteractable
 
     public virtual void OnAttack()
     {
-        RaycastHit[] hits = Physics.BoxCastAll(OwnUnit.EyeLocation.position, new Vector3(0.5f,0.5f,0.5f),OwnUnit.EyeLocation.forward,OwnUnit.EyeLocation.rotation,attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
+        soundManager.PlaySound(Sound.Shovel_Attack, transform.position, 1f);
+        var hits = Physics.OverlapBox(OwnUnit.EyeLocation.position, new Vector3(0.5f,0.5f,0.5f),OwnUnit.EyeLocation.rotation, LayerMask.GetMask("Player","Monster","Damagable"));
         foreach (var hit in hits)
         {
-            var entity = hit.collider.GetComponent<IDamagable>();
+            if(!hit.TryGetComponent<IDamagable>(out var damagable)) continue;
+            if (OwnUnit.gameObject == damagable.OwnObject) continue;
+            if (damagable.IsInvulnerable) continue;
 
-            if(OwnUnit.gameObject == entity.OwnObject) continue;
-            if (entity.IsInvulnerable) continue;
-            if(entity is InGamePlayer)
-            {
-                hit.collider.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
-            }
-            else
-            {
-                Debug.Log(entity.OwnObject.name);
-                entity.Damage(atkDamage, OwnUnit);
-            }
+            damagable.Damage(atkDamage, OwnUnit);
             break;
         }
     }
