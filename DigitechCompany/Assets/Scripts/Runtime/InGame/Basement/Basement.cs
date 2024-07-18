@@ -119,18 +119,25 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
         {
             other.transform.SetParent(transform);
 
-            if (other.TryGetComponent<ItemBase>(out var comp))
+            if (other.TryGetComponent<ItemBase>(out var item))
             {
-                wholeItems.TryAdd(comp.photonView.ViewID, comp);
-                curGameItems.TryAdd(comp.photonView.ViewID, comp);
+                wholeItems.TryAdd(item.photonView.ViewID, item);
+                curGameItems.TryAdd(item.photonView.ViewID, item);
             }
+
+            if(other.TryGetComponent<InGamePlayer>(out var player))
+                player.SetParent(photonView.ViewID);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (ReferenceEquals(other.transform.parent, transform))
+        {
             other.transform.SetParent(null);
+            if(other.TryGetComponent<InGamePlayer>(out var player))
+                player.SetParent(0);
+        }
     }
 
     private void Update()

@@ -75,31 +75,41 @@ public class AttackableItem : ItemBase, IInteractable
         animator.enabled = true;
         isUsePressed.Value = true;
         isUsing = true;
+
+        photonView.RPC(nameof(OnUsePressedRpc), RpcTarget.All, (int)id);
+    }
+
+    [PunRPC]
+    protected override void OnUsePressedRpc(int id)
+    {
+        animator.enabled = true;
+        isUsePressed.Value = true;
     }
 
     public override void OnUseReleased()
     {
         isUsePressed.Value = false;
+        photonView.RPC(nameof(OnUseReleasedRpc), RpcTarget.All);
     }
 
-    public override void OnInactive()
+    [PunRPC]
+    protected override void OnUseReleasedRpc()
     {
-        base.OnInactive();
-        animator.enabled = false;
         isUsePressed.Value = false;
     }
 
-    // protected override void OnSendData(List<Func<object>> send)
-    // {
-    //     base.OnSendData(send);
-    //     send.Add(() => isUsePressed.Value);
-    // }
+    public override void OnDiscard()
+    {
+        animator.enabled = false;
+        base.OnDiscard();
+    }
 
-    // protected override void OnReceiveData(List<Action<object>> receive)
-    // {
-    //     base.OnReceiveData(receive);
-    //     receive.Add(obj => isUsePressed.Value = (bool)obj);
-    // }
+    [PunRPC]
+    protected override void OnDiscardRpc()
+    {
+        animator.enabled = false;
+        base.OnDiscardRpc();
+    }
 
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

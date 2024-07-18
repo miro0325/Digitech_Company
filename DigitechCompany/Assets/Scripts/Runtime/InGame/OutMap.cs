@@ -22,6 +22,7 @@ public class OutMap : MonoBehaviour, IPVReAllocatable
     public MapMoveDoor ToMap => toMap;
     public Transform EnterPoint => enterPoint;
     public Transform ArrivePoint => arrivePoint;
+    public Transform DeliveryPoint => deliveryPoint;
     public EnvironmentSetting EnvirSetting => environmentSetting;
 
     public string ReAllocatePhotonViews()

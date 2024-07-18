@@ -62,10 +62,8 @@ public abstract class UnitBase : NetworkObject,IDamagable
     {
         if (curStats.GetStat(Stats.Key.Hp) <= 0) return;
         curStats.SetStat(Stats.Key.Hp, x => x - damage);
-        if (curStats.GetStat(Stats.Key.Hp) <= 0)
-        {
-            Death();
-        }
+
+        if (curStats.GetStat(Stats.Key.Hp) <= 0) Death();
     }
 
     protected virtual void Death()

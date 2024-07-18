@@ -1,14 +1,8 @@
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UniRx;
-using System.Collections;
 using DG.Tweening;
-using UnityEngine.Animations.Rigging;
-using System;
-using UnityEngine.InputSystem;
 using UniRx.Triggers;
-using UnityEngine.InputSystem.Composites;
 using Cysharp.Threading.Tasks;
 
 public enum InteractID
@@ -52,12 +46,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     [SerializeField] private Transform scanSphere;
 
     //field
+    private int parentPVID;
     private bool isRun;
     private bool isCrouch;
     private bool isGround;
     private bool isJump;
     private bool isDie = true;
-    private bool isInBasement = true;
     private bool isInMap;
     private float velocityY;
     private float camRotateX;
@@ -92,6 +86,17 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
     public InGamePlayerAnimator Animator => animator;
+
+    public void SetParent(int pvid)
+    {
+        photonView.RPC(nameof(SetParentRpc), RpcTarget.All, pvid);
+    }
+
+    [PunRPC]
+    private void SetParentRpc(int pvid)
+    {
+        parentPVID = pvid;
+    }
 
     public void SetInMap(bool @in)
     {
@@ -137,9 +142,9 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         if (photonView.IsMine)
         {
-            animator.SetActiveArmModel(true);
-            animator.SetActivePlayerModel(false);
             animator.SetEnableRagDoll(false);
+            animator.SetActivePlayerModel(false);
+            animator.SetActiveArmModel(true);
 
             input.Player.Enable();
             gameObject.SetActive(true);
@@ -154,6 +159,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
         isDie = false;
         animator.SetEnableRagDoll(false);
+        animator.SetActiveArmModel(false);
         animator.SetActivePlayerModel(true);
         gameObject.SetActive(true);
     }
@@ -222,17 +228,12 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     {
         Debug.Log(gameObject.scene.name);
         this
-            .ObserveEveryValueChanged(t => t.isInBasement)
+            .ObserveEveryValueChanged(t => t.parentPVID)
             .Subscribe(x =>
             {
-                Debug.Log(basement);
-                if (isInBasement) transform.SetParent(basement.transform);
-                else transform.SetParent(null);
+                if (x == 0) transform.SetParent(null);
+                else transform.SetParent(PhotonView.Find(x).transform);
             });
-
-        transform
-            .ObserveEveryValueChanged(t => transform.parent)
-            .Subscribe(parent => isInBasement = ReferenceEquals(parent, basement.transform));
     }
 
     private void Update()
@@ -548,14 +549,14 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(isDie);
-            stream.SendNext(isInBasement);
+            stream.SendNext(parentPVID);
             stream.SendNext(gameObject.activeSelf);
             stream.SendNext(curHandItemViewId.Value);
         }
         else
         {
             isDie = (bool)stream.ReceiveNext();
-            isInBasement = (bool)stream.ReceiveNext();
+            parentPVID = (int)stream.ReceiveNext();
             gameObject.SetActive((bool)stream.ReceiveNext());
             curHandItemViewId.Value = (int)stream.ReceiveNext();
         }

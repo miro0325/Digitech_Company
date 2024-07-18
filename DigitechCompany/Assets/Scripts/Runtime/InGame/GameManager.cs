@@ -109,6 +109,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private InGamePlayer player => _player ??= ServiceLocator.For(this).Get<InGamePlayer>();
     private Basement _basement;
     private Basement basement => _basement ??= ServiceLocator.For(this).Get<Basement>();
+    private Delivery _delivery;
+    private Delivery delivery => _delivery ??= ServiceLocator.For(this).Get<Delivery>();
     private SkyProcessor _skyProcessor;
     private SkyProcessor skyProcessor => _skyProcessor ??= ServiceLocator.For(this).Get<SkyProcessor>();
 
@@ -119,6 +121,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     //field
     private float targetEarn;
     private float curEarn;
+    private float curUsableMoney;
     private int remainDay;
     private float dateTime;
     private int inGamePlayerViewId;
@@ -149,7 +152,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     private void EarnRpc(string viewIdListJson)
     {
         var viewidList = viewIdListJson.ToList<int>();
-        if(viewidList.Count == 0) return;
+        if (viewidList.Count == 0) return;
 
         var items = viewidList
             .Select(viewid => PhotonView.Find(viewid).GetComponent<ItemBase>())
@@ -157,6 +160,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
         var sum = items.Select(item => item.SellPrice).Sum();
         curEarn += sum;
+        curUsableMoney += sum;
 
         earnedData = new EarnData() { gameTime = Time.time, items = items, wholeEarn = sum };
     }
@@ -189,7 +193,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         await UniTask.WaitUntil(() => !joinSyncCompleted.Where(synced => synced == false).Any());
 
         inGamePlayerViewId = NetworkObject.Instantiate("Prefabs/Player", basement.transform.position, Quaternion.identity).photonView.ViewID;
-        player.transform.SetParent(basement.transform);
+        player.SetParent(basement.photonView.ViewID);
         photonView.RPC(nameof(SendPlayerJoinToAllRpc), RpcTarget.All, PhotonNetwork.LocalPlayer, inGamePlayerViewId);
         photonView.RPC(nameof(SendRequestGameStateToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer);
     }
@@ -254,11 +258,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                         var player = NetworkObject.Sync("Prefabs/Player", kvp.Value.viewID) as InGamePlayer;
                         if (!kvp.Value.isAlive)
                         {
-                            player.Animator.SetEnableRagDoll(false);
+                            player.Animator.SetEnableRagDoll(true);
                         }
                         else
                         {
                             player.Animator.SetActiveArmModel(false);
+                            player.Animator.SetEnableRagDoll(false);
                             player.Animator.SetActivePlayerModel(true);
                         }
                     }
@@ -391,7 +396,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
             await UniTask.WaitUntil(() => gameStartSign, cancellationToken: this.GetCancellationTokenOnDestroy());
 
             state = GameState.Load;
-            await UniTask.WaitForSeconds(0.25f,cancellationToken: this.GetCancellationTokenOnDestroy());
+            await UniTask.WaitForSeconds(0.25f, cancellationToken: this.GetCancellationTokenOnDestroy());
             await InitializeGameAndRequestLoad();
 
             //Wait until all player sync complete
@@ -475,6 +480,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         basement.transform.SetParent(outMap.ArrivePoint);
         basement.transform.localEulerAngles = Vector3.zero;
 
+        delivery.transform.SetParent(outMap.DeliveryPoint);
+        delivery.transform.SetLocalPositionAndRotation(new Vector3(0, 100, 0), Quaternion.Euler(0, 0, 0));
+
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Map, $"{planet}\'{outMap?.GetReAllocatedData()}\'{inMap?.GetReAllocatedData()}");
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
@@ -485,14 +493,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             testSpawner.SpawnMonsters(1, inMap.MapBounds, inMap.WayPoints);
             itemManager.SpawnItem(1, inMap.MapBounds);
-            itemManager.SpawnItem(new Vector3(29,0,29), "Railgun");
+            itemManager.SpawnItem(new Vector3(29, 0, 29), "Railgun");
             itemManager.SpawnItem(new Vector3(28, 0, 28), "Drill");
             testSpawner.SpawnWalls(inMap.WallPoints);
         }
         else
         {
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
                 itemManager.SpawnItem(Vector3.up, "Mop");
+            itemManager.SpawnItem(Vector3.up, "Drill");
+            itemManager.SpawnItem(Vector3.up, "Railgun");
             itemManager.BuildItemDataJson();
         }
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
@@ -522,7 +532,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                     outMap = Instantiate(Resources.Load<OutMap>($"Prefabs/Maps/Out/{split[0]}"), new Vector3(0, 0, 0), Quaternion.identity);
                     outMap.ReBindPhotonViews(split[1]);
 
-                    if (planet != "Company")
+                    if (split[0] != "Company")
                     {
                         inMap = Instantiate(Resources.Load<InMap>("Prefabs/Maps/In/Map"), new Vector3(0, -50, 0), Quaternion.identity);
                         inMap.ReBindPhotonViews(split[2]);
@@ -539,6 +549,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
                     basement.transform.SetParent(outMap.ArrivePoint);
                     basement.transform.localEulerAngles = Vector3.zero;
+
+                    delivery.transform.SetParent(outMap.DeliveryPoint);
+                    delivery.transform.SetLocalPositionAndRotation(new Vector3(0, 100, 0), Quaternion.Euler(0, 0, 0));
                     break;
             }
             photonView.RPC(nameof(SendLoadCompleteToOwnerRpc), photonView.Owner, PhotonNetwork.LocalPlayer, syncTarget);

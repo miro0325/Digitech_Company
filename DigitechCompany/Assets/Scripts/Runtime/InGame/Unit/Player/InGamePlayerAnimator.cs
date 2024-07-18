@@ -54,13 +54,14 @@ public class InGamePlayerAnimator : MonoBehaviourPun, IPunObservable
             });
 
         playerModelRenderers = playerModelAnimator.GetComponentsInChildren<SkinnedMeshRenderer>();
-        playerModelRigidbodys = playerModelAnimator.GetComponentsInChildren<Rigidbody>();
+        if(playerModelRigidbodys == null) playerModelRigidbodys = playerModelAnimator.GetComponentsInChildren<Rigidbody>();
     }
 
     public void SetEnableRagDoll(bool enabled)
     {
+        if(playerModelRigidbodys == null) playerModelRigidbodys = playerModelAnimator.GetComponentsInChildren<Rigidbody>();
+        playerModelRigidbodys.For((i, ele) => ele.isKinematic = !enabled);
         hip.transform.localPosition = Vector3.zero;
-        playerModelRigidbodys?.For((i, ele) => ele.isKinematic = !enabled);
     }
 
     public void SetActivePlayerModel(bool active)

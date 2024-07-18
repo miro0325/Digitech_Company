@@ -322,42 +322,42 @@ PrefabInstance:
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: -0.0000014603138
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 589156286224792225, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
@@ -372,7 +372,17 @@ PrefabInstance:
     - target: {fileID: 589156286224792238, guid: 37d65b6b4e4658b459ffd394b09fa786,
         type: 3}
       propertyPath: m_Name
-      value: Delivary
+      value: Delivery
+      objectReference: {fileID: 0}
+    - target: {fileID: 3150181075303963112, guid: 37d65b6b4e4658b459ffd394b09fa786,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237402919401353199, guid: 37d65b6b4e4658b459ffd394b09fa786,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37d65b6b4e4658b459ffd394b09fa786, type: 3}
@@ -767,6 +777,7 @@ MonoBehaviour:
   - Rats
   - Siren
   curMonsters: []
+  curWalls: []
 --- !u!4 &1451083508
 Transform:
   m_ObjectHideFlags: 0
@@ -6159,6 +6170,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UI-InGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 1394255513407605132, guid: 72fefe0b64746b14e88b364800641757,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1989039690308540002, guid: 72fefe0b64746b14e88b364800641757,
         type: 3}

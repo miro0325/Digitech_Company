@@ -17,20 +17,6 @@ public class Railgun : AttackableItem
         chargeFX.Stop();
     }
 
-    protected override void SubscribeEvent()
-    {
-        isUsePressed
-            .Subscribe(b =>
-            {
-                if (b)
-                {
-                    animator.SetTrigger(Animator_AttackHash);
-                } 
-                animator.SetBool(Animator_AttackPressedHash, b);
-
-            });
-    }
-
     public override void OnUsePressed(InteractID id)
     {
         if (id != InteractID.ID2) return;
@@ -40,6 +26,8 @@ public class Railgun : AttackableItem
         isUsePressed.Value = true;
         isUsing = true;
         pressedTime = 0;
+
+        base.OnUsePressed(id);
     }
 
     public override void OnAttack()

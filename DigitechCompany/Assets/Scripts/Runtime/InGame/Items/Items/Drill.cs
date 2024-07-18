@@ -5,36 +5,6 @@ using UniRx;
 
 public class Drill : AttackableItem
 {
-
-    public override void OnCreate()
-    {
-        base.OnCreate();
-    }
-
-    protected override void SubscribeEvent()
-    {
-        isUsePressed
-            .Subscribe(b =>
-            {
-                if (b)
-                {
-                    animator.SetTrigger(Animator_AttackHash);
-                }
-                animator.SetBool(Animator_AttackPressedHash, b);
-
-            });
-    }
-
-    public override void OnUsePressed(InteractID id)
-    {
-        if (id != InteractID.ID2) return;
-        delayTime = 10f;
-        //Debug.Log("Ready");
-        animator.enabled = true;
-        isUsePressed.Value = true;
-        isUsing = true;
-    }
-
     public override void OnAttack()
     {
         //if (pressedTime < 2.5f) return;
@@ -58,24 +28,9 @@ public class Drill : AttackableItem
         }
     }
 
-    protected override void Update()
-    {
-        base.Update();
-        if (isUsing)
-        {
-        }
-        else
-        {
-        }
-        //if(isUsePressed.Value && isUsing)
-        //{
-        //    pressedTime += Time.deltaTime;
-        //}
-    }
-
-
     public void OnAttackAnimationStart()
     {
+
     }
 
     public override void OnAttackAnimationEnd()

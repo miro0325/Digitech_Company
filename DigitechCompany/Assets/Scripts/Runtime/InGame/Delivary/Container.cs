@@ -1,55 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class Container : MonoBehaviour
+[RequireComponent(typeof(PhotonView))]
+public class Container : MonoBehaviourPun
 {
-    [SerializeField] private Transform[] doors;
-    [SerializeField] private float pushSpeed;
-    [SerializeField] private Transform spawnRadius;
+    private ResourceLoader _resourceLoader;
+    private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
 
-    private List<ItemBase> items = new();
+    [SerializeField] private MeshRenderer spawnArea;
+    [SerializeField] private Transform holder;
+
+    public void SpawnItems(List<string> items)
+    {
+        foreach (var item in items)
+        {
+            var spawnPos =
+                new Vector3(
+                    Random.Range(-holder.localScale.x / 2, holder.localScale.x / 2),
+                    Random.Range(-holder.localScale.y / 2, holder.localScale.y / 2),
+                    Random.Range(-holder.localScale.z / 2, holder.localScale.z / 2)
+                );
+            var pv = NetworkObject.Instantiate($"Prefabs/Items/{item}").photonView;
+            photonView.RPC(nameof(SetPositionRpc), RpcTarget.All, pv.ViewID, spawnPos);
+        }
+    }
+
+    [PunRPC]
+    private void SetPositionRpc(int pvid, Vector3 spawnPos)
+    {
+        Debug.Log(spawnPos);
+        var item = PhotonView.Find(pvid);
+        item.transform.position = holder.transform.position + spawnPos;
+    }
+
+    public void DestoryRemainItems()
+    {
+        for(int i = holder.childCount - 1; i >= 0; i--)
+            Destroy(holder.GetChild(i).gameObject);
+    }
     
-    void Start()
+    private void OnTriggerStay(Collider other)
     {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
-    public void Seperate(List<ItemBase> itmeList)
-    {
-        items = itmeList;
-        Debug.Log(itmeList.Count);
-        SpawnItems();
-        transform.parent = null;
-        var r = gameObject.AddComponent<Rigidbody>();
-        r.mass = r.mass * 4;
-        DoorControl();
-        
-    }
-
-    private void SpawnItems()
-    {
-        foreach(var item in items)
+        if (other.transform.parent == null)
         {
-            var spawnPos = spawnRadius.position;
-            Debug.Log(item);
-            var spawnItem = Instantiate(item,spawnPos,Quaternion.identity);
-            
+            other.transform.SetParent(holder);
+            if(other.TryGetComponent<InGamePlayer>(out var player))
+                player.SetParent(photonView.ViewID);
         }
     }
 
-    private void DoorControl()
+    private void OnTriggerExit(Collider other)
     {
-        for(int i = 0; i < doors.Length; i++)
+        if (ReferenceEquals(other.transform.parent, holder))
         {
-            var r = doors[i].gameObject.AddComponent<Rigidbody>();
-            r.AddForce(transform.forward * pushSpeed);
+            other.transform.SetParent(null);
+            if(other.TryGetComponent<InGamePlayer>(out var player))
+                player.SetParent(0);
         }
-
     }
 }

@@ -8,8 +8,8 @@ using NaughtyAttributes;
 [CreateAssetMenu(menuName ="Command/Purchase")]
 public class Purchase : Command
 {
-    private ResourceLoader _resourceLoader;
-    private ResourceLoader resourceLoader => _resourceLoader ??= ServiceLocator.ForGlobal().Get<ResourceLoader>();
+    private Delivery _delivery;
+    private Delivery delivery => _delivery ??= ServiceLocator.ForSceneOf("InGame").Get<Delivery>();
     
     // public override string[] Aliases
     // {
@@ -45,29 +45,11 @@ public class Purchase : Command
 
     public override string Activate(string cmd, string[] args)
     {
-        if(args.Length == 0)
-        {
-            args = new string[1];
-            args[0] = "1";
-        }
-        List<ItemBase> list;
-        if(int.TryParse(args[0], out int count))
-        {
-            list = new List<ItemBase>(count);
-            for (int i = 0; i < count; i++)
-            {
-                if(TryGetItem(cmd, out var item))
-                    list.Add(item);
-            }
-        }
-        else //if args are not currect
-        {
-            list = new List<ItemBase>(1);
-            if(TryGetItem(cmd, out var item))
-                list.Add(item);
-            args[0] = "1";
-        }
-        // Delivary.Instance.AddDelivaryItems(list);
+        if(args.Length == 0) args = new string[1] { "1" };
+        int count = 1;
+        if(int.TryParse(args[0], out int c))
+            count = c;
+        delivery.Order(cmd, count);
         return GetExplainText(cmd,args);
     }
 
@@ -93,10 +75,4 @@ public class Purchase : Command
         }
         return txt;
     }
-
-    private bool TryGetItem(string key, out ItemBase item)
-    {
-        return resourceLoader.itemPrefabs.TryGetValue(key, out item);
-    }
-
 }
