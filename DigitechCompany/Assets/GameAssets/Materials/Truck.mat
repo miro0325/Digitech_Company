@@ -8,13 +8,13 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Truck
-  m_Shader: {fileID: 4800000, guid: 96c8c8b405b54fc44afa0e94a4b10e88, type: 3}
+  m_Shader: {fileID: 4800000, guid: 3dcfb4324f765e848ae759e788445bdd, type: 3}
   m_ValidKeywords:
-  - USE_BUMPMAP
-  - USE_SPECULAR
+  - _METALLICSPECGLOSSMAP
   m_InvalidKeywords:
   - SHADOWS_SCREEN
-  - _METALLICSPECGLOSSMAP
+  - USE_BUMPMAP
+  - USE_SPECULAR
   - _USEMAINLIGHT_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -27,6 +27,10 @@ Material:
     m_TexEnvs:
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: c52f8c75dd9c7574db32392df3842152, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BrushTex:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -46,6 +50,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -91,6 +99,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AdditionalLightStrength: 10
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -110,10 +119,18 @@ Material:
     - _EdgeSpecular: 1
     - _EdgeSpecularOffset: 1
     - _EnvironmentReflections: 1
+    - _ExtraSpecular: 0
+    - _FresnelIntensity: 1
+    - _FresnelSmooth: 0
+    - _FresnelThreshold: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _LightStrength: 1
+    - _MedBrushStrength: 0
+    - _MedSmooth: 0
+    - _MedThreshold: 0
+    - _MetalReflectProbeIntensity: 1
     - _Metallic: 0
     - _NormalStrength: 1
     - _OcclusionStrength: 1
@@ -121,13 +138,25 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _ReflectBrushStrength: 0
+    - _ReflectProbeIntensity: 1
+    - _ReflectProbeRotation: 0
+    - _ReflectSmooth: 0
+    - _ReflectThreshold: 0.593
     - _RimPower: 1
     - _RimThreshold: 1
+    - _ShadowBrushStrength: 0
+    - _ShadowSmooth: 0
+    - _ShadowThreshold: 0.678
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
+    - _SpecularIntensity: 1
+    - _SpecularSmooth: 0
+    - _SpecularThreshold: 0.245
     - _SrcBlend: 1
     - _Surface: 0
+    - _UseBrushTex: 0
     - _UseBumpMap: 1
     - _UseMainLight: 0
     - _UseShadowScreen: 1
@@ -141,9 +170,12 @@ Material:
     - _LightColor: {r: 1, g: 1, b: 1, a: 1}
     - _LightDir: {r: 0, g: 0, b: 0, a: 0}
     - _LightPos: {r: 0, g: 0, b: 0, a: 0}
+    - _MedColor: {r: 1, g: 1, b: 1, a: 1}
     - _Outline_Color: {r: 0, g: 0, b: 0, a: 1}
-    - _ShadowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ReflectColor: {r: 0.6132076, g: 0.6132076, b: 0.6132076, a: 1}
+    - _ShadowColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecularLightOffset: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &7655224640400755274
 MonoBehaviour:

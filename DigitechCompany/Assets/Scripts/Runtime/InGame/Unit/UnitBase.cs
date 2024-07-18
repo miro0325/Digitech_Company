@@ -33,7 +33,7 @@ public abstract class UnitBase : NetworkObject,IDamagable
 
     public abstract Stats BaseStats { get; }
 
-    public GameObject OwnObject => this.gameObject;
+    public virtual GameObject OwnObject => this.gameObject;
 
     public bool IsInvulnerable => IsDie;
 

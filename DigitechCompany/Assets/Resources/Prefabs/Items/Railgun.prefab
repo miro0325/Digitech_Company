@@ -78785,9 +78785,10 @@ MonoBehaviour:
   rightHandPoint: {fileID: 130340790}
   useBattery: 1
   fullBattery: 100
-  requireBattery: 100
+  requireBattery: 25
+  curBattery: 0
   attackPoint: {fileID: 1872744174}
-  atkDamage: 200
+  atkDamage: 300
   attackRadius: 15
   chargeFX: {fileID: 8111163682346875128}
   shootFX: {fileID: 7262677305623847669}
@@ -78828,7 +78829,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: -2929468362774218006}

@@ -12,6 +12,7 @@ public class InMap : MonoBehaviour, IPVReAllocatable
     [SerializeField] private Transform enterPoint;
     [SerializeField] private Door[] doors;
     [SerializeField] private Transform[] wayPoints;
+    [SerializeField] private Transform[] wallPoints;
     [SerializeField] private Bounds[] mapBounds;
     [SerializeField] private PhotonView[] reAllocates;
     [SerializeField, HideInInspector] private Transform wayPointParent;
@@ -21,6 +22,7 @@ public class InMap : MonoBehaviour, IPVReAllocatable
     public Door[] Doors => doors;
     public Bounds[] MapBounds => mapBounds;
     public Transform[] WayPoints => wayPoints;
+    public Transform[] WallPoints => wallPoints;
 
     // [Button]
     // private  void PreBuildWayPoint()

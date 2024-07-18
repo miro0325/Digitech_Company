@@ -142,7 +142,7 @@ public class Door : MonoBehaviourPun, IInteractable, IPunObservable
                 //calculate unit relative position
                 var dirToUnit = unit.transform.position - transform.parent.position;
                 float dot = Vector3.Dot(transform.parent.right, dirToUnit.normalized);
-                Debug.Log(dot);
+                //Debug.Log(dot);
                 
                 openRot = Quaternion.Euler(0, dot > 0 ? -openAngle : openAngle, 0);
                 doorState = DoorState.Open;

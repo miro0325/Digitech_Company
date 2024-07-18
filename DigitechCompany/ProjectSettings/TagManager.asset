@@ -17,8 +17,8 @@ TagManager:
   - Monster
   - Door
   - MonsterPath
-  - 
-  - 
+  - Damagable
+  - BrokenWall
   - 
   - 
   - 

@@ -250,6 +250,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ___DataContainer___
       objectReference: {fileID: 0}
+    - target: {fileID: 9192113893968700692, guid: d492e7eccb0e6a341aa1c099ba5c876b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9192113893968700695, guid: d492e7eccb0e6a341aa1c099ba5c876b,
         type: 3}
       propertyPath: m_RootOrder
@@ -374,6 +379,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ___CursorVisible___
       objectReference: {fileID: 0}
+    - target: {fileID: 3349609196275067691, guid: b422b41f47dad64449f9092dfbe2af09,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b422b41f47dad64449f9092dfbe2af09, type: 3}
 --- !u!1001 &315923633
@@ -387,6 +397,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ___NetworkObjectManager___
+      objectReference: {fileID: 0}
+    - target: {fileID: 1557538826250594424, guid: e170bdc52f4d6a748ae3994860699351,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1557538826250594429, guid: e170bdc52f4d6a748ae3994860699351,
         type: 3}
@@ -620,6 +635,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ___ResourceLoader___
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283910767631195089, guid: 48c954e469ceebe4d93f6df0223860d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3283910767631195090, guid: 48c954e469ceebe4d93f6df0223860d5,
         type: 3}

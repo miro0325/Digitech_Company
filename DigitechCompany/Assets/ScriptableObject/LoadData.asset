@@ -43,6 +43,7 @@ MonoBehaviour:
     - PowerStrip
     - Coffee
     - Railgun
+    - Drill
     values:
     - key: Shovel
       name: "\uC0BD"
@@ -340,3 +341,14 @@ MonoBehaviour:
       type: 1
       explain: "\uAD49\uC7A5\uD788 \uC13C \uC77C\uACA9\uC744 \uAC00\uD55C\uB2E4"
       isAvailable: 1
+    - key: Drill
+      name: "\uB4DC\uB9B4"
+      weight: 0
+      sellPriceMin: 0
+      sellPriceMax: 0
+      buyPrice: 0
+      isTwoHand: 1
+      type: 1
+      explain: "\uD2B9\uC815 \uBCBD\uC744 \uBD80\uC220 \uC218 \uC788\uC73C\uBA70,
+        \uACF5\uACA9\uC744 \uAC00"
+      isAvailable: 0

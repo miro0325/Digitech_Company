@@ -9,7 +9,8 @@ public class MonsterManager : MonoBehaviourPun, IService
     [SerializeField] Transform[] waypoints;
     [SerializeField] List<string> monsters = new List<string>();
     public List<MonsterBase> curMonsters = new();
-    
+    public List<BreakableWall> curWalls = new();
+
     public void SpawnMonsters()
     {
         foreach (var monster in curMonsters)
@@ -50,13 +51,33 @@ public class MonsterManager : MonoBehaviourPun, IService
 
                 if (NavMesh.SamplePosition(randomPos + Vector3.down * 50, out var hit, 3, ~0)) //~0 is all layer 
                 {
-                   
                     var randomMonsterKey = monsters[Random.Range(0, monsters.Count)];
-                    var monster = NetworkObject.Instantiate($"Prefabs/Monsters/{randomMonsterKey}",     hit.position, Quaternion.identity) as MonsterBase;
+                    var monster = NetworkObject.Instantiate($"Prefabs/Monsters/{randomMonsterKey}", hit.position, Quaternion.identity) as MonsterBase;
                     curMonsterAmount++;
                     monster.Inititalize(waypoints);
                     curMonsters.Add(monster);
                 }
+            }
+        }
+    }
+
+    public void SpawnWalls(Transform[] wallPoints)
+    {
+        foreach (var wall in curWalls)
+        {
+            if(wall != null)
+                NetworkObject.Destory(wall.photonView.ViewID);
+        }
+        curWalls.Clear();
+        foreach (var point in wallPoints)
+        {
+            if (NavMesh.SamplePosition(point.position, out var hit, 3, ~0)) //~0 is all layer 
+            {
+                    Debug.Log("Spawn Wall");
+
+                var wall = NetworkObject.Instantiate($"Prefabs/Objects/BreakableWall", hit.position, point.rotation) as BreakableWall;
+                wall.transform.position = hit.position + Vector3.up * (wall.transform.localScale.y / 2);
+                curWalls.Add(wall);
             }
         }
     }

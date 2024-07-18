@@ -46,23 +46,23 @@ public class Railgun : AttackableItem
     {
         //if (pressedTime < 2.5f) return;
         curBattery -= requireBattery;
-        shootFX.Play();
+        //shootFX.Play();
         RaycastHit[] hits = Physics.BoxCastAll(attackPoint.position, new Vector3(0.5f, 0.5f, 0.5f), attackPoint.forward, attackPoint.rotation, attackRadius, LayerMask.GetMask("Player", "Monster", "Damagable"));
         foreach (var hit in hits)
         {
             var entity = hit.collider.GetComponent<IDamagable>();
+            if(entity == null) continue;
             if (OwnUnit.gameObject == entity.OwnObject) continue;
             if (entity.IsInvulnerable) continue;
-            Debug.Log(entity.OwnObject.name);
             if (entity is InGamePlayer)
             {
                 hit.collider.GetComponent<InGamePlayer>().Damage(atkDamage, OwnUnit);
             }
             else
             {
+                Debug.Log(entity.OwnObject.name);
                 entity.Damage(atkDamage, OwnUnit);
             }
-            break;
         }
     }
 
@@ -77,9 +77,16 @@ public class Railgun : AttackableItem
         {
             chargeFX.Stop();
         }
-        if(isUsePressed.Value && isUsing)
-        {
-            pressedTime += Time.deltaTime;
-        }
+    }
+
+
+    public void OnAttackAnimationStart()
+    {
+        shootFX.Play();
+    }
+
+    public override void OnAttackAnimationEnd()
+    {
+        base.OnAttackAnimationEnd();
     }
 }

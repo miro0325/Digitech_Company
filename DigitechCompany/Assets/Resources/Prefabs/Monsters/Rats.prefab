@@ -1006,7 +1006,7 @@ MonoBehaviour:
   eyeLocation: {fileID: 0}
   fov: {fileID: 3697752146121768887}
   waypoints: []
-  tempSpeed: 5
+  tempSpeed: 4
   animator: {fileID: 3697752146121768874}
   attackPoint: {fileID: 0}
   attackRadius: 1
@@ -1019,7 +1019,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 520
   maxSearchCount: 3
-  itemDetectRange: 3
+  itemDetectRange: 2
   renderer: {fileID: 4290093288329407412}
   baseTexture: {fileID: 2800000, guid: 06a9eb70ce0135444b95aad37faf98cc, type: 3}
   madTexture: {fileID: 2800000, guid: 738b934e8c8b8fc4ea90610a8a0ad04e, type: 3}

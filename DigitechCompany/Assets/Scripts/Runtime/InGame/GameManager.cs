@@ -414,7 +414,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         {
             testSpawner.SpawnMonsters(1, inMap.MapBounds, inMap.WayPoints);
             itemManager.SpawnItem(1, inMap.MapBounds);
-            //itemManager.SpawnItem(player.transform.position, "Railgun");
+            itemManager.SpawnItem(new Vector3(29,0,29), "Railgun");
+            itemManager.SpawnItem(new Vector3(28, 0, 28), "Drill");
+            testSpawner.SpawnWalls(inMap.WallPoints);
         }
         else
         {
