@@ -16,6 +16,9 @@ TagManager:
   - Item
   - Monster
   - Door
+  - MonsterPath
+  - Damagable
+  - BrokenWall
   - 
   - 
   - 
@@ -34,10 +37,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - NonBakeNavmesh
   m_SortingLayers:
   - name: Default
     uniqueID: 0

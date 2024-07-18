@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e22d73e04d042499ba2e42259240c7, type: 3}
+  m_Name: Moons
+  m_EditorClassIdentifier: 
+  commandDatas:
+  - cmd: Moons
+    aliases:
+    - moons
+  explain: "\uC774\uB3D9 \uAC00\uB2A5\uD55C \uC9C0\uC5ED:\n\nDigitech\n> 523\uB144
+    \uC804, \uD3D0\uD5C8\uAC00 \uB41C \uB514\uC9C0\uD14D \uACE0\uB4F1\uD559\uAD50\n\nCompany\n>
+    \uBB3C\uAC74\uC744 \uD314 \uC218 \uC788\uB294 \uD68C\uC0AC"

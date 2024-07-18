@@ -49,7 +49,7 @@ public class LobbyRoomSlot : MonoBehaviour
 
     public void OnJoinedRoomFailed(short returnCode, string message)
     {
-        popupUI.Open($"规 立加 角菩\n{message}");
+        popupUI.Open($"规 立加 角菩\n{message}", new PopupUI.ButtonData("犬牢"));
     }
 
     public void Initialize(RoomInfo info)

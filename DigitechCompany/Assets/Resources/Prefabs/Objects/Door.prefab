@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3133006498100407322}
   - component: {fileID: 3133006498100407324}
   - component: {fileID: 3133006498100407325}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: door_case
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3133006498100407323}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 3133006498530678985}
   - component: {fileID: 3133006498530678987}
   - component: {fileID: 3133006498530678984}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: door_handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,7 +175,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3133006499109886490}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 3133006499891749473}
   - component: {fileID: 3133006499891749472}
   - component: {fileID: 3133006499891749475}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +251,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3133006499891749501}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

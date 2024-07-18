@@ -27,7 +27,7 @@ Material:
   - _NORMALMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -60,10 +60,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmissionTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -115,7 +111,7 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1.19
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.439
+    - _FresnelThreshold: 0.741
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -125,7 +121,7 @@ Material:
     - _MetalReflectProbeIntensity: 1.2
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _Outline_Bold: 0.1
+    - _Outline_Bold: 0.01
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
@@ -140,9 +136,9 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpecularIntensity: 1.4
+    - _SpecularIntensity: 1
     - _SpecularSmooth: 0
-    - _SpecularThreshold: 0.613
+    - _SpecularThreshold: 0.018
     - _SrcBlend: 1
     - _Surface: 0
     - _UseBrushTex: 0

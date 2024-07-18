@@ -582,7 +582,6 @@ GameObject:
   - component: {fileID: 4533226164529577545}
   - component: {fileID: -3897669536047213738}
   - component: {fileID: 8923223543857133881}
-  - component: {fileID: -6886395286883424787}
   m_Layer: 8
   m_Name: Spider
   m_TagString: Untagged
@@ -721,7 +720,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 520
 --- !u!114 &4533226164529577591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -735,6 +734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 0}
+  eyeLocation: {fileID: 0}
   fov: {fileID: 4533226164529577588}
   waypoints: []
   tempSpeed: 3
@@ -743,6 +743,7 @@ MonoBehaviour:
   attackRadius: 1.25
   attackRange: 0.75
   attackDamage: 10
+  curIndex: -1
   legs:
   - {fileID: 8307488114125364046}
   - {fileID: 8307488114922925101}
@@ -753,6 +754,7 @@ MonoBehaviour:
   - {fileID: 8307488113305371974}
   - {fileID: 8307488114960557876}
   rigBuilder: {fileID: 4533226164529577584}
+  state: 0
 --- !u!195 &4533226164529577590
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -760,7 +762,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3864811414245532875}
-  m_Enabled: 0
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.3
   m_Speed: 3.5
@@ -796,7 +798,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 4533226164529577591}
   - {fileID: -3897669536047213738}
-  - {fileID: -6886395286883424787}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -841,22 +842,6 @@ CapsuleCollider:
   m_Height: 1.68
   m_Direction: 2
   m_Center: {x: 0, y: 0.43, z: -0.29}
---- !u!114 &-6886395286883424787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3864811414245532875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4600804285405898879
 GameObject:
   m_ObjectHideFlags: 0
@@ -1616,7 +1601,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488113327284789
 GameObject:
@@ -1834,7 +1819,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488113850838454
 GameObject:
@@ -1920,7 +1905,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114009400496
 GameObject:
@@ -2006,7 +1991,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114179188163
 GameObject:
@@ -2061,7 +2046,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114572816958
 GameObject:
@@ -2391,7 +2376,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114922925099
 GameObject:
@@ -2446,7 +2431,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488114960557874
 GameObject:
@@ -2501,7 +2486,7 @@ MonoBehaviour:
   stepSpeed: 6
   isGround:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032
   debugColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8307488115021629156
 GameObject:

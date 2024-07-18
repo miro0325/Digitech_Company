@@ -25,8 +25,8 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SubtractiveShadowColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
+  m_SkyboxMaterial: {fileID: 2100000, guid: c1c961cbd00909b45b34d97fd7df5cbf, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.006013802, g: 0.06016229, b: 0.19518852, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -250,6 +250,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ___DataContainer___
       objectReference: {fileID: 0}
+    - target: {fileID: 9192113893968700692, guid: d492e7eccb0e6a341aa1c099ba5c876b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9192113893968700695, guid: d492e7eccb0e6a341aa1c099ba5c876b,
         type: 3}
       propertyPath: m_RootOrder
@@ -374,6 +379,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ___CursorVisible___
       objectReference: {fileID: 0}
+    - target: {fileID: 3349609196275067691, guid: b422b41f47dad64449f9092dfbe2af09,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b422b41f47dad64449f9092dfbe2af09, type: 3}
 --- !u!1001 &315923633
@@ -387,6 +397,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ___NetworkObjectManager___
+      objectReference: {fileID: 0}
+    - target: {fileID: 1557538826250594424, guid: e170bdc52f4d6a748ae3994860699351,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1557538826250594429, guid: e170bdc52f4d6a748ae3994860699351,
         type: 3}
@@ -620,6 +635,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ___ResourceLoader___
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283910767631195089, guid: 48c954e469ceebe4d93f6df0223860d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3283910767631195090, guid: 48c954e469ceebe4d93f6df0223860d5,
         type: 3}
@@ -1165,6 +1185,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI-Lobby
       objectReference: {fileID: 0}
+    - target: {fileID: 1354950479263320295, guid: 99667fae569bd3d48b9f9db67289465e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1354950479450604127, guid: 99667fae569bd3d48b9f9db67289465e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1334,6 +1359,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI-Multiplay
       objectReference: {fileID: 0}
+    - target: {fileID: 2131200777517184797, guid: acdf4c453b1f9fa40beba15b1fc5f8d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2131200777568138484, guid: acdf4c453b1f9fa40beba15b1fc5f8d5,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1463,6 +1493,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4239181648152911248, guid: 9069175d5efc5594b8d01f89c4805d81,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9069175d5efc5594b8d01f89c4805d81, type: 3}
 --- !u!1001 &5348858906747818172
@@ -1521,6 +1556,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UI-MultiplayOptionMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348858908566369409, guid: 50c958587b8055041aca5f673265d5b7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5348858908566369534, guid: 50c958587b8055041aca5f673265d5b7,
         type: 3}

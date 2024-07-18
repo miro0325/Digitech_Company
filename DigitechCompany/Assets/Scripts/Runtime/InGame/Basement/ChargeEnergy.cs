@@ -43,6 +43,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
             //Debug.Log(Vector3.Distance(transform.position, player.transform.position));
             if (Vector3.Distance(transform.position, player.transform.position) > interactableRange) return false;
             if (player.Inventory.GetCurrentSlotItem() == null) return false;
+            if (!player.Inventory.GetCurrentSlotItem().UseBattery) return false;
         } else
         {
             return false;
@@ -70,6 +71,7 @@ public class ChargeEnergy : MonoBehaviour, IInteractable
         item.transform.DOMove(transform.position, 0.5f);
         yield return player.ItemHolder.transform.DOMove(transform.position, 0.5f).WaitForCompletion();
         chargingEffect.Play();
+        player.Inventory.GetCurrentSlotItem().SetBattery(999);
         yield return wait;
         item.transform.DOMove(itemOriginPos, 0.5f);
         player.ItemHolder.transform.DOMove(originPos, 0.5f).OnComplete(() => {

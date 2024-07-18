@@ -27,7 +27,7 @@ Material:
   - _NORMALMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -60,10 +60,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmissionTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -115,7 +111,7 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1.19
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.439
+    - _FresnelThreshold: 0.877
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0

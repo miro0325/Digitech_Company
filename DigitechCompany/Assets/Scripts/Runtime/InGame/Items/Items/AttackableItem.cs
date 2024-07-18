@@ -8,17 +8,18 @@ using System;
 public class AttackableItem : ItemBase, IInteractable
 {
     //static
-    private static int Animator_AttackHash = Animator.StringToHash("attack");
-    private static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
+    protected static int Animator_AttackHash = Animator.StringToHash("attack");
+    protected static int Animator_AttackPressedHash = Animator.StringToHash("attackPressed");
 
     //field
-    [SerializeField] private Transform attackPoint;
-    [SerializeField] private float atkDamage;
-    [SerializeField] private float attackRadius;
+    [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected float atkDamage;
+    [SerializeField] protected float attackRadius;
 
-    private ReactiveProperty<bool> isUsePressed = new();
-    private float delayTime;
-    private Animator animator;
+    protected ReactiveProperty<bool> isUsePressed = new();
+    protected float delayTime;
+    protected Animator animator;
+    protected bool isUsing = false;
 
     //function
     public override void OnCreate()
@@ -26,10 +27,15 @@ public class AttackableItem : ItemBase, IInteractable
         base.OnCreate();
         
         animator = GetComponent<Animator>();
+        SubscribeEvent();
+    }
+
+    protected virtual void SubscribeEvent()
+    {
         isUsePressed
             .Subscribe(b =>
             {
-                if(b)
+                if (b)
                     animator.SetTrigger(Animator_AttackHash);
                 animator.SetBool(Animator_AttackPressedHash, b);
             });
@@ -37,6 +43,10 @@ public class AttackableItem : ItemBase, IInteractable
 
     public override bool IsUsable(InteractID id)
     {
+        if(UseBattery)
+        {
+            if (curBattery < requireBattery) return false;
+        }
         if(id == InteractID.ID2) return delayTime <= 0;
         return false;
     }
@@ -64,6 +74,7 @@ public class AttackableItem : ItemBase, IInteractable
         delayTime = 100f;
         animator.enabled = true;
         isUsePressed.Value = true;
+        isUsing = true;
     }
 
     public override void OnUseReleased()
@@ -105,29 +116,30 @@ public class AttackableItem : ItemBase, IInteractable
 
     public virtual void OnAttack()
     {
-        Collider[] hits = Physics.OverlapSphere(attackPoint.position, attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
-        //Debug.Log("Attack!" + hits.Length);
-        foreach (Collider hit in hits)
+        RaycastHit[] hits = Physics.BoxCastAll(OwnUnit.EyeLocation.position, new Vector3(0.5f,0.5f,0.5f),OwnUnit.EyeLocation.forward,OwnUnit.EyeLocation.rotation,attackRadius, LayerMask.GetMask("Player","Monster","Damagable"));
+        foreach (var hit in hits)
         {
-            var entity = hit.GetComponent<IDamagable>();
+            var entity = hit.collider.GetComponent<IDamagable>();
+
             if(OwnUnit.gameObject == entity.OwnObject) continue;
             if (entity.IsInvulnerable) continue;
-            Debug.Log(entity.OwnObject.name);
             if(entity is InGamePlayer)
             {
-                hit.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
+                hit.collider.GetComponent<InGamePlayer>().Damage(atkDamage,OwnUnit);
             }
             else
             {
+                Debug.Log(entity.OwnObject.name);
                 entity.Damage(atkDamage, OwnUnit);
             }
             break;
         }
     }
 
-    public void OnAttackAnimationEnd()
+    public virtual void OnAttackAnimationEnd()
     {
         delayTime = 0.1f;
         animator.enabled = false;
+        isUsing = false;
     }
 }

@@ -100,6 +100,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AdditionalLightStrength: 10
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -114,7 +115,7 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.647
+    - _FresnelThreshold: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0

@@ -12,6 +12,9 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     protected static int Animator_DamagedHash = Animator.StringToHash("Damaged");
     protected static int Animator_DeathHash = Animator.StringToHash("Death");
 
+    public override Stats BaseStats => testBaseStat;
+    public NavMeshAgent Agent => agent;
+
     [Header("Monstar Basic Setting"),Space(20)]
     [SerializeField]
     protected FieldOfView fov;
@@ -28,25 +31,40 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     [SerializeField] protected float attackRange;
     [Space(5)][SerializeField] protected float attackDamage;
  
+    public int curIndex = -1;
+
     protected NavMeshAgent agent;
     protected NavMeshPath path;
     protected BehaviorTree.Tree tree;
+    protected InGamePlayer targetPlayer;
     protected Stats testBaseStat = new();
     protected Vector3 destination;
     protected Vector3 receivePos;
+    protected Vector3 targetPos;
     protected Quaternion receiveRot;
+    protected Quaternion lastRotation;
+    protected float rotationThreshold = 0.1f;
+    protected float delayTime;
+    protected float curDelayTime = 0;
     protected bool isAttacking = false;
     protected bool isDeath = false;
-    public int curIndex = -1;
-
-    public override Stats BaseStats => testBaseStat;
-    public NavMeshAgent Agent => agent;
+    protected bool isCalled = false;
+    protected bool isCalculatePath = false;
+    protected bool isSetRandomPos = false;
 
     protected virtual void Start()
     {
+        
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = tempSpeed;
-        //if(!photonView.IsMine) agent.enabled = false;
+        if (!photonView.IsMine)
+        {
+            agent.enabled = false;
+        }
+        else
+        {
+            agent.speed = tempSpeed;
+            path = new NavMeshPath();
+        }
         if(animator == null)
         {
             animator = GetComponent<Animator>();
@@ -54,7 +72,7 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         Spawn();
     }
 
-    public virtual void Inititalize(Transform[] waypoints)
+    public virtual void Inititalize(Transform[] waypoints, bool isSpawnInPlaying = false)
     {
         this.waypoints = waypoints.Select(x => x.position).ToList();
         if (!photonView.IsMine) return;
@@ -77,7 +95,6 @@ public abstract class MonsterBase : UnitBase, IPunObservable
     {
         //if (!photonView.IsMine) return;
         tree.Update();
-        //FixTransform();
     }
 
     protected void FixTransform()
@@ -116,17 +133,23 @@ public abstract class MonsterBase : UnitBase, IPunObservable
 
     public virtual void Move(Vector3 targetPos)
     {
-        if (SetDestinationToPosition(targetPos, true))
+        if (SetDestinationToPosition(targetPos))
         {
-            if (RotateToDir(destination))
-            {
-                agent.SetDestination(destination);
-            }
+            agent.SetDestination(destination);
         }
-        
+        else
+        {
+            Debug.LogError($"Can't Go To Destination");
+        }
     }
 
-    protected abstract void Attack();
+    protected virtual void Attack()
+    {
+        //photonView.RPC(nameof(AttackRPC), RpcTarget.Others);
+    }
+
+    [PunRPC]
+    protected abstract void AttackRPC();
 
     protected override void Death()
     {
@@ -158,8 +181,9 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         NavMeshHit hit = default;
         if (checkForPath)
         {
+            if (isCalculatePath) return false;
             position = GetNavMeshPosition(position, hit, 1.75f);
-            path = new NavMeshPath();
+            path.ClearCorners();
             if (!agent.CalculatePath(position, path))
             {
                 return false;
@@ -182,6 +206,33 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         return state;
     }
 
+    protected NodeState IsCalled()
+    {
+        return (isCalled) ? NodeState.Succes : NodeState.Failure;
+    } 
+
+    protected virtual NodeState GoToCalledPos()
+    {
+        Vector3 finalPos;
+        while(true)
+        {
+            if(SetRandomPosition(targetPos, out finalPos, 3))
+            {
+                break;
+            }
+        }
+        if(Vector3.Distance(transform.position,finalPos) > 0.6f)
+        {
+            if (SetDestinationToPosition(finalPos))
+            {
+                Move(destination);
+            }
+            return NodeState.Running;
+        }
+        return NodeState.Succes;
+    }
+
+    //문 발견 시 문을 연다
     protected virtual NodeState DetectDoor()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, 1.5f,LayerMask.GetMask("Door"));
@@ -208,19 +259,79 @@ public abstract class MonsterBase : UnitBase, IPunObservable
         
     }
 
+    //몬스터를 특정 위치로 이동시킨다
+    public virtual void CallMonsterToPos(Vector3 pos, InGamePlayer targetPlayer = null)
+    {
+        targetPos = pos;
+        isCalled = true;
+        delayTime = Random.Range(1.5f, 4.5f);
+        curDelayTime = 0;
+    }
+
+    //랜덤 NavMesh 위치를 구한다
+    protected bool SetRandomPosition(Vector3 pos, out Vector3 finalPosition, float radius, int layerMask = -1)
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * radius;
+        randomDirection += transform.position;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomDirection, out hit, radius, layerMask))
+        {
+            finalPosition = hit.position;
+            agent.SetDestination(finalPosition);
+            return true;
+        }
+        finalPosition = transform.position;
+        return false;
+    }
+
+    protected int GetFareastWaypoint()
+    {
+        float fareastDist = 0;
+        int fareastIndex = Random.Range(0,waypoints.Count);
+        for(int i = 0; i < waypoints.Count; i++)
+        {
+            float dist = Vector3.Distance(transform.position, waypoints[i]);
+            if(dist > fareastDist)
+            {
+                fareastDist = dist;
+                fareastIndex = i;
+            }
+        }
+        return fareastIndex;
+    }
+
+    //protected bool DetectRotation()
+    //{
+    //    Quaternion deltaRotation = transform.rotation * Quaternion.Inverse(lastRotation);
+    //    //  lastRotation = transform.rotation;
+    //    float angle;
+    //    Vector3 axis;
+    //    deltaRotation.ToAngleAxis(out angle, out axis);
+
+    //    float angularSpeed = angle / Time.deltaTime;
+
+    //    if (angularSpeed > rotationThreshold)
+    //    {
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
+
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        //if (stream.IsWriting)
-        //{
-        //    stream.SendNext(transform.position);
-        //    stream.SendNext(transform.rotation);
-        //}
-        //else
-        //{
-        //    receivePos = (Vector3)stream.ReceiveNext();
-        //    receiveRot = (Quaternion)stream.ReceiveNext();
-        //    //transform.position = (Vector3)stream.ReceiveNext();
-        //    //transform.rotation = (Quaternion)stream.ReceiveNext();
-        //}
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            receivePos = (Vector3)stream.ReceiveNext();
+            receiveRot = (Quaternion)stream.ReceiveNext();
+        }
     }
 }

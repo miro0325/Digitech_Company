@@ -965,7 +965,6 @@ GameObject:
   - component: {fileID: 3697752146121768872}
   - component: {fileID: 3697752146121768874}
   - component: {fileID: 3460338138072610868}
-  - component: {fileID: 2520911418076543993}
   m_Layer: 8
   m_Name: Rats
   m_TagString: Untagged
@@ -1004,18 +1003,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 5608524817079616401}
+  eyeLocation: {fileID: 0}
   fov: {fileID: 3697752146121768887}
   waypoints: []
-  tempSpeed: 5
+  tempSpeed: 4
   animator: {fileID: 3697752146121768874}
   attackPoint: {fileID: 0}
   attackRadius: 1
   attackRange: 1.2
   attackDamage: 5
+  curIndex: -1
   weapon: {fileID: 7510127010037814660}
   state: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 520
   maxSearchCount: 3
-  itemDetectRange: 3
+  itemDetectRange: 2
   renderer: {fileID: 4290093288329407412}
   baseTexture: {fileID: 2800000, guid: 06a9eb70ce0135444b95aad37faf98cc, type: 3}
   madTexture: {fileID: 2800000, guid: 738b934e8c8b8fc4ea90610a8a0ad04e, type: 3}
@@ -1040,7 +1044,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 520
 --- !u!195 &3697752146121768886
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1091,7 +1095,7 @@ MonoBehaviour:
     SynchronizeType: 1
     Name: AttackState
   m_SynchronizeLayers:
-  - SynchronizeType: 0
+  - SynchronizeType: 1
     LayerIndex: 0
 --- !u!114 &3697752146121768872
 MonoBehaviour:
@@ -1114,7 +1118,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3697752146121768884}
   - {fileID: 3697752146121768873}
-  - {fileID: 2520911418076543993}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1153,22 +1156,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.88, z: 0}
---- !u!114 &2520911418076543993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4042786954871760151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4227238645846070774
 GameObject:
   m_ObjectHideFlags: 0

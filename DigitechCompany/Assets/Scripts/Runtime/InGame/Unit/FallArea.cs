@@ -10,8 +10,8 @@ public class FallArea : MonoBehaviour
         {
             if(other.TryGetComponent(out UnitBase unit))
             {
-                if(unit.IsDie)
-                unit.Damage(999, unit);
+                if(!unit.IsDie)
+                    unit.Damage(999, unit);
             }
         }
     }

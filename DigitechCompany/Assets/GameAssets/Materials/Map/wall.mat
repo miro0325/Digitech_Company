@@ -30,7 +30,7 @@ Material:
   - USE_BUMPMAP
   - USE_SPECULAR
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -108,6 +108,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AdditionalLightStrength: 10
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1.2
@@ -130,7 +131,7 @@ Material:
     - _ExtraSpecular: 0
     - _FresnelIntensity: 1.15
     - _FresnelSmooth: 0
-    - _FresnelThreshold: 0.604
+    - _FresnelThreshold: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0

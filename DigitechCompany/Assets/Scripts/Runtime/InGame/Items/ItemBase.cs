@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Photon.Pun;
 using UniRx;
 using UnityEngine;
@@ -18,8 +19,13 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     [SerializeField] protected Vector3 camHoldRot;
     [SerializeField] protected Transform leftHandPoint;
     [SerializeField] protected Transform rightHandPoint;
+    [SerializeField] protected bool useBattery;
+    [SerializeField] protected float fullBattery;
+    [SerializeField] protected float requireBattery;
+    [SerializeField] protected float curBattery;
 
     //field
+    protected bool inSellArea;
     protected float layRotation;
     protected float sellPrice;
     protected string key;
@@ -32,7 +38,9 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     //property
     protected UnitBase OwnUnit { get; private set; }
 
+    public bool InSellArea => inSellArea;
     public bool InHand => ownUnitViewId.Value != 0;
+    public bool UseBattery => useBattery;
     public virtual float SellPrice => sellPrice;
     public float LayRotation => layRotation;
     public string Key => key;
@@ -47,6 +55,26 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
     {
         this.key = key;
         sellPrice = Random.Range(ItemData.sellPriceMin, ItemData.sellPriceMax);
+        photonView.RPC(nameof(SetFullBatteryRPC), RpcTarget.Others, fullBattery);
+        curBattery = fullBattery;
+    }
+
+    [PunRPC]
+    protected virtual void SetFullBatteryRPC(float _fullBattery)
+    {
+        fullBattery = _fullBattery;
+    }
+
+    public virtual void SetBattery(float _battery)
+    {
+        curBattery = (_battery > fullBattery) ? fullBattery : _battery;
+        photonView.RPC(nameof(SetBatteryRPC),RpcTarget.Others,_battery);
+    }
+
+    [PunRPC]
+    protected virtual void SetBatteryRPC(float _battery)
+    {
+        curBattery = (_battery > fullBattery) ? fullBattery : _battery;
     }
 
     public virtual InteractID GetTargetInteractID(UnitBase unit) => InteractID.ID1;
@@ -55,6 +83,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public virtual string GetInteractionExplain(UnitBase unit)
     {
+        if(inSellArea) return "";
+
         var player = unit as InGamePlayer;
         if (player)
         {
@@ -70,6 +100,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
 
     public virtual bool IsInteractable(UnitBase unit)
     {
+        if(inSellArea) return false;
+
         var player = unit as InGamePlayer;
         if (player)
         {
@@ -113,6 +145,8 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
         collider = GetComponent<Collider>();
         transformView = GetComponent<PhotonTransformView>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
+        
+        // DisableRender();
 
         ownUnitViewId
             .Subscribe(viewId =>
@@ -276,6 +310,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
             stream.SendNext(layRotation);
             stream.SendNext(ownUnitViewId.Value);
             stream.SendNext(sellPrice);
+            stream.SendNext(curBattery);
         }
         else
         {
@@ -283,6 +318,7 @@ public class ItemBase : NetworkObject, IPunObservable, IInteractable, IUseable
             layRotation = (float)stream.ReceiveNext();
             ownUnitViewId.Value = (int)stream.ReceiveNext();
             sellPrice = (float)stream.ReceiveNext();
+            curBattery = (float)stream.ReceiveNext();
         }
     }
 }

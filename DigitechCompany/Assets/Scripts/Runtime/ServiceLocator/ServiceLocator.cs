@@ -37,7 +37,7 @@ public class ServiceLocator
         var scene = SceneManager.GetSceneByName(name);
         if(!sceneContainers.TryGetValue(scene, out var container))
         {
-            container = new GameObject("Service Container [Scene]").AddComponent<ServiceContainer>();
+            container = new GameObject($"Service Container [Scene]").AddComponent<ServiceContainer>();
             container.Initialize(false);
             SceneManager.MoveGameObjectToScene(container.gameObject, scene);
             sceneContainers.Add(scene, container);

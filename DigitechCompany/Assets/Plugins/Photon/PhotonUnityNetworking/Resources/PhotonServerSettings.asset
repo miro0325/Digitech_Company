@@ -126,6 +126,17 @@ MonoBehaviour:
   - SendDieToAllRpc
   - SendReviveToAllRpc
   - DeathRPC
+  - SetInMapRpc
+  - DestoryMaps
+  - AttackRPC
+  - SendChangePlanetToAllRpc
+  - ChangeHeadRPC
+  - ReturnOriginTextureRPC
+  - SetBatteryRPC
+  - SetFullBatteryRPC
+  - MoveItemToSellPositionRpc
+  - SellTaskRpc
+  - EarnRpc
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

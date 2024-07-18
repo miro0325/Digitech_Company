@@ -17,9 +17,6 @@ namespace Basements
         [SerializeField] private Transform watchCamLocation;
         [SerializeField] private float moveDelay;
         private bool isMoving = false;
-
-        private Vector3 prevCamPos;
-        private Vector3 prevCamRot;
         
         [Header("Console Input")]
         [SerializeField] private TMP_InputField consoleInput;
@@ -28,8 +25,7 @@ namespace Basements
 
         [SerializeField] private int wordCountLimit;
 
-        [SerializeField] private List<Command> commands = new List<Command>();
-        private Dictionary<string, Command> commandDic = new Dictionary<string, Command>();
+        private Dictionary<string, (string original, Command command)> commandDic = new();
         
         private InGamePlayer curPlayer;
 
@@ -44,19 +40,21 @@ namespace Basements
         private void Initialize()
         {
             cam = Camera.main.transform;
-            foreach(var command in commands)
+            foreach(var command in Resources.LoadAll<Command>("Commands"))
             {
-                command.Init();
-                if(!command.IsMultiple)
-                    commandDic.Add(command.Cmd, command);
-                foreach(var aliases in command.Aliases)
+                foreach(var data in command.CommandDatas)
                 {
-                    commandDic.Add(aliases,command);
+                    commandDic.Add(data.cmd, (data.cmd, command));
+                    foreach(var aliase in data.aliases)
+                        commandDic.Add(aliase, (data.cmd, command));
                 }
             }
             //consoleInput.onEndEdit.AddListener(delegate { SendConsoleCommand(); });
-            consoleInput.onSubmit.AddListener(delegate { SendConsoleCommand(); });
-            consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
+            // consoleInput.onSubmit.AddListener(delegate { SendConsoleCommand(); });
+            // consoleInput.onValueChanged.AddListener(delegate { LimitWordCount(); });
+
+            consoleInput.onSubmit.AddListener(_ => SendConsoleCommand());
+            consoleInput.onValueChanged.AddListener(_ => LimitWordCount());
         }
 
         private void Update()
@@ -71,14 +69,15 @@ namespace Basements
                 isConnectTerminal = false;
                 DisconnectTerminal();
             }
+
+            if(isConnectTerminal && Input.GetKeyDown(KeyCode.Return))
+                SendConsoleCommand();
         }
 
         private void ConnectTerminal()
         {
             if (!curPlayer || !curPlayer.photonView.IsMine) return;
             input.Player.Disable();
-            //prevCamPos = cam.transform.position;
-            //prevCamRot = cam.transform.eulerAngles;
             isMoving = true;
             cam.transform.SetParent(watchCamLocation);
             cam.transform.DOLocalMove(Vector3.zero, moveDelay);
@@ -102,52 +101,41 @@ namespace Basements
         private void SendConsoleCommand()
         {
             string msg = consoleInput.text;
-            if(CheckCommand(msg, out Command cmd))
+            if(TryGetCommand(msg, out string original, out Command cmd))
             {
-                var cd = msg.Split(' ')[0].Trim().ToLower();
-                var args = GetArgs(msg);
-                explainText.text = cmd.Activate(cd,args);
+                explainText.text = cmd.Activate(original, GetArgs(msg));
             } else
             {
                 if(!string.IsNullOrEmpty(msg.Replace(" ",string.Empty)) || msg.Replace(" ", string.Empty).Length != 0)
                     SendNotExistCommand(msg);
-                //Debug.Log(msg.Replace(" ", string.Empty).Length);
             }
             consoleInput.text = "";
             consoleInput.ActivateInputField();
-
         }
 
         private void SendNotExistCommand(string msg)
         {
-            //Debug.Log(msg);
-            //Debug.Log(msg.Split(' '));
-            var notExistCmd = msg.Split(' ')[0].Trim().ToLower();
-            
-            explainText.text = $"{notExistCmd} is not exist Command";  
+            var notExistCmd = msg.Split(' ')[0].Trim();
+            explainText.text = $"{notExistCmd}은(는) 존재하지 않는 커맨드 입니다."; 
         }
 
         private bool CheckCommand(string msg)
         {
-            msg = msg.ToLower();
             string key = msg.Split(' ')[0];
-            if(commandDic.ContainsKey(key))
-            {
-                return true;    
-            }
-            return false;
+            return commandDic.ContainsKey(key);
         }
 
-        private bool CheckCommand(string msg, out Command cmd)
+        private bool TryGetCommand(string msg, out string original, out Command cmd)
         {
-            msg = msg.ToLower();
             string key = msg.Split(' ')[0];
             if (commandDic.ContainsKey(key))
             {
-                cmd = commandDic[key];
+                original = commandDic[key].original;
+                cmd = commandDic[key].command;
                 return true;
             } else
             {
+                original = "";
                 cmd = null;
                 return false;
             }
@@ -155,7 +143,6 @@ namespace Basements
 
         private string[] GetArgs(string msg)
         {
-            msg = msg.ToLower();
             if (string.IsNullOrEmpty(msg)) return null;
             if(CheckCommand(msg))
             {
@@ -175,8 +162,6 @@ namespace Basements
             }
         }
 
-        
-
         private void LimitWordCount()
         {
             var len = consoleInput.text.Length;
@@ -184,7 +169,6 @@ namespace Basements
             {
                 consoleInput.text = consoleInput.text.Substring(0,wordCountLimit); 
             }
-            
         }
 
         public InteractID GetTargetInteractID(UnitBase unit)

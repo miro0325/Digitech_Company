@@ -49,12 +49,12 @@ public class FieldOfView : MonoBehaviour
         for(int i = 0; i < hits.Length; i++)
         {
             Transform target = hits[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position).normalized;
+            Vector3 dirToTarget = ((target.position + Vector3.up * 0.5f) - (transform.position + Vector3.up * 0.5f)).normalized;
             
             if(Vector3.Angle(transform.forward, dirToTarget) < viewRange)
             {
                 float distToTarget = Vector3.Distance(transform.position, target.position);
-                if(!Physics.Raycast(transform.position,dirToTarget,distToTarget,obstacleMask))
+                if(!Physics.Raycast(transform.position+Vector3.up*0.5f,dirToTarget,distToTarget,obstacleMask))
                 {
                     if(target.TryGetComponent(out UnitBase unit))
                     {

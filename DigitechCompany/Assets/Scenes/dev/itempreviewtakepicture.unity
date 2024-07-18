@@ -252,7 +252,7 @@ PrefabInstance:
     - target: {fileID: 7921545433663057366, guid: ed5376ad12789d5419a9440161b23e47,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed5376ad12789d5419a9440161b23e47, type: 3}
@@ -517,6 +517,80 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 831521177}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &936983109
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6198723082606952577, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9304492
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.36642095
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -42.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449932044554290387, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7793665065085116009, guid: dce7d4d4124ce414f9c186b6bfd70643,
+        type: 3}
+      propertyPath: m_Name
+      value: Railgun
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dce7d4d4124ce414f9c186b6bfd70643, type: 3}
 --- !u!1 &1047028031
 GameObject:
   m_ObjectHideFlags: 0
@@ -1025,7 +1099,7 @@ PrefabInstance:
     - target: {fileID: 1562513690961932807, guid: 524585656b3ee1743ac34730b492e7d2,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 1562513690961932807, guid: 524585656b3ee1743ac34730b492e7d2,
         type: 3}
@@ -1205,7 +1279,7 @@ PrefabInstance:
     - target: {fileID: 5560247382742892239, guid: 90c65d7ed305a0c4c9cbd6e5811b1d43,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 5560247382742892239, guid: 90c65d7ed305a0c4c9cbd6e5811b1d43,
         type: 3}
@@ -1484,6 +1558,16 @@ PrefabInstance:
         type: 3}
       propertyPath: sceneViewId
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2793636788809391081, guid: dd8a924a7441a5d449f0cd6a468f9be7,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2793636788809391086, guid: dd8a924a7441a5d449f0cd6a468f9be7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2864915064015088004, guid: dd8a924a7441a5d449f0cd6a468f9be7,
         type: 3}

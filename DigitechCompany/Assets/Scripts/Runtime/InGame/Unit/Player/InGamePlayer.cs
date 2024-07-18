@@ -44,6 +44,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     [SerializeField] private Vector3 groundCastOffset;
     [SerializeField] private float groundCastRadius;
     [SerializeField] private LayerMask groundCastMask;
+    [SerializeField] private Color scanColor;
     [Header("Reference")]
     [SerializeField] private Transform camView;
     [SerializeField] private Transform camHolder;
@@ -56,7 +57,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     private bool isGround;
     private bool isJump;
     private bool isDie = true;
-    private bool isInBasement;
+    private bool isInBasement = true;
+    private bool isInMap;
     private float velocityY;
     private float camRotateX;
     private float scanWaitTime;
@@ -78,6 +80,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public bool IsCrouch => isCrouch;
     public bool IsGround => isGround;
     public bool IsJump => isJump;
+    public bool IsInMap => isInMap;
     public new bool IsDie => isDie;
     public Vector2 MoveInput => moveInput;
     public float[] InteractRequireTimes => interactRequireTimes;
@@ -88,6 +91,18 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
     public IReadOnlyReactiveProperty<int> CurrentHandItemViewID => curHandItemViewId;
     public override Stats BaseStats => testBaseStat;
     public Transform Head => animator.GetHeadTransform();
+    public InGamePlayerAnimator Animator => animator;
+
+    public void SetInMap(bool @in)
+    {
+        photonView.RPC(nameof(SetInMapRpc), RpcTarget.All, @in);
+    }
+
+    [PunRPC]
+    private void SetInMapRpc(bool @in)
+    {
+        isInMap = @in;
+    }
 
     public override void Damage(float damage, UnitBase attacker)
     {
@@ -114,7 +129,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
 
     public void Revive()
     {
-        photonView.RPC(nameof(SendReviveToAllRpc), photonView.Owner);
+        photonView.RPC(nameof(SendReviveToAllRpc), RpcTarget.All);
     }
 
     [PunRPC]
@@ -230,11 +245,6 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         DoRotation();
     }
 
-    private void FixedUpdate()
-    {
-        cc.Move(velocity * Time.fixedDeltaTime);
-    }
-
     private void DoLife()
     {
         if (!photonView.IsMine) return;
@@ -252,8 +262,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         isDie = true;
         animator.SetEnableRagDoll(true);
         animator.SetActivePlayerModel(true);
-        
-        if(photonView.IsMine)
+
+        if (photonView.IsMine)
         {
             input.Player.Disable();
             animator.SetActiveArmModel(false);
@@ -276,39 +286,32 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             if (input.Player.Scan.WasPressedThisFrame())
             {
                 scanWaitTime = 1.33f;
-                ScanRoutine().Forget();
+
+                //calculate
+                scanData = new ScanData { gameTime = Time.time, items = new() };
+                foreach (var kvp in itemManager.Items)
+                {
+                    if (kvp.Value.InHand) continue;
+
+                    if (IsInView(kvp.Value.MeshRenderer))
+                    {
+                        scanData.price += kvp.Value.SellPrice;
+                        scanData.items.Add(kvp.Value);
+                    }
+                }
+
+                //animation
+                scanSphere.gameObject.SetActive(true);
+                scanSphere.localScale = Vector3.one * 0.1f;
+                scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
+
+                var color = scanSphereMaterial.color;
+                var startColor = new Color(color.r, color.g, color.b, 0.25f);
+                var targetColor = new Color(startColor.r, startColor.g, startColor.b, 0);
+                scanSphereMaterial.color = startColor;
+                scanSphereMaterial.DOColor(targetColor, 0.5f);
             }
         }
-    }
-
-    private async UniTask ScanRoutine()
-    {
-        //calculate
-        scanData = new ScanData { gameTime = Time.time, items = new() };
-        foreach (var kvp in itemManager.Items)
-        {
-            if (kvp.Value.InHand) continue;
-
-            if (IsInView(kvp.Value.MeshRenderer))
-            {
-                scanData.price += kvp.Value.SellPrice;
-                scanData.items.Add(kvp.Value);
-            }
-        }
-
-        //animation
-        scanSphere.gameObject.SetActive(true);
-        scanSphere.DOScale(Vector3.one * 30, 1f).SetEase(Ease.OutQuart);
-        await UniTask.WaitForSeconds(0.5f);
-
-        var startColor = scanSphereMaterial.color;
-        var targetColor = new Color(startColor.r, startColor.g, startColor.b, 0);
-        scanSphereMaterial.DOColor(targetColor, 0.5f);
-        await UniTask.WaitForSeconds(0.5f);
-
-        scanSphere.gameObject.SetActive(false);
-        scanSphereMaterial.color = startColor;
-        scanSphere.localScale = Vector3.one * 0.1f;
     }
 
     private bool IsInView(Renderer toCheck)
@@ -347,6 +350,7 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
             if (input.Player.Interact.WasPressedThisFrame())
             {
                 var interactId = (InteractID)(int)input.Player.Interact.ReadValue<float>();
+                Debug.Log(item.IsUsable(interactId));
                 if (item.IsUsable(interactId))
                     item.OnUsePressed(interactId);
             }
@@ -511,6 +515,8 @@ public partial class InGamePlayer : UnitBase, IService, IPunObservable
         }
 
         velocity.y = velocityY;
+
+        cc.Move(velocity * Time.deltaTime);
     }
 
     private void DoRotation()

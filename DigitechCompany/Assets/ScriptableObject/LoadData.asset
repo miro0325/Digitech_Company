@@ -42,16 +42,19 @@ MonoBehaviour:
     - ChestPress
     - PowerStrip
     - Coffee
+    - Railgun
+    - Drill
     values:
     - key: Shovel
       name: "\uC0BD"
       weight: 1.3
       sellPriceMin: 0
       sellPriceMax: 0
-      buyPrice: 0
+      buyPrice: 50
       isTwoHand: 0
       type: 1
-      explain: "O\r"
+      explain: O
+      isAvailable: 1
     - key: Mask
       name: "\uAC00\uBA74"
       weight: 0.3
@@ -60,7 +63,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: Laptop
       name: "\uB178\uD2B8\uBD81"
       weight: 12
@@ -69,7 +73,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "\uC5F4\uACE0 \uB2EB\uAE30\r"
+      explain: "\uC5F4\uACE0 \uB2EB\uAE30"
+      isAvailable: 1
     - key: CellPhone
       name: "\uD734\uB300\uD3F0"
       weight: 0.8
@@ -78,7 +83,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "\uAECF\uB2E4 \uCF1C\uAE30\r"
+      explain: "\uAECF\uB2E4 \uCF1C\uAE30"
+      isAvailable: 0
     - key: Mouse
       name: "\uB9C8\uC6B0\uC2A4"
       weight: 0.3
@@ -87,7 +93,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Keyboard
       name: "\uD0A4\uBCF4\uB4DC"
       weight: 7
@@ -96,7 +103,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Key
       name: "\uC5F4\uC1E0"
       weight: 0.5
@@ -105,7 +113,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "O\r"
+      explain: O
+      isAvailable: 1
     - key: Painting
       name: "\uADF8\uB9BC"
       weight: 15
@@ -114,7 +123,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Mop
       name: "\uB300\uAC78\uB798"
       weight: 5
@@ -124,7 +134,8 @@ MonoBehaviour:
       isTwoHand: 0
       type: 0
       explain: "\uB300\uAC78\uB808\uB97C \uD718\uB458\uB7EC \uD53C\uACA9\uB41C \uC5D4\uD2F0\uD2F0\uB97C
-        \uBC00\uACE0, \uC18D\uB3C4 \uB514\uBC84\uD504\uB97C \uBD80\uC5EC\uD55C\uB2E4\r"
+        \uBC00\uACE0, \uC18D\uB3C4 \uB514\uBC84\uD504\uB97C \uBD80\uC5EC\uD55C\uB2E4"
+      isAvailable: 1
     - key: DumbbelSmall
       name: "\uD551\uD06C\uB364\uBCA8"
       weight: 6.5
@@ -134,7 +145,8 @@ MonoBehaviour:
       isTwoHand: 0
       type: 0
       explain: "\uB364\uBCA8\uB97C \uC774\uC6A9\uD558\uC5EC \uC6B4\uB3D9\uC744 \uD558\uC5EC
-        \uADFC\uB825\uC744 \uC62C\uB9B0\uB2E4.\r"
+        \uADFC\uB825\uC744 \uC62C\uB9B0\uB2E4."
+      isAvailable: 1
     - key: DumbbelHeavy
       name: "\uACE0\uC911\uB7C9\uB364\uBCA8"
       weight: 18.7
@@ -144,7 +156,8 @@ MonoBehaviour:
       isTwoHand: 0
       type: 0
       explain: "\uB364\uBCA8\uC744 \uC774\uC6A9\uD558\uC5EC \uBAAC\uC2A4\uD130\uB97C
-        \uACF5\uACA9\uD55C\uB2E4 ( \uC0BD \uB300\uCCB4\uC6A9 )\r"
+        \uACF5\uACA9\uD55C\uB2E4 ( \uC0BD \uB300\uCCB4\uC6A9 )"
+      isAvailable: 1
     - key: DumbbelBar
       name: "\uB364\uBCA8\uBC14"
       weight: 34
@@ -153,7 +166,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: KettleBell
       name: "\uCF00\uD2C0\uBCA8"
       weight: 26
@@ -162,7 +176,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: RiotGoods
       name: "\uB77C\uC774\uC5C7\uAD7F\uC988"
       weight: 0.1
@@ -171,7 +186,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: DigitechGoods
       name: "\uB514\uC9C0\uD14D\uAD7F\uC988"
       weight: 0.1
@@ -180,7 +196,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Bag
       name: "\uAC00\uBC29"
       weight: 15
@@ -190,7 +207,8 @@ MonoBehaviour:
       isTwoHand: 1
       type: 0
       explain: "\uC120\uBB3C\uC0C1\uC790 \uB098\uC624\uB294 \uBB3C\uAC74 ( \uB178\uD2B8\uBD81
-        , \uD0A4\uBCF4\uB4DC , \uACE0\uC911\uB7C9 \uB364\uBCA8 , \uD551\uD06C \uB364\uBCA8)\r"
+        , \uD0A4\uBCF4\uB4DC , \uACE0\uC911\uB7C9 \uB364\uBCA8 , \uD551\uD06C \uB364\uBCA8)"
+      isAvailable: 0
     - key: EmptyCan
       name: "\uBE48 \uBAAC\uC2A4\uD130 \uCE94"
       weight: 1
@@ -199,7 +217,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: ToySwordCase
       name: "\uC7A5\uB09C\uAC10 \uAC80\uC9D1"
       weight: 10
@@ -208,7 +227,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: RunningMachine
       name: "\uB7F0\uB2DD\uBA38\uC2E0"
       weight: 35
@@ -217,7 +237,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: HighBar
       name: "\uCCA0\uBD09"
       weight: 25
@@ -226,7 +247,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: LegPress
       name: "\uB808\uADF8\uD504\uB808\uC2A4"
       weight: 40
@@ -235,7 +257,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: LegExtension
       name: "\uB808\uADF8\uC775\uC2A4\uD150\uC158"
       weight: 34
@@ -244,7 +267,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: OverheadPress
       name: "\uC204\uB354\uD504\uB808\uC2A4 \uBA38\uC2E0"
       weight: 48
@@ -253,7 +277,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Protein
       name: "\uD504\uB85C\uD2F4"
       weight: 10
@@ -262,7 +287,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 1
     - key: Shooes
       name: "\uC2E0\uBC1C"
       weight: 15
@@ -271,7 +297,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: ChestPress
       name: "\uCCB4\uC2A4\uD2B8 \uD504\uB808\uC2A4"
       weight: 50
@@ -280,7 +307,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 1
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: PowerStrip
       name: "\uBA40\uD2F0\uD0ED"
       weight: 3
@@ -289,7 +317,8 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: "X\r"
+      explain: X
+      isAvailable: 0
     - key: Coffee
       name: "\uCEE4\uD53C"
       weight: 1
@@ -301,3 +330,25 @@ MonoBehaviour:
       explain: "\uCEE4\uD53C\uB97C \uB9C8\uC2E4 \uC2DC \uC77C\uC815 \uC2DC\uAC04
         \uB3D9\uC548 \uC2A4\uD14C\uBBF8\uB098\uAC00 \uC18C\uBAA8\uB418\uC9C0 \uC54A\uB294\uB2E4.
         (1\uD68C\uC6A9)"
+      isAvailable: 0
+    - key: Railgun
+      name: "\uB808\uC77C\uAC74"
+      weight: 60
+      sellPriceMin: 0
+      sellPriceMax: 0
+      buyPrice: 523
+      isTwoHand: 1
+      type: 1
+      explain: "\uAD49\uC7A5\uD788 \uC13C \uC77C\uACA9\uC744 \uAC00\uD55C\uB2E4"
+      isAvailable: 1
+    - key: Drill
+      name: "\uB4DC\uB9B4"
+      weight: 0
+      sellPriceMin: 0
+      sellPriceMax: 0
+      buyPrice: 0
+      isTwoHand: 1
+      type: 1
+      explain: "\uD2B9\uC815 \uBCBD\uC744 \uBD80\uC220 \uC218 \uC788\uC73C\uBA70,
+        \uACF5\uACA9\uC744 \uAC00"
+      isAvailable: 0

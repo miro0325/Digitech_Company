@@ -5,6 +5,7 @@ public abstract class UnitBase : NetworkObject,IDamagable
 {
     [Header("BaseUnit")]
     [SerializeField] protected Transform itemHolder;
+    [SerializeField] protected Transform eyeLocation;
 
     protected Stats maxStats = new();
     protected Stats curStats = new();
@@ -12,6 +13,7 @@ public abstract class UnitBase : NetworkObject,IDamagable
     protected Inventory inventory;
     
     public Transform ItemHolder => itemHolder;
+    public Transform EyeLocation => eyeLocation;
     public Stats MaxStats => maxStats;
     public Stats CurStats => curStats;
     public Stats.Modifier Modifier => modifier;
@@ -31,7 +33,7 @@ public abstract class UnitBase : NetworkObject,IDamagable
 
     public abstract Stats BaseStats { get; }
 
-    public GameObject OwnObject => this.gameObject;
+    public virtual GameObject OwnObject => this.gameObject;
 
     public bool IsInvulnerable => IsDie;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class JsonSerializer
@@ -12,9 +13,24 @@ public static class JsonSerializer
             => this.array = array;
     }
 
+    [Serializable]
+    public class ListWrapper<TArray>
+    {
+        public List<TArray> list;
+
+        public ListWrapper(List<TArray> list)
+            => this.list = list;
+    }
+
     public static string ClassToJson<TClass>(TClass @class)
     {
         return JsonUtility.ToJson(@class);
+    }
+
+    public static string ListToJson<TList>(List<TList> list)
+    {
+        var wrapper = new ListWrapper<TList>(list);
+        return JsonUtility.ToJson(wrapper);
     }
 
     public static string ArrayToJson<TArray>(TArray[] array)
@@ -33,6 +49,11 @@ public static class JsonSerializer
         return JsonUtility.FromJson<ArrayWrapper<TArray>>(json).array;
     }
 
+    public static List<TList> JsonToList<TList>(string json)
+    {
+        return JsonUtility.FromJson<ListWrapper<TList>>((json)).list;
+    }
+
     public static string ToJson<TClass>(this TClass @class) where TClass : class
     {
         return ClassToJson(@class);
@@ -43,8 +64,23 @@ public static class JsonSerializer
         return ArrayToJson(array);
     }
 
+    public static string ToJson<TList>(this List<TList> array)
+    {
+        return ListToJson(array);
+    }
+
     public static TClass ToClass<TClass>(this string json) where TClass : class
     {
         return JsonToClass<TClass>(json);
+    }
+
+    public static TArray[] ToArray<TArray>(this string json)
+    {
+        return JsonToArray<TArray>(json);
+    }
+
+    public static List<TList> ToList<TList>(this string json)
+    {
+        return JsonToList<TList>(json);
     }
 }
