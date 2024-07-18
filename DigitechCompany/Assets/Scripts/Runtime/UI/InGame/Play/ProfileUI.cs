@@ -12,12 +12,13 @@ public class ProfileUI : MonoBehaviour
 
     [SerializeField] private Image hp;
     [SerializeField] private Image stamina;
+    [SerializeField] private Image itemBattery;
 
     private void Update()
     {
         if (ReferenceEquals(player, null)) return;
 
         hp.color = new Color(1, 0, 0, DOVirtual.EasedValue(0, 0.75f, 1 - (player.CurStats.GetStat(Stats.Key.Hp) / player.MaxStats.GetStat(Stats.Key.Hp)), Ease.InQuad));
-        stamina.fillAmount = Mathf.Lerp(0, 0.4f, player.CurStats.GetStat(Stats.Key.Stamina) / player.MaxStats.GetStat(Stats.Key.Stamina));
+        stamina.fillAmount = player.CurStats.GetStat(Stats.Key.Stamina) / player.MaxStats.GetStat(Stats.Key.Stamina);
     }
 }

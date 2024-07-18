@@ -25,7 +25,6 @@ namespace Basements
 
         [SerializeField] private int wordCountLimit;
 
-        [SerializeField] private List<Command> commands;
         private Dictionary<string, (string original, Command command)> commandDic = new();
         
         private InGamePlayer curPlayer;
@@ -41,7 +40,7 @@ namespace Basements
         private void Initialize()
         {
             cam = Camera.main.transform;
-            foreach(var command in commands)
+            foreach(var command in Resources.LoadAll<Command>("Commands"))
             {
                 foreach(var data in command.CommandDatas)
                 {

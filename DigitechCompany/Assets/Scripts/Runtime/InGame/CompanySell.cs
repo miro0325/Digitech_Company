@@ -3,10 +3,15 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using DG.Tweening;
 using Photon.Pun;
+using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(PhotonView))]
 public class CompanySell : MonoBehaviourPun, IInteractable
 {
+    private GameManager _gameManager;
+    private GameManager gameManager => _gameManager ??= ServiceLocator.For(this).Get<GameManager>();
+
     [SerializeField] private Vector3 offset;
     [SerializeField] private Vector3 halfExtends;
     [SerializeField] private GameObject blockingColliders;
@@ -46,11 +51,26 @@ public class CompanySell : MonoBehaviourPun, IInteractable
     public void OnInteract(UnitBase unit)
     {
         isSelling = true;
+        photonView.RPC(nameof(SellTaskRpc), RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void SellTaskRpc()
+    {
         SellTask().Forget();
     }
 
     private async UniTask SellTask()
     {
+        var colliders = Physics.OverlapBox(transform.position + offset, halfExtends);
+
+        List<ItemBase> items = new();
+        foreach(var col in colliders)
+        {
+            if(col.TryGetComponent<ItemBase>(out var comp))
+                items.Add(comp);
+        }
+
         blockingColliders.SetActive(true);
         await UniTask.WaitForSeconds(1f);
 
@@ -60,10 +80,13 @@ public class CompanySell : MonoBehaviourPun, IInteractable
         var rightDoorTargetPos = rightDoorDefaultPos;
         rightDoorTargetPos.z += 7.5f;
         
-        leftDoor.DOLocalMove(leftDoorTargetPos, 6f).SetEase(Ease.InQuad);
-        rightDoor.DOLocalMove(rightDoorTargetPos, 6f).SetEase(Ease.InQuad);
-        await UniTask.WaitForSeconds(8f);
-        
+        leftDoor.DOLocalMove(leftDoorTargetPos, 4f).SetEase(Ease.InQuad);
+        rightDoor.DOLocalMove(rightDoorTargetPos, 4f).SetEase(Ease.InQuad);
+        await UniTask.WaitForSeconds(6f);
+
+        if(items.Count > 0)
+            gameManager.Earn(items.Select(item => item.photonView.ViewID).ToList().ToJson());
+
         leftDoor.DOLocalMove(leftDoorDefaultPos, 2f).SetEase(Ease.Unset);
         rightDoor.DOLocalMove(rightDoorDefaultPos, 2f).SetEase(Ease.Unset);
 
