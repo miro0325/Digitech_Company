@@ -17,5 +17,15 @@ MonoBehaviour:
     aliases:
     - shovel
     - sh
+  - cmd: Railgun
+    aliases: []
+  - cmd: Drill
+    aliases:
+    - drill
+  - cmd: Flashlight
+    aliases:
+    - flashlight
+    - flash
+    - light
   explain: "<cmd> <args[0]>\uAC1C \uAD6C\uB9E4 \uB428"
   loadData: {fileID: 11400000, guid: be26cdf156ef6284abc158b46d88db43, type: 2}

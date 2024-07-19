@@ -118,14 +118,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     //inspector
     [SerializeField] private NavMeshSurface surface;
-    [SerializeField] private MeshRenderer[] rooms;
+    [SerializeField] private Material spaceSky;
     [SerializeField] private InGameFadeInUI fade;
 
     //field
     private float targetEarn;
     private float curEarn;
-    private float curUsableMoney = 300;
-    private int remainDay = 3;
+    private float curUsableMoney = 3000;
+    private int remainDay = 1;
     private float dateTime;
     private int inGamePlayerViewId;
     private bool gameEndSign;
@@ -147,6 +147,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
     public float CurEarn => curEarn;
     public float CurUsableMoney => curUsableMoney;
     public int RemainDay => remainDay;
+    public string Planet => planet;
 
     public event System.Action OnLoadComplete;
 
@@ -390,6 +391,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
                 {
                     if (curEarn < targetEarn)
                     {
+                        UserInput.input.Player.Interact.Disable();
                         FailureTask().Forget();
                         return;
                     }
@@ -505,13 +507,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Map] = true;
 
         //==================Item==================//
-        Debug.Log(rooms.Length);
-
         if (planet != "Company")
         {
             testSpawner.SpawnMonsters(1, inMap.MapBounds, inMap.WayPoints);
-            itemManager.SpawnItem(1, inMap.MapBounds);
+            itemManager.SpawnItem(3, inMap.MapBounds);
             testSpawner.SpawnWalls(inMap.WallPoints);
+        }
+        else
+        {
+            itemManager.SpawnItem(Vector3.up, "Laptop");
+            itemManager.SpawnItem(Vector3.up, "Mask");
+            itemManager.SpawnItem(Vector3.up, "DumbbelSmall");
+            itemManager.SpawnItem(Vector3.up, "KettleBell");
+            itemManager.SpawnItem(Vector3.up, "Protein");
+            itemManager.SpawnItem(Vector3.up, "DumbbelBar");
+            itemManager.BuildItemDataJson();
         }
         playerDatas[PhotonNetwork.LocalPlayer.ActorNumber].sync[(int)SyncTarget.Item] = true;
         photonView.RPC(nameof(SendGameDataLoadToClientRpc), RpcTarget.Others, (int)SyncTarget.Item, itemManager.ItemDataJson);
@@ -574,12 +584,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
             if (player.IsInMap)
             {
-                skyProcessor.SetFogValue(Color.black, 0.1f);
+                skyProcessor.SetFogValue(Color.black, 0.15f);
             }
             else
             {
-                var midnightTime = 10;
-                var endTime = 30;
+                var midnightTime = 200;
+                var endTime = 600;
                 if (dateTime < midnightTime)
                 {
                     var lerp = dateTime / midnightTime;
@@ -596,6 +606,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IService, IPunObservable
 
     private async UniTask FailureTask()
     {
+        RenderSettings.skybox = spaceSky;
+
         await UniTask.WaitForSeconds(3f);
         basement.RotateLight();
 

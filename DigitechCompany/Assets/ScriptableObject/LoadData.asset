@@ -177,7 +177,7 @@ MonoBehaviour:
       buyPrice: 0
       isTwoHand: 0
       type: 0
-      explain: X
+      explain: s
       isAvailable: 1
     - key: RiotGoods
       name: "\uB77C\uC774\uC5C7\uAD7F\uC988"
@@ -344,22 +344,22 @@ MonoBehaviour:
       isAvailable: 1
     - key: Drill
       name: "\uB4DC\uB9B4"
-      weight: 0
+      weight: 30
       sellPriceMin: 0
       sellPriceMax: 0
-      buyPrice: 0
+      buyPrice: 300
       isTwoHand: 1
       type: 1
       explain: "\uD2B9\uC815 \uBCBD\uC744 \uBD80\uC220 \uC218 \uC788\uC73C\uBA70,
         \uACF5\uACA9\uC744 \uAC00"
-      isAvailable: 0
+      isAvailable: 1
     - key: Flashlight
       name: "\uC190\uC804\uB4F1"
-      weight: 0
+      weight: 3
       sellPriceMin: 0
       sellPriceMax: 0
-      buyPrice: 0
+      buyPrice: 25
       isTwoHand: 0
       type: 1
       explain: "\uBC30\uD130\uB9AC\uB97C \uC0AC\uC6A9\uD574 \uBE5B\uC744 \uBE44\uCD98\uB2E4"
-      isAvailable: 0
+      isAvailable: 1

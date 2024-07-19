@@ -40,7 +40,8 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
     [SerializeField] float tireRotAngle;
     [SerializeField] Ease ease;
     [SerializeField] private Transform camParent;
-    [SerializeField] private Transform[] lights;
+    [SerializeField] private Transform[] redLights;
+    [SerializeField] private GameObject[] lights;
     [SerializeField] private GameObject flame;
 
     private bool isMoving = false;
@@ -73,9 +74,12 @@ public class Basement : MonoBehaviourPun, IService, IPunObservable
     private void RotateLightRpc()
     {
         foreach(var light in lights)
+            light.gameObject.SetActive(false);
+
+        foreach(var redLight in redLights)
         {
-            light.gameObject.SetActive(true);
-            light.DORotate(new Vector3(0, 360 * 10, 0), 10f);
+            redLight.gameObject.SetActive(true);
+            redLight.DORotate(new Vector3(0, 360 * 10, 0), 10f, RotateMode.WorldAxisAdd);
         }
     }
 
